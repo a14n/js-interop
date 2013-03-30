@@ -11,6 +11,7 @@ class TypedProxy {
   final constructors = <Constructor>[];
   final getters = <Getter>[];
   final setters = <Setter>[];
+  final methods = <Method>[];
 
   TypedProxy(this.name);
 
@@ -27,6 +28,9 @@ class TypedProxy {
   }
   void addSetter(dynamic type, String name) {
     setters.add(new Setter(type, name));
+  }
+  void addMethod(dynamic returnType, String name, [List<Parameter> params]) {
+    methods.add(new Method(returnType, name, params));
   }
 
   String generateAsString() {
@@ -48,6 +52,10 @@ class TypedProxy {
     if (!setters.isEmpty) {
       r.writeln();
       setters.forEach((s) => r.writeln("  " + s.generateAsString()));
+    }
+    if (!methods.isEmpty) {
+      r.writeln();
+      methods.forEach((m) => r.writeln("  " + m.generateAsString()));
     }
     r.writeln("}");
     return r.toString();
@@ -113,13 +121,48 @@ class Constructor {
   }
 }
 
+class Method {
+  final dynamic returnType;
+  final String name;
+  final List<Parameter> parameters;
+
+  Method(this.returnType, this.name, this.parameters);
+
+  String generateAsString() {
+    final r = new StringBuffer();
+    if (returnType != null) {
+      r.write(returnType is SerializableType ? returnType.type : returnType);
+    } else {
+      r.write("void");
+    }
+    r.write(" $name(");
+    if (parameters != null) {
+      r.write(parameters.map((p) => "${p.type} ${p.name}").join(", "));
+    }
+    r.write(") ");
+    if (returnType != null) {
+      r.write("=> ");
+    } else {
+      r.write("{ return ");
+    }
+    final jsCall = "\$unsafe.$name(" + (parameters == null ? "" : parameters.map((p) => p.toJs()).join(", ")) + ")";
+    r.write(returnType is SerializableType ? returnType.fromJs(jsCall) : jsCall);
+    r.write(";");
+    if (returnType == null) {
+      r.write(" }");
+    }
+    return r.toString();
+  }
+}
+
 class Parameter {
-  final dynamic type;
+  final dynamic _type;
   final String name;
 
-  Parameter(this.type, this.name);
+  Parameter(this._type, this.name);
 
-  String toJs() => "$name";
+  String get type => _type is SerializableType ? _type.type : "$_type";
+  String toJs() => _type is SerializableType ? _type.toJs(name) : "$name";
 }
 
 abstract class SerializableType {

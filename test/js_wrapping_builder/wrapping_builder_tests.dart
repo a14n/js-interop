@@ -24,6 +24,13 @@ main() {
       expect(content, equals(_buildTemplate(constructors:r"""
   Person(String firstname, int age) : super(js.context.Person, [firstname, age]);""")));
     });
+    test('simple', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addConstructor(params : [new jsb.Parameter(new jsb.TypedProxyType(person.name), "father"), new jsb.Parameter(new jsb.ListProxyType(String), "hobbies")]);
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(constructors:r"""
+  Person(Person father, List<String> hobbies) : super(js.context.Person, [father, hobbies is js.Serializable<js.Proxy> ? hobbies : js.array(hobbies)]);""")));
+    });
   });
 
   group('getters', () {
@@ -94,13 +101,34 @@ main() {
     });
   });
 
-  test('properties', () {
-    final person = new jsb.TypedProxy("Person");
-    person.addProperty(String, "firstname");
-    final content = person.generateAsString();
-    expect(content, equals(_buildTemplate(getters:r"""
-  String get firstname => $unsafe.firstname;""", setters:r"""
-  set firstname(String firstname) => $unsafe.firstname = firstname;""")));
+  group('methods', () {
+    test('simple types', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addMethod(String, "getName");
+      person.addMethod(int, "computeAge");
+      person.addMethod(bool, "like", [new jsb.Parameter(String, "name")]);
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(getters:r"""
+  String getName() => $unsafe.getName();
+  int computeAge() => $unsafe.computeAge();
+  bool like(String name) => $unsafe.like(name);""")));
+    });
+
+    test('returning a TypeProxy', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addMethod(new jsb.TypedProxyType(person.name), "getFather");
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(setters:r"""
+  Person getFather() => Person.cast($unsafe.getFather());""")));
+    });
+
+    test('taking a TypeProxy', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addMethod(null, "setChildren", [new jsb.Parameter(new jsb.ListProxyType(new jsb.TypedProxyType(person.name)), "children")]);
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(setters:r"""
+  void setChildren(List<Person> children) { return $unsafe.setChildren(children is js.Serializable<js.Proxy> ? children : js.array(children)); }""")));
+    });
   });
 }
 
