@@ -61,8 +61,8 @@ class Getter {
   Getter(this.type, this.name);
 
   String generateAsString() {
-    if (type is TypedProxy) {
-      return "${type.name} get $name => ${type.name}.cast(\$unsafe.$name);";
+    if (type is SerializableType) {
+      return "${type.type} get $name => ${type.fromJs('\$unsafe.$name')};";
     } else {
       return "$type get $name => \$unsafe.$name;";
     }
@@ -76,11 +76,11 @@ class Setter {
   Setter(this.type, this.name);
 
   String generateAsString() {
-    var type = this.type;
-    if (type is TypedProxy) {
-      type = type.name;
+    if (type is SerializableType) {
+      return "set $name(${type.type} $name) => \$unsafe.$name = ${type.toJs(name)};";
+    } else {
+      return "set $name($type $name) => \$unsafe.$name = $name;";
     }
-    return "set $name($type $name) => \$unsafe.$name = $name;";
   }
 }
 
@@ -105,7 +105,7 @@ class Constructor {
     r.write(" : super(js.context.${typedProxy.name}");
     if (parameters != null) {
       r.write(", [");
-      r.write(parameters.map((p) => p.name).join(", "));
+      r.write(parameters.map((p) => p.toJs()).join(", "));
       r.write("]");
     }
     r.write(");");
@@ -118,4 +118,35 @@ class Parameter {
   final String name;
 
   Parameter(this.type, this.name);
+
+  String toJs() => "$name";
+}
+
+abstract class SerializableType {
+  String get type;
+  String toJs([String base]);
+  String fromJs(String base);
+  String forCast();
+}
+
+class TypedProxyType implements SerializableType {
+  final String name;
+
+  TypedProxyType(this.name);
+
+  String get type => name;
+  String toJs([String base = ""]) => base;
+  String fromJs(String base) => "$name.cast($base)";
+  String forCast() => "$name.cast";
+}
+
+class ListProxyType implements SerializableType {
+  final dynamic ofType;
+
+  ListProxyType(this.ofType);
+
+  String get type => "List<${ofType is SerializableType ? ofType.type : ofType}>";
+  String toJs([String base = ""]) => "$base is js.Serializable<js.Proxy> ? $base : js.array($base)";
+  String fromJs(String base) => "jsw.JsArrayToListAdapter.castListOfSerializables($base, ${ofType.forCast()})";
+  String forCast() => ofType is SerializableType ? "(e) => jsw.JsArrayToListAdapter.castListOfSerializables(e, ${ofType.forCast()})" : "jsw.JsArrayToListAdapter.cast";
 }

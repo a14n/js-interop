@@ -41,10 +41,26 @@ main() {
 
     test('returning a TypedProxy', () {
       final person = new jsb.TypedProxy("Person");
-      person.addGetter(person, "father");
+      person.addGetter(new jsb.TypedProxyType(person.name), "father");
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(getters:r"""
   Person get father => Person.cast($unsafe.father);""")));
+    });
+
+    test('returning a List', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addGetter(new jsb.ListProxyType(new jsb.TypedProxyType(person.name)), "children");
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(setters:r"""
+  List<Person> get children => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.children, Person.cast);""")));
+    });
+
+    test('returning a List of List of String', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addGetter(new jsb.ListProxyType(new jsb.ListProxyType(new jsb.ListProxyType(String))), "foo");
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(setters:r"""
+  List<List<List<String>>> get foo => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.foo, (e) => jsw.JsArrayToListAdapter.castListOfSerializables(e, jsw.JsArrayToListAdapter.cast));""")));
     });
   });
 
@@ -63,10 +79,18 @@ main() {
 
     test('taking a TypeProxy', () {
       final person = new jsb.TypedProxy("Person");
-      person.addSetter(person, "father");
+      person.addSetter(new jsb.TypedProxyType(person.name), "father");
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(setters:r"""
   set father(Person father) => $unsafe.father = father;""")));
+    });
+
+    test('taking a List', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addSetter(new jsb.ListProxyType(new jsb.TypedProxyType(person.name)), "children");
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(setters:r"""
+  set children(List<Person> children) => $unsafe.children = children is js.Serializable<js.Proxy> ? children : js.array(children);""")));
     });
   });
 
