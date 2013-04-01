@@ -9,6 +9,20 @@ main() {
     final content = person.generateAsString();
     expect(content, equals(_buildTemplate()));
   });
+  test('extends', () {
+    final person = new jsb.TypedProxy("Person", extendsFrom: "Human");
+    final content = person.generateAsString();
+    expect(content, equals(r"""
+import 'package:js/js.dart' as js;
+import 'package:js/js_wrapping.dart' as jsw;
+
+class Person extends Human {
+  static Person cast(js.Proxy proxy) => proxy == null ? null : new Person.fromProxy(proxy);
+
+  Person.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+}
+"""));
+  });
   test('libConfig', () {
     final libConfig = new jsb.LibConfig(partOf:"test", fileHeader:"// hello");
     final person = new jsb.TypedProxy("Person");

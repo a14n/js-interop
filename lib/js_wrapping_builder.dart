@@ -14,13 +14,14 @@ class LibConfig {
 
 class TypedProxy {
   final String name;
+  final String extendsFrom;
   final constructors = <Constructor>[];
   final getters = <Getter>[];
   final setters = <Setter>[];
   final methods = <Method>[];
   final customs = <String>[];
 
-  TypedProxy(this.name);
+  TypedProxy(this.name, {this.extendsFrom});
 
   void addConstructor({String name, String functionName, List<Parameter> params}) {
     constructors.add(new Constructor(this, name, functionName, params));
@@ -55,7 +56,13 @@ class TypedProxy {
       r.writeln("import 'package:js/js_wrapping.dart' as jsw;");
     }
     r.writeln();
-    r.writeln("class $name extends jsw.TypedProxy {");
+    r.write("class $name extends ");
+    if (extendsFrom != null) {
+      r.write(extendsFrom);
+    } else {
+      r.write("jsw.TypedProxy");
+    }
+    r.writeln(" {");
     r.writeln("  static $name cast(js.Proxy proxy) => proxy == null ? null : new $name.fromProxy(proxy);");
     r.writeln();
     if (!constructors.isEmpty) {
