@@ -123,7 +123,7 @@ class Person extends jsw.TypedProxy {
       person.addMethod(int, "computeAge");
       person.addMethod(bool, "like", [new jsb.Parameter(String, "name")]);
       final content = person.generateAsString();
-      expect(content, equals(_buildTemplate(getters:r"""
+      expect(content, equals(_buildTemplate(methods:r"""
   String getName() => $unsafe.getName();
   int computeAge() => $unsafe.computeAge();
   bool like(String name) => $unsafe.like(name);""")));
@@ -133,7 +133,7 @@ class Person extends jsw.TypedProxy {
       final person = new jsb.TypedProxy("Person");
       person.addMethod(new jsb.TypedProxyType(person.name), "getFather");
       final content = person.generateAsString();
-      expect(content, equals(_buildTemplate(setters:r"""
+      expect(content, equals(_buildTemplate(methods:r"""
   Person getFather() => Person.cast($unsafe.getFather());""")));
     });
 
@@ -141,13 +141,20 @@ class Person extends jsw.TypedProxy {
       final person = new jsb.TypedProxy("Person");
       person.addMethod(null, "setChildren", [new jsb.Parameter(new jsb.ListProxyType(new jsb.TypedProxyType(person.name)), "children")]);
       final content = person.generateAsString();
-      expect(content, equals(_buildTemplate(setters:r"""
+      expect(content, equals(_buildTemplate(methods:r"""
   void setChildren(List<Person> children) { return $unsafe.setChildren(children is js.Serializable<js.Proxy> ? children : js.array(children)); }""")));
     });
   });
+  test('cutom', () {
+    final person = new jsb.TypedProxy("Person");
+    person.addCustom("// custom part where I can define what I want");
+    final content = person.generateAsString();
+    expect(content, equals(_buildTemplate(custom:r"""
+// custom part where I can define what I want""")));
+  });
 }
 
-_buildTemplate({String constructors, String getters, String setters}) {
+_buildTemplate({String constructors, String getters, String setters, String methods, String custom}) {
   final r = new StringBuffer();
   r.writeln(r"""
 import 'package:js/js.dart' as js;
@@ -167,6 +174,14 @@ class Person extends jsw.TypedProxy {
   if (setters != null) {
     r.writeln();
     r.writeln(setters);
+  }
+  if (methods != null) {
+    r.writeln();
+    r.writeln(methods);
+  }
+  if (custom != null) {
+    r.writeln();
+    r.writeln(custom);
   }
   r.writeln("}");
   return r.toString();

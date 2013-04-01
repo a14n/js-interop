@@ -18,6 +18,7 @@ class TypedProxy {
   final getters = <Getter>[];
   final setters = <Setter>[];
   final methods = <Method>[];
+  final customs = <String>[];
 
   TypedProxy(this.name);
 
@@ -37,6 +38,9 @@ class TypedProxy {
   }
   void addMethod(dynamic returnType, String name, [List<Parameter> params]) {
     methods.add(new Method(returnType, name, params));
+  }
+  void addCustom(String content){
+    customs.add(content);
   }
 
   String generateAsString([LibConfig libConfig]) {
@@ -69,6 +73,10 @@ class TypedProxy {
     if (!methods.isEmpty) {
       r.writeln();
       methods.forEach((m) => r.writeln("  " + m.generateAsString()));
+    }
+    if (!customs.isEmpty) {
+      r.writeln();
+      customs.forEach((content) => r.writeln(content));
     }
     r.writeln("}");
     return r.toString();
