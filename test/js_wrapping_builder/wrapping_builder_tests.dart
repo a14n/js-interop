@@ -9,6 +9,21 @@ main() {
     final content = person.generateAsString();
     expect(content, equals(_buildTemplate()));
   });
+  test('libConfig', () {
+    final libConfig = new jsb.LibConfig(partOf:"test", fileHeader:"// hello");
+    final person = new jsb.TypedProxy("Person");
+    final content = person.generateAsString(libConfig);
+    expect(content, equals(r"""
+// hello
+part of test;
+
+class Person extends jsw.TypedProxy {
+  static Person cast(js.Proxy proxy) => proxy == null ? null : new Person.fromProxy(proxy);
+
+  Person.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+}
+"""));
+  });
   group('constructors', () {
     test('empty', () {
       final person = new jsb.TypedProxy("Person");

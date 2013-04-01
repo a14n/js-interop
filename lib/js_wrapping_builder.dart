@@ -6,6 +6,12 @@ library js.wrapping;
 
 import 'package:meta/meta.dart';
 
+class LibConfig {
+  final String partOf;
+  final String fileHeader;
+  LibConfig({this.partOf, this.fileHeader});
+}
+
 class TypedProxy {
   final String name;
   final constructors = <Constructor>[];
@@ -33,10 +39,17 @@ class TypedProxy {
     methods.add(new Method(returnType, name, params));
   }
 
-  String generateAsString() {
+  String generateAsString([LibConfig libConfig]) {
     final r = new StringBuffer();
-    r.writeln("import 'package:js/js.dart' as js;");
-    r.writeln("import 'package:js/js_wrapping.dart' as jsw;");
+    if (libConfig != null && libConfig.fileHeader != null) {
+      r.writeln(libConfig.fileHeader);
+    }
+    if (libConfig != null && libConfig.partOf != null) {
+      r.writeln("part of ${libConfig.partOf};");
+    } else {
+      r.writeln("import 'package:js/js.dart' as js;");
+      r.writeln("import 'package:js/js_wrapping.dart' as jsw;");
+    }
     r.writeln();
     r.writeln("class $name extends jsw.TypedProxy {");
     r.writeln("  static $name cast(js.Proxy proxy) => proxy == null ? null : new $name.fromProxy(proxy);");
