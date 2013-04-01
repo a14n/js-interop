@@ -176,7 +176,7 @@ class Method {
     if (returnType != null) {
       r.write("=> ");
     } else {
-      r.write("{ return ");
+      r.write("{ ");
     }
     final jsCall = "\$unsafe.$name(" + (parameters == null ? "" : parameters.map((p) => p.toJs()).join(", ")) + ")";
     r.write(returnType is SerializableType ? returnType.fromJs(jsCall) : jsCall);

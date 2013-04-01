@@ -163,10 +163,10 @@ class Person extends jsw.TypedProxy {
       person.addMethod(null, "setChildren", [new jsb.Parameter(new jsb.ListProxyType(new jsb.TypedProxyType(person.name)), "children")]);
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(methods:r"""
-  void setChildren(List<Person> children) { return $unsafe.setChildren(children is js.Serializable<js.Proxy> ? children : js.array(children)); }""")));
+  void setChildren(List<Person> children) { $unsafe.setChildren(children is js.Serializable<js.Proxy> ? children : js.array(children)); }""")));
     });
   });
-  test('cutom', () {
+  test('custom', () {
     final person = new jsb.TypedProxy("Person");
     person.addCustom("// custom part where I can define what I want");
     final content = person.generateAsString();
