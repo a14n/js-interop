@@ -22,8 +22,8 @@ class TypedProxy {
 
   TypedProxy(this.name);
 
-  void addConstructor({String name, List<Parameter> params}) {
-    constructors.add(new Constructor(this, name, params));
+  void addConstructor({String name, String functionName, List<Parameter> params}) {
+    constructors.add(new Constructor(this, name, functionName, params));
   }
 
   void addProperty(dynamic type, String name) {
@@ -116,9 +116,10 @@ class Setter {
 class Constructor {
   final TypedProxy typedProxy;
   final String name;
+  final String functionName;
   final List<Parameter> parameters;
 
-  Constructor(this.typedProxy, this.name, this.parameters);
+  Constructor(this.typedProxy, this.name, this.functionName, this.parameters);
 
   String generateAsString() {
     final r = new StringBuffer();
@@ -131,7 +132,11 @@ class Constructor {
       r.write(parameters.map((p) => "${p.type} ${p.name}").join(", "));
     }
     r.write(")");
-    r.write(" : super(js.context.${typedProxy.name}");
+    if (functionName != null) {
+      r.write(" : super(${functionName}");
+    } else {
+      r.write(" : super(js.context.${typedProxy.name}");
+    }
     if (parameters != null) {
       r.write(", [");
       r.write(parameters.map((p) => p.toJs()).join(", "));

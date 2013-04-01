@@ -32,6 +32,13 @@ class Person extends jsw.TypedProxy {
       expect(content, equals(_buildTemplate(constructors:r"""
   Person() : super(js.context.Person);""")));
     });
+    test('custom function name', () {
+      final person = new jsb.TypedProxy("Person");
+      person.addConstructor(functionName:"namespace.Person");
+      final content = person.generateAsString();
+      expect(content, equals(_buildTemplate(constructors:r"""
+  Person() : super(namespace.Person);""")));
+    });
     test('simple', () {
       final person = new jsb.TypedProxy("Person");
       person.addConstructor(params : [new jsb.Parameter(String, "firstname"), new jsb.Parameter(int, "age")]);
@@ -39,7 +46,7 @@ class Person extends jsw.TypedProxy {
       expect(content, equals(_buildTemplate(constructors:r"""
   Person(String firstname, int age) : super(js.context.Person, [firstname, age]);""")));
     });
-    test('simple', () {
+    test('typed', () {
       final person = new jsb.TypedProxy("Person");
       person.addConstructor(params : [new jsb.Parameter(new jsb.TypedProxyType(person.name), "father"), new jsb.Parameter(new jsb.ListProxyType(String), "hobbies")]);
       final content = person.generateAsString();
