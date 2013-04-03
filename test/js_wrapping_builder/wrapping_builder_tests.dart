@@ -44,28 +44,28 @@ class Person extends jsw.TypedProxy {
       person.addConstructor();
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(constructors:r"""
-  Person() : super(js.context.Person);""")));
+  Person() : this.fromProxy(new js.Proxy.withArgList(js.context.Person));""")));
     });
     test('custom function name', () {
       final person = new jsb.TypedProxy("Person");
       person.addConstructor(functionName:"namespace.Person");
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(constructors:r"""
-  Person() : super(namespace.Person);""")));
+  Person() : this.fromProxy(new js.Proxy.withArgList(namespace.Person));""")));
     });
     test('simple', () {
       final person = new jsb.TypedProxy("Person");
       person.addConstructor(params : [new jsb.Parameter(String, "firstname"), new jsb.Parameter(int, "age")]);
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(constructors:r"""
-  Person(String firstname, int age) : super(js.context.Person, [firstname, age]);""")));
+  Person(String firstname, int age) : this.fromProxy(new js.Proxy.withArgList(js.context.Person, [firstname, age]));""")));
     });
     test('typed', () {
       final person = new jsb.TypedProxy("Person");
       person.addConstructor(params : [new jsb.Parameter(new jsb.TypedProxyType(person.name), "father"), new jsb.Parameter(new jsb.ListProxyType(String), "hobbies")]);
       final content = person.generateAsString();
       expect(content, equals(_buildTemplate(constructors:r"""
-  Person(Person father, List<String> hobbies) : super(js.context.Person, [father, hobbies is js.Serializable<js.Proxy> ? hobbies : js.array(hobbies)]);""")));
+  Person(Person father, List<String> hobbies) : this.fromProxy(new js.Proxy.withArgList(js.context.Person, [father, hobbies is js.Serializable<js.Proxy> ? hobbies : js.array(hobbies)]));""")));
     });
   });
 

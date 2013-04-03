@@ -138,18 +138,18 @@ class Constructor {
     if (parameters != null) {
       r.write(parameters.map((p) => "${p.type} ${p.name}").join(", "));
     }
-    r.write(")");
+    r.write(") : this.fromProxy(new js.Proxy.withArgList(");
     if (functionName != null) {
-      r.write(" : super(${functionName}");
+      r.write(functionName);
     } else {
-      r.write(" : super(js.context.${typedProxy.name}");
+      r.write("js.context.${typedProxy.name}");
     }
     if (parameters != null) {
       r.write(", [");
       r.write(parameters.map((p) => p.toJs()).join(", "));
       r.write("]");
     }
-    r.write(");");
+    r.write("));");
     return r.toString();
   }
 }
