@@ -178,7 +178,7 @@ class Method {
     } else {
       r.write("{ ");
     }
-    final jsCall = "\$unsafe.$name(" + (parameters == null ? "" : parameters.map((p) => p.toJs()).join(", ")) + ")";
+    final jsCall = "\$unsafe${name == 'toString' ? '["toString"]' : '.$name'}(" + (parameters == null ? "" : parameters.map((p) => p.toJs()).join(", ")) + ")";
     r.write(returnType is SerializableType ? returnType.fromJs(jsCall) : jsCall);
     r.write(";");
     if (returnType == null) {
@@ -223,6 +223,6 @@ class ListProxyType implements SerializableType {
 
   String get type => "List<${ofType is SerializableType ? ofType.type : ofType}>";
   String toJs([String base = ""]) => "$base is js.Serializable<js.Proxy> ? $base : js.array($base)";
-  String fromJs(String base) => "jsw.JsArrayToListAdapter.castListOfSerializables($base, ${ofType.forCast()})";
-  String forCast() => ofType is SerializableType ? "(e) => jsw.JsArrayToListAdapter.castListOfSerializables(e, ${ofType.forCast()})" : "jsw.JsArrayToListAdapter.cast";
+  String fromJs(String base) => ofType is SerializableType ? "jsw.JsArrayToListAdapter.castListOfSerializables($base, ${ofType.forCast()})" : "jsw.JsArrayToListAdapter.cast($base)";
+  String forCast() => ofType is SerializableType ? "(e) => jsw.JsArrayToListAdapter.castListOfSerializables(e, ${ofType.forCast()})" : "(e) => jsw.JsArrayToListAdapter.cast(e)";
 }
