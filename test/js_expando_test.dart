@@ -25,6 +25,8 @@ main() {
       expect(expando[window], null);
       expando[window] = 'bar';
       expect(expando[window], 'bar');
+      expando[window] = 'foo';
+      expect(expando[window], 'foo');
       // reset global state
       expando[window] = null;
     });
