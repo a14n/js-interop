@@ -5,18 +5,9 @@
 library js.proxy_creator;
 
 String createProxySkeleton(String name) {
-  final className = name.substring(name.lastIndexOf('.') + 1);
-  final implClassName = className + 'Impl';
+  final className = '_' + name.substring(name.lastIndexOf('.') + 1);
   return '''
-abstract class $className extends JsInterface {
-  factory $className() => new $implClassName();
-  $className.created(JsObject o) : super.created(o);
-}
-
 @JsProxy(constructor: '$name')
-class $implClassName extends $className {
-  factory $implClassName() => new JsInterface($implClassName, []);
-  $implClassName.created(JsObject o) : super.created(o);
-  noSuchMethod(i) => super.noSuchMethod(i);
+abstract class $className {
 }''';
 }

@@ -8,9 +8,11 @@
  */
 library js;
 
-// js.dart is just an alias for mirrors.dart at runtime. The transformer
-// replaces this import of js.dart with src/static.dart.
-export 'package:js/src/mirrors.dart';
+export 'dart:js' show JsObject, context;
+
+export 'package:js/src/js_impl.dart' show JsInterface, JsGlobal, toJs, toDart,
+    registerJsConstructorForType, registerFactoryForJsConstructor;
 export 'package:js/src/js_expando.dart' show JsExpando;
 export 'package:js/src/js_list.dart' show JsList;
 export 'package:js/src/js_map.dart' show JsMap;
+export 'package:js/src/metadata.dart';

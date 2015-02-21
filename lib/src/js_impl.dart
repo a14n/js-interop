@@ -23,7 +23,8 @@ abstract class JsInterface {
 
   final JsObject _jsObject;
 
-  factory JsInterface(Type type, [Iterable args]) {
+  @deprecated
+  JsInterface() : _jsObject = null {
     throw new StateError('JsInterface should never be called');
   }
 

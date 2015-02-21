@@ -9,11 +9,12 @@ import 'dart:js' as js;
 
 // these imports instead of js.dart so the transformer doesn't kick in and
 // remove mirrors
-import 'package:js/src/js_expando.dart';
-import 'package:js/src/mirrors.dart';
+import 'package:js/js.dart';
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';
+
+part 'js_expando_test.g.dart';
 
 main() {
   useHtmlEnhancedConfiguration();
@@ -42,13 +43,7 @@ main() {
   });
 }
 
-abstract class Foo extends JsInterface {
-  Foo.created(JsObject o) : super.created(o);
-  factory Foo() => new FooImpl();
-}
-
-@JsProxy(constructor: 'Foo')
-class FooImpl extends Foo {
-  FooImpl.created(JsObject o) : super.created(o);
-  factory FooImpl() => new JsInterface(FooImpl, []);
+@JsProxy()
+abstract class _Foo {
+  _Foo();
 }
