@@ -10,6 +10,7 @@ import 'package:analyzer/src/generated/scanner.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../src/metadata.dart';
+import 'util.dart';
 
 class JsProxyGenerator extends GeneratorForAnnotation<JsProxy> {
   const JsProxyGenerator();
@@ -90,14 +91,13 @@ class JsProxyClassGenerator {
         .where((c) => c.node.initializers.isEmpty)
         .forEach((c) {
       var newJsObject = "new JsObject(context['$jsConstructor']";
-      if (c.parameters.isNotEmpty){
+      if (c.parameters.isNotEmpty) {
         final parameterList = c.parameters.map((p) => p.displayName).join(', ');
         newJsObject += ", [$parameterList].map(toJs).toList()";
       }
       newJsObject += ")";
       transformations.add(new SourceTransformation.insertion(
-          c.node.parameters.end,
-          " : this.created($newJsObject)"));
+          c.node.parameters.end, " : this.created($newJsObject)"));
     });
 
     // generate properties
@@ -162,27 +162,6 @@ class JsProxyClassGenerator {
     return SourceTransformation.applyAll(code, transformations,
         initialPadding: -clazz.node.offset);
   }
-}
-
-bool isAnnotationOfType(
-    ElementAnnotation annotation, ClassElement annotationClass) {
-  var metaElement = annotation.element;
-  var exp;
-  var type;
-  if (metaElement is PropertyAccessorElement) {
-    exp = metaElement.variable;
-    type = exp.evaluationResult.value.type;
-  } else if (metaElement is ConstructorElement) {
-    exp = metaElement;
-    type = metaElement.enclosingElement.type;
-  } else {
-    throw new UnimplementedError('Unsupported annotation: ${annotation}');
-  }
-  if (exp == annotationClass) return true;
-  if (type.isSubtypeOf(annotationClass.type)) {
-    return true;
-  }
-  return false;
 }
 
 SourceTransformation removeNode(AstNode node) =>

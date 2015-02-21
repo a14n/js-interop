@@ -2,6 +2,7 @@ library js.example.js_proxy;
 
 import 'package:js/js.dart';
 
+part 'p.dart';
 part 'example.g.dart';
 
 @JsProxy()
@@ -25,7 +26,7 @@ abstract class _JsFoo {
   int m5(int a, b);
 }
 
-@JsProxy()
+@JsProxy(constructor: 'a.b.JsBar')
 abstract class _JsBar {
   JsBar m1();
 }

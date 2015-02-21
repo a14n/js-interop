@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-02-21T13:41:02.284Z
+// 2015-02-21T15:01:54.988Z
 
 part of js.example.js_proxy;
 
@@ -43,6 +43,20 @@ class JsFoo extends JsInterface {
 }
 
 // **************************************************************************
+// Generator: Instance of 'InitializeJavascriptGenerator'
+// Target: abstract class _JsFoo
+// **************************************************************************
+
+void initializeJavaScript() {
+  registerFactoryForJsConstructor(
+      getPath('JsFoo'), (o) => new JsFoo.created(o));
+  registerFactoryForJsConstructor(
+      getPath('a.b.JsBar'), (o) => new JsBar.created(o));
+  registerFactoryForJsConstructor(
+      getPath('JsBaz'), (o) => new JsBaz.created(o));
+}
+
+// **************************************************************************
 // Generator: Instance of 'JsProxyGenerator'
 // Target: abstract class _JsBar
 // **************************************************************************
@@ -50,4 +64,14 @@ class JsFoo extends JsInterface {
 class JsBar extends JsInterface {
   JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
   JsBar.created(JsObject o) : super.created(o);
+}
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: abstract class _JsBaz
+// **************************************************************************
+
+class JsBaz extends JsInterface {
+  JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
+  JsBaz.created(JsObject o) : super.created(o);
 }
