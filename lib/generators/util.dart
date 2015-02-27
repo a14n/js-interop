@@ -3,9 +3,14 @@ library js.util;
 import 'package:analyzer/analyzer.dart';
 import 'package:analyzer/src/generated/ast.dart';
 import 'package:analyzer/src/generated/element.dart';
-import 'package:analyzer/src/generated/scanner.dart';
 
 import '../src/metadata.dart';
+
+LibraryElement getLib(Element element, String name) =>
+    element.library.visibleLibraries.firstWhere((l) => l.name == name);
+
+ClassElement getType(Element element, String libraryName, String className) =>
+    getLib(element, libraryName).getType(className);
 
 bool isAnnotationOfType(
     ElementAnnotation annotation, ClassElement annotationClass) {
@@ -34,17 +39,30 @@ JsProxy getProxyAnnotation(ClassElement interface, ClassElement jsProxyClass) {
       String constructor;
       for (Expression e in a.arguments.arguments) {
         if (e is NamedExpression) {
-          if (e.name.label.name == 'global' && e.expression is BooleanLiteral) {
-            BooleanLiteral b = e.expression;
-            global = b.value;
-          } else if (e.name.label.name == 'constructor' &&
+          if (e.name.label.name == 'constructor' &&
               e.expression is StringLiteral) {
             StringLiteral s = e.expression;
             constructor = s.stringValue;
           }
         }
       }
-      return new JsProxy(global: global, constructor: constructor);
+      return new JsProxy(constructor: constructor);
+    }
+  }
+  return null;
+}
+
+Namespace getNamespaceAnnotation(
+    AnnotatedNode node, ClassElement namespaceClass) {
+  for (Annotation a in node.metadata) {
+    var e = a.element;
+    if (e is ConstructorElement && e.type.returnType == namespaceClass.type) {
+      if (a.arguments.arguments.length == 1) {
+        var param = a.arguments.arguments.first;
+        if (param is StringLiteral) {
+          return new Namespace(param.stringValue);
+        }
+      }
     }
   }
   return null;

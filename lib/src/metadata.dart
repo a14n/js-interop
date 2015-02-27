@@ -35,8 +35,12 @@ class NoExport {
  */
 class JsProxy {
   final String constructor;
-  final bool global;
-  const JsProxy({this.constructor, this.global: false});
+  const JsProxy({this.constructor});
+}
+
+class Namespace {
+  final String namespace;
+  const Namespace(this.namespace);
 }
 
 class Jsify {

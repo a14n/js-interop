@@ -1,3 +1,4 @@
+@Namespace('z.y.x')
 library js.example.js_proxy;
 
 import 'package:js/js.dart';
@@ -6,7 +7,8 @@ part 'p.dart';
 part 'example.g.dart';
 
 @JsProxy()
-abstract class _JsFoo {
+abstract class _JsFoo  {
+  /// test
   _JsFoo();
 
   int i, k;
@@ -30,3 +32,15 @@ abstract class _JsFoo {
 abstract class _JsBar {
   JsBar m1();
 }
+
+@JsProxy()
+int _find(String a) => null;
+
+@JsProxy()
+String _a;
+
+@JsProxy()
+String get _b => null;
+
+@JsProxy()
+set _b(String b1) => null;

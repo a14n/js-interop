@@ -29,24 +29,13 @@ abstract class JsInterface {
   }
 
   JsInterface.created(JsObject o) : _jsObject = o {
-    // since multiple Dart objects of different classes may represent
-    // the global name space, we don't store a reference
-    if (!isGlobal(this)) {
-      if (o[DART_OBJECT_PROPERTY] != null) {
-        throw new ArgumentError('JsObject is already wrapped');
-      }
-      o[DART_OBJECT_PROPERTY] = this;
+    if (o[DART_OBJECT_PROPERTY] != null) {
+      throw new ArgumentError('JsObject is already wrapped');
     }
+    o[DART_OBJECT_PROPERTY] = this;
   }
 
 }
-
-/**
- * Marker interface for global objects.
- */
-abstract class JsGlobal {}
-
-bool isGlobal(JsInterface o) => o is JsGlobal;
 
 /**
  * Converts a Dart object to a [JsObject] (or supported primitive) for sending
@@ -71,6 +60,8 @@ dynamic toJs(dynamic o) {
 
   return o;
 }
+
+JsObject unwrap(JsInterface o) => o == null ? null : o._jsObject;
 
 // Exported Dart Object -> JsObject
 final Expando<JsObject> _exportedProxies = new Expando<JsObject>();

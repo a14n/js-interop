@@ -6,6 +6,7 @@ import 'package:analyzer/src/generated/element.dart';
 
 import 'package:source_gen/source_gen.dart';
 
+import 'js_proxy_generator.dart';
 import 'util.dart';
 
 final _libs = <LibraryElement>[];
@@ -25,6 +26,8 @@ class InitializeJavascriptGenerator extends Generator {
     if (jsMetadataLib == null) return null;
 
     var jsProxyClass = jsMetadataLib.getType('JsProxy');
+    var namespaceClass = jsMetadataLib.getType('Namespace');
+
     var proxies = libElement.units
         .expand((e) => e.types)
         .where((ClassElement e) =>
@@ -34,9 +37,10 @@ class InitializeJavascriptGenerator extends Generator {
 
     var ouput = 'void initializeJavaScript(){';
     for (ClassElement clazz in proxies) {
-      final name = clazz.displayName.substring(1);
-      final proxy = getProxyAnnotation(clazz, jsProxyClass);
-      final constructor = proxy.constructor != null ? proxy.constructor : name;
+      final name = JsProxyClassGenerator.getNewClassName(clazz);
+      final jsProxy = getProxyAnnotation(clazz, jsProxyClass);
+      final constructor = JsProxyClassGenerator.getJsProxyConstructor(
+          clazz, namespaceClass, jsProxy);
       ouput += "registerFactoryForJsConstructor(getPath('$constructor'),"
           " (o) => new $name.created(o));";
     }

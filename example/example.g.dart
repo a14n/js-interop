@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-02-21T15:01:54.988Z
+// 2015-02-27T21:03:34.873Z
 
 part of js.example.js_proxy;
 
@@ -9,14 +9,24 @@ part of js.example.js_proxy;
 // **************************************************************************
 
 class JsFoo extends JsInterface {
-  JsFoo() : this.created(new JsObject(context['JsFoo']));
+  JsFoo.created(JsObject o) : super.created(o);
+/// test
+  JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 
+  void set k(int _k) {
+    toJs(this)['_k'] = toJs(_k);
+  }
+  int get k => toDart(toJs(this)['k']) as int;
+  void set i(int _i) {
+    toJs(this)['_i'] = toJs(_i);
+  }
+  int get i => toDart(toJs(this)['i']) as int;
   int j = null;
   bool get l => toDart(toJs(this)['l']) as bool;
 
   String get a => toDart(toJs(this)['a']) as String;
   void set a(String a) {
-    toJs(this)['a'] = a;
+    toJs(this)['a'] = toJs(a);
   }
 
   String get b => '';
@@ -31,15 +41,6 @@ class JsFoo extends JsInterface {
       toDart(toJs(this).callMethod('m4', [a].map(toJs).toList())) as String;
   int m5(int a, b) =>
       toDart(toJs(this).callMethod('m5', [a, b].map(toJs).toList())) as int;
-  void set k(int k) {
-    toJs(this)['k'] = k;
-  }
-  int get k => toDart(toJs(this)['k']) as int;
-  void set i(int i) {
-    toJs(this)['i'] = i;
-  }
-  int get i => toDart(toJs(this)['i']) as int;
-  JsFoo.created(JsObject o) : super.created(o);
 }
 
 // **************************************************************************
@@ -49,11 +50,11 @@ class JsFoo extends JsInterface {
 
 void initializeJavaScript() {
   registerFactoryForJsConstructor(
-      getPath('JsFoo'), (o) => new JsFoo.created(o));
+      getPath('z.y.x.JsFoo'), (o) => new JsFoo.created(o));
   registerFactoryForJsConstructor(
-      getPath('a.b.JsBar'), (o) => new JsBar.created(o));
+      getPath('z.y.x.a.b.JsBar'), (o) => new JsBar.created(o));
   registerFactoryForJsConstructor(
-      getPath('JsBaz'), (o) => new JsBaz.created(o));
+      getPath('z.y.x.JsBaz'), (o) => new JsBaz.created(o));
 }
 
 // **************************************************************************
@@ -62,8 +63,33 @@ void initializeJavaScript() {
 // **************************************************************************
 
 class JsBar extends JsInterface {
-  JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
   JsBar.created(JsObject o) : super.created(o);
+
+  JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
+}
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: _find
+// **************************************************************************
+
+int find(String a) =>
+    toDart(context.callMethod('find', [a].map(toJs).toList())) as int;
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: _b
+// **************************************************************************
+
+String get b => toDart(context['b']) as String;
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: _b
+// **************************************************************************
+
+set b(String b1) {
+  context['b'] = toJs(b1);
 }
 
 // **************************************************************************
@@ -72,6 +98,7 @@ class JsBar extends JsInterface {
 // **************************************************************************
 
 class JsBaz extends JsInterface {
-  JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
   JsBaz.created(JsObject o) : super.created(o);
+
+  JsBar m1() => toDart(toJs(this).callMethod('m1')) as JsBar;
 }
