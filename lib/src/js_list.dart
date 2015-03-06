@@ -16,23 +16,23 @@ import 'package:js/js.dart';
  * [toJs] function when added, and converted to Dart with the [toDart] funtion
  * when accessed.
  */
-class JsList<E> extends ListBase<E> {
+class JsList<E> extends JsInterface with ListMixin<E> {
   JsArray _o;
 
   /**
    * Creates an instance backed by a new JavaScript Array.
    */
-  JsList() : _o = new JsArray();
+  JsList() : this.created(new JsArray());
 
   /**
    * Creates an instance by deep converting [list] to JavaScript with [jsify].
    */
-  JsList.jsify(List<E> list) : _o = jsify(list);
+  JsList.jsify(List<E> list) : this.created(jsify(list));
 
   /**
    * Creates an instance backed by the JavaScript object [o].
    */
-  JsList.fromJsObject(JsObject o) : _o = o;
+  JsList.created(JsArray o) : _o = o, super.created(o);
 
   @override
   int get length => _o.length;

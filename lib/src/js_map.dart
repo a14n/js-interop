@@ -19,7 +19,7 @@ import 'package:js/src/js_impl.dart';
  * Keys must be [String] because they are used as JavaScript property names. The
  * key '__proto__' is disallowed.
  */
-class JsMap<V> extends MapMixin<String, V> {
+class JsMap<V> extends JsInterface with MapMixin<String, V> {
   static final _obj = context['Object'];
 
   final JsObject _o;
@@ -28,17 +28,17 @@ class JsMap<V> extends MapMixin<String, V> {
    * Creates an instance backed by a new JavaScript object whose prototype is
    * Object.
    */
-  JsMap() : _o = new JsObject(_obj);
+  JsMap() : this.created(new JsObject(_obj));
 
   /**
    * Creates an instance by deep converting [map] to JavaScript with [jsify].
    */
-  JsMap.jsify(Map<String, dynamic> map) : _o = jsify(map);
+  JsMap.jsify(Map<String, dynamic> map) : this.created(jsify(map));
 
   /**
    * Creates an instance backed by the JavaScript object [o].
    */
-  JsMap.fromJsObject(JsObject o) : _o = o;
+  JsMap.created(JsObject o) : _o = o, super.created(o);
 
   void _checkKey(String key) {
     if (key == '__proto__') {

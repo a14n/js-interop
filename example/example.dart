@@ -8,10 +8,11 @@ part 'example.g.dart';
 
 @JsProxy()
 abstract class _JsFoo  {
-  /// test
   _JsFoo();
 
-  int i, k;
+  int i;
+
+  num k1, k2;
   int j = null;
   bool get l;
 
@@ -33,6 +34,7 @@ abstract class _JsBar {
   JsBar m1();
 }
 
+/// comment
 @JsProxy()
 int _find(String a) => null;
 

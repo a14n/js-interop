@@ -23,18 +23,13 @@ abstract class JsInterface {
 
   final JsObject _jsObject;
 
-  @deprecated
-  JsInterface() : _jsObject = null {
-    throw new StateError('JsInterface should never be called');
-  }
-
   JsInterface.created(JsObject o) : _jsObject = o {
     if (o[DART_OBJECT_PROPERTY] != null) {
       throw new ArgumentError('JsObject is already wrapped');
     }
-    o[DART_OBJECT_PROPERTY] = this;
+    _obj.callMethod('defineProperty', [o, DART_OBJECT_PROPERTY,
+         new JsObject(_obj)..['value'] = this]);
   }
-
 }
 
 /**
@@ -46,7 +41,7 @@ dynamic toJs(dynamic o) {
   if (o is num || o is String || o is bool || o is DateTime
       || o is JsObject) return o;
 
-  if (o is JsInterface) return  o._jsObject;
+  if (o is JsInterface) return unwrap(o);
   var type = o.runtimeType;
   var ctor = _exportedConstructors[type];
   if (ctor != null) {
@@ -61,7 +56,7 @@ dynamic toJs(dynamic o) {
   return o;
 }
 
-JsObject unwrap(JsInterface o) => o == null ? null : o._jsObject;
+JsObject unwrap(JsInterface o) => o._jsObject;
 
 // Exported Dart Object -> JsObject
 final Expando<JsObject> _exportedProxies = new Expando<JsObject>();
@@ -87,7 +82,7 @@ dynamic toDart(dynamic o, [Symbol fallbackType]) {
     var wrapper = o[DART_OBJECT_PROPERTY];
     if (wrapper == null) {
       if (o is JsArray) {
-        wrapper = new JsList.fromJsObject(o);
+        wrapper = new JsList.created(o);
       } else {
         // look up JsInterface factory
         var jsConstructor = o['constructor'] as JsFunction;
@@ -104,7 +99,7 @@ dynamic toDart(dynamic o, [Symbol fallbackType]) {
 
     // no wrapper, handle fallback cases
     if (fallbackType == #Map) {
-      return new JsMap.fromJsObject(o);
+      return new JsMap.created(o);
     }
   }
 
@@ -118,7 +113,7 @@ dynamic jsify(data) {
     throw new ArgumentError("object must be a Map or Iterable, was $data");
   }
 
-  if (data is JsObject || data is JsMap || data is JsList) return data;
+  if (data is JsObject) return data;
 
   var _convertedObjects = new HashMap.identity();
 
@@ -126,7 +121,10 @@ dynamic jsify(data) {
     if (_convertedObjects.containsKey(o)) {
       return _convertedObjects[o];
     }
-    if (o is Map) {
+
+    if (o is JsInterface) {
+      return unwrap(o);
+    } else if (o is Map) {
       final convertedMap = new JsObject(_obj);
       _convertedObjects[o] = convertedMap;
       for (var key in o.keys) {

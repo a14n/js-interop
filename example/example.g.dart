@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-02-27T21:03:34.873Z
+// 2015-03-04T20:52:08.638Z
 
 part of js.example.js_proxy;
 
@@ -10,17 +10,21 @@ part of js.example.js_proxy;
 
 class JsFoo extends JsInterface {
   JsFoo.created(JsObject o) : super.created(o);
-/// test
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 
-  void set k(int _k) {
-    toJs(this)['_k'] = toJs(_k);
-  }
-  int get k => toDart(toJs(this)['k']) as int;
   void set i(int _i) {
     toJs(this)['_i'] = toJs(_i);
   }
   int get i => toDart(toJs(this)['i']) as int;
+
+  void set k2(num _k2) {
+    toJs(this)['_k2'] = toJs(_k2);
+  }
+  num get k2 => toDart(toJs(this)['k2']) as num;
+  void set k1(num _k1) {
+    toJs(this)['_k1'] = toJs(_k1);
+  }
+  num get k1 => toDart(toJs(this)['k1']) as num;
   int j = null;
   bool get l => toDart(toJs(this)['l']) as bool;
 
@@ -48,13 +52,20 @@ class JsFoo extends JsInterface {
 // Target: abstract class _JsFoo
 // **************************************************************************
 
-void initializeJavaScript() {
-  registerFactoryForJsConstructor(
-      getPath('z.y.x.JsFoo'), (o) => new JsFoo.created(o));
-  registerFactoryForJsConstructor(
-      getPath('z.y.x.a.b.JsBar'), (o) => new JsBar.created(o));
-  registerFactoryForJsConstructor(
-      getPath('z.y.x.JsBaz'), (o) => new JsBaz.created(o));
+void initializeJavaScript({List<String> exclude, List<String> include}) {
+  bool accept(String name) => (include != null && include.contains(name)) ||
+      (include == null && exclude != null && !exclude.contains(name));
+
+  void register(String name, JsInterface f(JsObject o)) =>
+      registerFactoryForJsConstructor(getPath(name), f);
+
+  void mayRegister(String name, JsInterface f(JsObject o)) {
+    if (accept(name)) register(name, f);
+  }
+
+  mayRegister('z.y.x.JsFoo', (o) => new JsFoo.created(o));
+  mayRegister('z.y.x.a.b.JsBar', (o) => new JsBar.created(o));
+  mayRegister('z.y.x.JsBaz', (o) => new JsBaz.created(o));
 }
 
 // **************************************************************************
@@ -72,6 +83,8 @@ class JsBar extends JsInterface {
 // Generator: Instance of 'JsProxyGenerator'
 // Target: _find
 // **************************************************************************
+
+/// comment
 
 int find(String a) =>
     toDart(context.callMethod('find', [a].map(toJs).toList())) as int;
