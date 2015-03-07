@@ -9,24 +9,6 @@
 library js.metadata;
 
 /**
- * A metadata annotation to mark a library, variable, class, function or method
- * declaration for export to JavaScript. All children of the declaration are
- * also exported, unless they are marked with [NoExport].
- */
-class Export {
-  final String as;
-  const Export({this.as});
-}
-
-/**
- * A metadata annotation to override an [Export] annotation on a higher-level
- * declaration to not export the target declaration or its children.
- */
-class NoExport {
-  const NoExport();
-}
-
-/**
  * A metadata annotation that marks a class as a proxy implementation for a
  * JsInterface.
  *
@@ -34,20 +16,16 @@ class NoExport {
  * all abstract methods defined on superclasses that extend JsInterface.
  */
 class JsProxy {
+  final bool anonymousObject;
   final String constructor;
-  const JsProxy({this.constructor});
+  const JsProxy._(this.anonymousObject, this.constructor);
+  const JsProxy({String constructor}) : this._(false, constructor);
+  const JsProxy.anonymous() : this._(true, null);
 }
 
-class Namespace {
-  final String namespace;
-  const Namespace(this.namespace);
+class JsGlobal {
+  const JsGlobal();
 }
-
-class Jsify {
-  const Jsify();
-}
-
-const jsify = const Jsify();
 
 /// A metadata annotation that allows to customize the name used for method call
 /// or attribute access on the javascript side.

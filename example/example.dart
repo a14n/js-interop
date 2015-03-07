@@ -1,14 +1,13 @@
-@Namespace('z.y.x')
+@JsName('z.y.x')
 library js.example.js_proxy;
 
 import 'package:js/js.dart';
 
-part 'p.dart';
 part 'example.g.dart';
 
 @JsProxy()
-abstract class _JsFoo  {
-  _JsFoo();
+abstract class _JsFoo {
+  factory _JsFoo() = dynamic;
 
   int i;
 
@@ -31,18 +30,23 @@ abstract class _JsFoo  {
 
 @JsProxy(constructor: 'a.b.JsBar')
 abstract class _JsBar {
+  external factory _JsBar();
+  external factory _JsBar.named(int x, int y);
   JsBar m1();
 }
 
-/// comment
 @JsProxy()
-int _find(String a) => null;
+abstract class _JsBaz extends JsBar {
+  external factory _JsBaz();
+}
 
-@JsProxy()
-String _a;
+@JsGlobal()
+abstract class _Context {
+  int find(String a);
 
-@JsProxy()
-String get _b => null;
+  String a;
 
-@JsProxy()
-set _b(String b1) => null;
+  String get b;
+
+  set b(String b1);
+}

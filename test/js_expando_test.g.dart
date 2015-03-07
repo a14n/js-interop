@@ -1,15 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-02-27T13:20:48.170Z
+// 2015-03-07T22:27:27.926Z
 
 part of js.test.js_expando_test;
 
 // **************************************************************************
 // Generator: Instance of 'InitializeJavascriptGenerator'
-// Target: main
+// Target: library js.test.js_expando_test
 // **************************************************************************
 
-void initializeJavaScript() {
-  registerFactoryForJsConstructor(getPath('Foo'), (o) => new Foo.created(o));
+void initializeJavaScript({List<String> exclude, List<String> include}) {
+  bool accept(String name) => (include != null && include.contains(name)) ||
+      (include == null && exclude != null && !exclude.contains(name));
+
+  void register(String name, JsInterface f(JsObject o)) =>
+      registerFactoryForJsConstructor(getPath(name), f);
+
+  void mayRegister(String name, JsInterface f(JsObject o)) {
+    if (accept(name)) register(name, f);
+  }
+
+  mayRegister('Foo', (o) => new Foo.created(o));
 }
 
 // **************************************************************************

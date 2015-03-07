@@ -9,16 +9,12 @@ import 'package:source_gen/source_gen.dart';
 import 'js_proxy_generator.dart';
 import 'util.dart';
 
-final _libs = <LibraryElement>[];
-
 class InitializeJavascriptGenerator extends Generator {
   const InitializeJavascriptGenerator();
 
   Future<String> generate(Element element) async {
-    var libElement = element.library;
-
-    if (_libs.contains(libElement)) return null;
-    _libs.add(libElement);
+    if (element is! LibraryElement) return null;
+    LibraryElement libElement = element;
 
     final jsMetadataLib = libElement.visibleLibraries.firstWhere(
         (l) => l.name == 'js.metadata', orElse: () => null);
@@ -26,7 +22,7 @@ class InitializeJavascriptGenerator extends Generator {
     if (jsMetadataLib == null) return null;
 
     var jsProxyClass = jsMetadataLib.getType('JsProxy');
-    var namespaceClass = jsMetadataLib.getType('Namespace');
+    var jsNameClass = jsMetadataLib.getType('JsName');
 
     var proxies = libElement.units
         .expand((e) => e.types)
@@ -45,8 +41,11 @@ class InitializeJavascriptGenerator extends Generator {
     for (ClassElement clazz in proxies) {
       final name = JsProxyClassGenerator.getNewClassName(clazz);
       final jsProxy = getProxyAnnotation(clazz, jsProxyClass);
+
+      if (jsProxy.anonymousObject) continue;
+
       final constructor = JsProxyClassGenerator.getJsProxyConstructor(
-          clazz, namespaceClass, jsProxy);
+          clazz, jsNameClass, jsProxy);
       ouput += "mayRegister('$constructor', (o) => new $name.created(o));";
     }
     ouput += '}';

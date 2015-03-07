@@ -31,38 +31,25 @@ bool isAnnotationOfType(
   return type.isSubtypeOf(annotationClass.type);
 }
 
-JsProxy getProxyAnnotation(ClassElement interface, ClassElement jsProxyClass) {
+JsProxy getProxyAnnotation(Element interface, ClassElement jsProxyClass) {
   var node = interface.node;
   for (Annotation a in node.metadata) {
     var e = a.element;
     if (e is ConstructorElement && e.type.returnType == jsProxyClass.type) {
-      bool global;
-      String constructor;
-      for (Expression e in a.arguments.arguments) {
-        if (e is NamedExpression) {
-          if (e.name.label.name == 'constructor' &&
-              e.expression is StringLiteral) {
-            StringLiteral s = e.expression;
-            constructor = s.stringValue;
+      if (e.isDefaultConstructor) {
+        String constructor;
+        for (Expression e in a.arguments.arguments) {
+          if (e is NamedExpression) {
+            if (e.name.label.name == 'constructor' &&
+                e.expression is StringLiteral) {
+              StringLiteral s = e.expression;
+              constructor = s.stringValue;
+            }
           }
         }
-      }
-      return new JsProxy(constructor: constructor);
-    }
-  }
-  return null;
-}
-
-Namespace getNamespaceAnnotation(
-    AnnotatedNode node, ClassElement namespaceClass) {
-  for (Annotation a in node.metadata) {
-    var e = a.element;
-    if (e is ConstructorElement && e.type.returnType == namespaceClass.type) {
-      if (a.arguments.arguments.length == 1) {
-        var param = a.arguments.arguments.first;
-        if (param is StringLiteral) {
-          return new Namespace(param.stringValue);
-        }
+        return new JsProxy(constructor: constructor);
+      } else if (e.name == 'anonymous') {
+        return new JsProxy.anonymous();
       }
     }
   }

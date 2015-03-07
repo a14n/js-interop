@@ -45,5 +45,5 @@ main() {
 
 @JsProxy()
 abstract class _Foo {
-  _Foo();
+  factory _Foo() = dynamic;
 }

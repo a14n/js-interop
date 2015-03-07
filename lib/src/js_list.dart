@@ -7,7 +7,7 @@ library js.js_list;
 import 'dart:collection';
 import 'dart:js';
 
-import 'package:js/js.dart';
+import 'js_impl.dart';
 
 /**
  * A [List] interface wrapper for [JsArray]s.

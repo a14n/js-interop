@@ -11,101 +11,30 @@ import 'package:source_gen/source_gen.dart';
 import '../src/metadata.dart';
 import 'util.dart';
 
-class JsProxyGenerator extends GeneratorForAnnotation<JsProxy> {
+class JsProxyGenerator extends Generator {
   const JsProxyGenerator();
 
-  Future<String> generateForAnnotatedElement(
-      Element element, JsProxy annotation) async {
+  Future<String> generate(Element element) async {
+    if (element is! ClassElement) return null;
+
+    final libElement = element.library;
+    final jsMetadataLib = libElement.visibleLibraries.firstWhere(
+        (l) => l.name == 'js.metadata', orElse: () => null);
+
+    if (jsMetadataLib == null) return null;
+
+    final jsProxyClass = jsMetadataLib.getType('JsProxy');
+    final annotation = getProxyAnnotation(element, jsProxyClass);
+
+    if (annotation == null) return null;
+
     if (!element.isPrivate) throw '$element must be private';
 
     if (element is ClassElement) {
       return new JsProxyClassGenerator(element, annotation).generate();
     }
-
-    // top level
-    if (element.enclosingElement is CompilationUnitElement) {
-      if (element is FunctionElement) {
-        return generateForFunction(element);
-      }
-
-      if (element is TopLevelVariableElement) {
-        return generateForTopLevelVariable(element);
-      }
-
-      if (element is PropertyAccessorElement) {
-        return generateForPropertyAccessor(element);
-      }
-    }
+    return null;
   }
-}
-
-String generateForFunction(FunctionElement func) {
-  final newName = func.displayName.substring(1);
-
-  final transformer = new Transformer();
-
-  // remove JsProxy annotation
-  var jsProxyClass = getType(func, 'js.metadata', 'JsProxy');
-  func.node.metadata
-      .where((e) => isAnnotationOfType(e.elementAnnotation, jsProxyClass))
-      .forEach((e) => transformer.removeNode(e));
-
-  // rename
-  transformer.replace(func.node.name.offset, func.node.name.end, newName);
-
-  // body transformation
-  var call = "context.callMethod('$newName'";
-  if (func.parameters.isNotEmpty) {
-    final parameterList = func.parameters.map((p) => p.displayName).join(', ');
-    call += ", [$parameterList].map(toJs).toList()";
-  }
-  call += ")";
-  if (func.returnType.isVoid) {
-    transformer.replace(func.node.functionExpression.body.offset,
-        func.node.functionExpression.body.end, '$call;');
-  } else {
-    transformer.replace(func.node.functionExpression.body.offset,
-        func.node.functionExpression.body.end,
-        " => ${toDart(func.returnType, call)};");
-  }
-  return transformer.applyOn(func);
-}
-
-String generateForTopLevelVariable(TopLevelVariableElement element) {
-  return null;
-}
-
-String generateForPropertyAccessor(PropertyAccessorElement accessor) {
-  final transformer = new Transformer();
-
-  final name = accessor.displayName.substring(1);
-  FunctionDeclaration funcDecl = accessor.node;
-
-  // remove JsProxy annotation
-  var jsProxyClass = getType(accessor, 'js.metadata', 'JsProxy');
-  funcDecl.metadata
-      .where((e) => isAnnotationOfType(e.elementAnnotation, jsProxyClass))
-      .forEach((e) => transformer.removeNode(e));
-
-  // rename to public
-  transformer.replace(funcDecl.name.offset, funcDecl.name.end, name);
-
-  // generate body
-  String newFuncDecl;
-  if (accessor.isGetter) {
-    final type = accessor.returnType;
-    final getterBody = createGetterBody(type, name, target: 'context');
-    newFuncDecl = " => $getterBody";
-  } else if (accessor.isSetter) {
-    final type = accessor.parameters.first.type;
-    final setterBody = createSetterBody(accessor.parameters.first,
-        jsName: name, target: 'context');
-    newFuncDecl = " { $setterBody }";
-  }
-  transformer.replace(funcDecl.functionExpression.body.offset,
-      funcDecl.functionExpression.body.end, newFuncDecl);
-
-  return transformer.applyOn(accessor);
 }
 
 class JsProxyClassGenerator {
@@ -113,12 +42,11 @@ class JsProxyClassGenerator {
   final JsProxy annotation;
   final transformer = new Transformer();
 
-  ClassElement _jsProxyClass, _namespaceClass, _jsInterfaceClass;
+  ClassElement _jsProxyClass, _jsNameClass;
 
   JsProxyClassGenerator(this.clazz, this.annotation) {
     _jsProxyClass = getType(clazz, 'js.metadata', 'JsProxy');
-    _namespaceClass = getType(clazz, 'js.metadata', 'Namespace');
-    _jsInterfaceClass = getType(clazz, 'js.impl', 'JsInterface');
+    _jsNameClass = getType(clazz, 'js.metadata', 'JsName');
   }
 
   String generate() {
@@ -140,18 +68,38 @@ class JsProxyClassGenerator {
     // rename class
     transformer.replace(
         clazz.node.name.offset, clazz.node.name.end, newClassName);
-    clazz.constructors.where((c) => !c.isSynthetic).forEach((c) {
-      final begin = c.node.firstTokenAfterCommentAndMetadata.offset;
-      if (c.isDefaultConstructor) {
-        transformer.replace(begin, c.node.returnType.end, newClassName);
-      } else {
-        transformer.replace(
-            begin, c.node.name.end, '$newClassName.${c.displayName}');
+
+    // generate constructors
+    final jsConstructor = annotation.anonymousObject ? 'Object' :
+        getJsProxyConstructor(clazz, _jsNameClass, annotation);
+    for (final constr in clazz.constructors) {
+      // check that there are only factory constructors that redirect to dynamic
+      if (constr.isSynthetic) continue;
+
+      // rename
+      transformer.replace(
+          constr.node.returnType.offset, constr.node.returnType.end, newClassName);
+
+      // generate only factory redirected constructor for dynamic
+      if (!constr.isFactory || constr.node.redirectedConstructor == null || constr.node.redirectedConstructor.type.name.name != 'dynamic') {
+        continue;
       }
-    });
+
+      var newJsObject = "new JsObject(getPath('$jsConstructor')";
+      if (constr.parameters.isNotEmpty) {
+        final parameterList = constr.parameters.map((p) => p.displayName).join(', ');
+        newJsObject += ", [$parameterList].map(toJs).toList()";
+      }
+      newJsObject += ")";
+      transformer.removeToken(constr.node.factoryKeyword);
+      transformer.removeToken(constr.node.separator);
+      transformer.removeNode(constr.node.redirectedConstructor);
+      transformer
+          .insertAt(constr.node.end - 1, " : this.created($newJsObject)");
+    }
 
     // generate the constructor .created
-    if (!clazz.constructors.any((e) => e.displayName == 'created')) {
+    if (!clazz.constructors.any((e) => e.name == 'created')){
       final insertionIndex = clazz.constructors
               .where((e) => !e.isSynthetic).isEmpty
           ? clazz.node.leftBracket.end
@@ -159,25 +107,6 @@ class JsProxyClassGenerator {
       transformer.insertAt(insertionIndex,
           '$newClassName.created(JsObject o) : super.created(o);\n');
     }
-
-    // generate constructors
-    final jsConstructor =
-        getJsProxyConstructor(clazz, _namespaceClass, annotation);
-    clazz.constructors
-        .where((c) => !c.isFactory)
-        .where((c) => c.displayName != 'created')
-        .where((c) => !c.isSynthetic)
-        .where((c) => c.node.initializers.isEmpty)
-        .forEach((c) {
-      var newJsObject = "new JsObject(getPath('$jsConstructor')";
-      if (c.parameters.isNotEmpty) {
-        final parameterList = c.parameters.map((p) => p.displayName).join(', ');
-        newJsObject += ", [$parameterList].map(toJs).toList()";
-      }
-      newJsObject += ")";
-      transformer
-          .insertAt(c.node.parameters.end, " : this.created($newJsObject)");
-    });
 
     // generate properties
     transformAbstractAccessors(transformer,
@@ -190,7 +119,7 @@ class JsProxyClassGenerator {
 
     // generate abstract methods
     clazz.methods.where((e) => !e.isStatic).forEach((m) {
-      var call = "toJs(this).callMethod('${m.displayName}'";
+      var call = "unwrap(this).callMethod('${m.displayName}'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
         call += ", [$parameterList].map(toJs).toList()";
@@ -240,7 +169,7 @@ class JsProxyClassGenerator {
         code = "${accessor.returnType.displayName} get $name => $getterBody";
       } else if (accessor.isSetter) {
         final param = accessor.parameters.first;
-        final setterBody = createSetterBody(param);
+        final setterBody = createSetterBody(param, jsName: name);
         code = accessor.returnType.displayName +
             " set $name(${param.type.displayName} ${param.displayName})"
             "{ $setterBody }";
@@ -265,11 +194,11 @@ class JsProxyClassGenerator {
   }
 
   static String getJsProxyConstructor(ClassElement clazz,
-      ClassElement namespaceClass, JsProxy jsProxyAnnotation) {
+      ClassElement jsNameClass, JsProxy jsProxyAnnotation) {
     var jsConstructor = "";
-    final namespace = getNamespaceAnnotation(
-        clazz.library.unit.directives.first, namespaceClass);
-    if (namespace != null) jsConstructor += namespace.namespace + '.';
+    final namespace = getNameAnnotation(
+        clazz.library.unit.directives.first, jsNameClass);
+    if (namespace != null) jsConstructor += namespace.name + '.';
     if (jsProxyAnnotation.constructor != null) {
       jsConstructor += jsProxyAnnotation.constructor;
     } else {
@@ -283,22 +212,19 @@ class JsProxyClassGenerator {
 }
 
 String createGetterBody(DartType type, String name,
-    {String target: "toJs(this)"}) {
-  final typeName = type.displayName;
+    {String target: "unwrap(this)"}) {
   return toDart(type, "$target['$name']") + ';';
 }
 
 String createSetterBody(ParameterElement param,
-    {String target: "toJs(this)", String jsName}) {
+    {String target: "unwrap(this)", String jsName}) {
   final name = param.displayName;
   final type = param.type;
-  final typeName = type.displayName;
   jsName = jsName != null ? jsName : name;
   return "$target['$jsName'] = " + toJs(type, name) + ';';
 }
 
 String toDart(DartType type, String content) {
-  final typeName = type.displayName;
   return "toDart($content) as $type";
 }
 
