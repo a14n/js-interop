@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-07T22:22:22.755Z
+// 2015-03-08T16:03:58.404Z
 
 part of google_maps.sample.simple;
 
@@ -28,7 +28,7 @@ void initializeJavaScript({List<String> exclude, List<String> include}) {
 // Target: abstract class _GMap
 // **************************************************************************
 
-class GMap extends JsInterface {
+class GMap extends JsInterface implements _GMap {
   GMap.created(JsObject o) : super.created(o);
   GMap(Node mapDiv, [MapOptions opts]) : this.created(new JsObject(
           getPath('google.maps.Map'), [mapDiv, opts].map(toJs).toList()));
@@ -39,7 +39,7 @@ class GMap extends JsInterface {
 // Target: abstract class _LatLng
 // **************************************************************************
 
-class LatLng extends JsInterface {
+class LatLng extends JsInterface implements _LatLng {
   LatLng.created(JsObject o) : super.created(o);
   LatLng(num lat, num lng, [bool noWrap]) : this.created(new JsObject(
           getPath('google.maps.LatLng'),
@@ -59,7 +59,7 @@ class LatLng extends JsInterface {
 // Target: abstract class _MapOptions
 // **************************************************************************
 
-class MapOptions extends JsInterface {
+class MapOptions extends JsInterface implements _MapOptions {
   MapOptions.created(JsObject o) : super.created(o);
   MapOptions() : this.created(new JsObject(getPath('Object')));
   void set zoom(int _zoom) {

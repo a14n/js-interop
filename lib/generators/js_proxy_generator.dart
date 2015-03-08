@@ -52,6 +52,13 @@ class JsProxyClassGenerator {
   String generate() {
     final newClassName = getNewClassName(clazz);
 
+    // add implements to make analyzer happy
+    if (clazz.node.implementsClause == null) {
+      transformer.insertAt(clazz.node.leftBracket.offset, ' implements ${clazz.displayName}');
+    } else {
+      transformer.insertAt(clazz.node.implementsClause.end, ', ${clazz.displayName}');
+    }
+
     // add JsInterface extension
     if (clazz.node.extendsClause == null) {
       transformer.insertAt(clazz.node.name.end, ' extends JsInterface');

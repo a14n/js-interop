@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-07T22:27:27.901Z
+// 2015-03-08T16:04:33.784Z
 
 part of js.example.js_proxy;
 
@@ -29,7 +29,7 @@ void initializeJavaScript({List<String> exclude, List<String> include}) {
 // Target: abstract class _JsFoo
 // **************************************************************************
 
-class JsFoo extends JsInterface {
+class JsFoo extends JsInterface implements _JsFoo {
   JsFoo.created(JsObject o) : super.created(o);
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 
@@ -73,7 +73,7 @@ class JsFoo extends JsInterface {
 // Target: abstract class _JsBar
 // **************************************************************************
 
-class JsBar extends JsInterface {
+class JsBar extends JsInterface implements _JsBar {
   JsBar.created(JsObject o) : super.created(o);
   external factory JsBar();
   external factory JsBar.named(int x, int y);
@@ -85,7 +85,7 @@ class JsBar extends JsInterface {
 // Target: abstract class _JsBaz
 // **************************************************************************
 
-class JsBaz extends JsBar {
+class JsBaz extends JsBar implements _JsBaz {
   JsBaz.created(JsObject o) : super.created(o);
   external factory JsBaz();
 }

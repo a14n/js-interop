@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-07T22:27:27.926Z
+// 2015-03-08T16:04:33.806Z
 
 part of js.test.js_expando_test;
 
@@ -27,7 +27,7 @@ void initializeJavaScript({List<String> exclude, List<String> include}) {
 // Target: abstract class _Foo
 // **************************************************************************
 
-class Foo extends JsInterface {
+class Foo extends JsInterface implements _Foo {
   Foo.created(JsObject o) : super.created(o);
   Foo() : this.created(new JsObject(getPath('Foo')));
 }
