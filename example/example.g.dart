@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-08T16:04:33.784Z
+// 2015-03-08T21:14:11.333Z
 
 part of js.example.js_proxy;
 
 // **************************************************************************
-// Generator: Instance of 'InitializeJavascriptGenerator'
+// Generator: Instance of 'JsProxyGenerator'
 // Target: library js.example.js_proxy
 // **************************************************************************
 

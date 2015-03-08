@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-08T16:04:33.806Z
+// 2015-03-08T21:14:11.351Z
 
 part of js.test.js_expando_test;
 
 // **************************************************************************
-// Generator: Instance of 'InitializeJavascriptGenerator'
+// Generator: Instance of 'JsProxyGenerator'
 // Target: library js.test.js_expando_test
 // **************************************************************************
 

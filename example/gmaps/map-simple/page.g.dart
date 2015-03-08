@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-08T16:03:58.404Z
+// 2015-03-08T21:15:46.518Z
 
 part of google_maps.sample.simple;
 
 // **************************************************************************
-// Generator: Instance of 'InitializeJavascriptGenerator'
+// Generator: Instance of 'JsProxyGenerator'
 // Target: library google_maps.sample.simple
 // **************************************************************************
 
