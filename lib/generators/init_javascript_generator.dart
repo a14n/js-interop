@@ -31,13 +31,19 @@ class InitializeJavascriptGenerator extends Generator {
 
     if (proxies.isEmpty) return null;
 
-    var ouput = 'void initializeJavaScript({List<String> exclude, List<String> include}){';
-    ouput += "bool accept(String name) => (include != null && include.contains(name)) || "
-        "(include == null && exclude != null && !exclude.contains(name));\n\n";
-    ouput += "void register(String name, JsInterface f(JsObject o)) => "
-        "registerFactoryForJsConstructor(getPath(name), f);\n\n";
-    ouput += "void mayRegister(String name, JsInterface f(JsObject o)) { "
-        "if(accept(name))register(name, f);}\n\n";
+    var ouput = '''
+void initializeJavaScript({List<String> exclude, List<String> include}) {
+  bool accept(String name) => (include != null && include.contains(name)) ||
+      (include == null && exclude != null && !exclude.contains(name));
+
+  void register(String name, JsInterface f(JsObject o)) =>
+      registerFactoryForJsConstructor(getPath(name), f);
+
+  void mayRegister(String name, JsInterface f(JsObject o)) {
+      if(accept(name))register(name, f);
+  }
+
+''';
     for (ClassElement clazz in proxies) {
       final name = JsProxyClassGenerator.getNewClassName(clazz);
       final jsProxy = getProxyAnnotation(clazz, jsProxyClass);
