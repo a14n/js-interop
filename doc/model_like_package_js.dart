@@ -35,6 +35,6 @@ class _$LatLng extends LatLng {
 }
 
 toDart(a)=> null;
-toJs(a)=> null;
+toJs(a)=>  a is JsInterface ? a._o : null;
 
 // drawbacks : need to re-implements with inheritance (and not possible to use private members)

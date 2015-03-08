@@ -36,6 +36,6 @@ class JsExpando<T> {
   void operator []=(Object object, T value) {
     var jso = (object is JsObject) ? object
         : new JsObject.fromBrowserObject(object);
-    jso[propertyName] = toJs(value as T);
+    jso[propertyName] = toJs(value);
   }
 }

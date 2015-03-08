@@ -40,7 +40,6 @@ class JsList<E> extends JsInterface with ListMixin<E> {
   @override
   void set length(int length) { _o.length = length; }
 
-  // TODO: add [E] as fallback type for toDart()
   @override
   E operator [](index) => toDart(_o[index]) as E;
 
@@ -71,12 +70,8 @@ class JsList<E> extends JsInterface with ListMixin<E> {
   }
 
   @override
-  E removeAt(int index) {
-    // TODO: add [E] as fallback type for toDart()
-    return toDart(_o.removeAt(index)) as E;
-  }
+  E removeAt(int index) => toDart(_o.removeAt(index)) as E;
 
-  // TODO: add [E] as fallback type for toDart()
   @override
   E removeLast() => toDart(_o.removeLast()) as E;
 

@@ -9,7 +9,6 @@
 library js.impl;
 
 import 'dart:js';
-import 'package:js/src/js_map.dart';
 import 'package:js/src/js_list.dart';
 import 'dart:collection';
 export 'dart:js' show context, JsObject;
@@ -42,24 +41,11 @@ dynamic toJs(dynamic o) {
       || o is JsObject) return o;
 
   if (o is JsInterface) return unwrap(o);
-  var type = o.runtimeType;
-  var ctor = _exportedConstructors[type];
-  if (ctor != null) {
-    var proxy = _exportedProxies[o];
-    if (proxy == null) {
-      proxy = new JsObject(ctor, [o]);
-      _exportedProxies[o] = proxy;
-    }
-    return proxy;
-  }
 
   return o;
 }
 
 JsObject unwrap(JsInterface o) => o._jsObject;
-
-// Exported Dart Object -> JsObject
-final Expando<JsObject> _exportedProxies = new Expando<JsObject>();
 
 /**
  * Converts a JS value (primitive or [JsObject]) to Dart.
@@ -69,13 +55,8 @@ final Expando<JsObject> _exportedProxies = new Expando<JsObject>();
  * Dart object is returned. The Dart object is stored as a reference on the
  * JS object so that the same Dart object is returned from subsequent calls
  * to [toDart].
- *
- * If [o] is a JS object with no associated proxy class, the [fallbackType] is
- * used to create a transient wrapper of the correct type. Currently [Map] is
- * the only supported fallback type. [Future] and [Stream] are planned fallback
- * types.
  */
-dynamic toDart(dynamic o, [Symbol fallbackType]) {
+dynamic toDart(dynamic o) {
   if (o == null) return o;
 
   if (o is JsObject) {
@@ -96,11 +77,6 @@ dynamic toDart(dynamic o, [Symbol fallbackType]) {
       }
     }
     if (wrapper != null) return wrapper;
-
-    // no wrapper, handle fallback cases
-    if (fallbackType == #Map) {
-      return new JsMap.created(o);
-    }
   }
 
   return o;
@@ -145,13 +121,6 @@ dynamic jsify(data) {
 }
 
 // Dart Type -> JS constructorfor proxy
-final Map<Type, JsFunction> _exportedConstructors = <Type, JsFunction>{};
-
-registerJsConstructorForType(Type type, JsFunction constructor) {
-  _exportedConstructors[type] = constructor;
-}
-
-// Dart Type -> JS constructorfor proxy
 final Map<JsFunction, InterfaceFactory> _interfaceConstructors =
     <JsFunction, InterfaceFactory>{};
 
@@ -160,11 +129,6 @@ typedef JsInterface InterfaceFactory(JsObject o);
 registerFactoryForJsConstructor(JsFunction constructor,
     InterfaceFactory factory) {
   _interfaceConstructors[constructor] = factory;
-}
-
-dynamic getOptionalArg(JsObject args, String name) {
-  if (args == null) return null;
-  return args[name];
 }
 
 JsObject getPath(String path) =>

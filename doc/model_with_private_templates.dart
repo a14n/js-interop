@@ -15,14 +15,6 @@ abstract class _B extends A {
   String m1();
 }
 
-int _find(String a) => dynamic;
-
-String _a;
-
-String get _b => dynamic;
-
-set _b(String b1) => dynamic;
-
 main() {
   print(new B.created(null).m1());
   print(new B().m1());
