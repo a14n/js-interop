@@ -12,14 +12,15 @@ export 'dart:js' show JsObject, context;
 
 export 'package:js/src/js_impl.dart'
     show
-        JsInterface,
+        asJsObject,
+        getPath,
+        getState,
         JsGlobal,
-        toJs,
-        toDart,
+        JsInterface,
         registerJsConstructorForType,
         registerFactoryForJsConstructor,
-        getPath,
-        asJsObject;
+        toJs,
+        toDart;
 export 'package:js/src/js_expando.dart' show JsExpando;
 export 'package:js/src/js_list.dart' show JsList;
 export 'package:js/src/js_map.dart' show JsMap;

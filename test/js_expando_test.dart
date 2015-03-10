@@ -20,7 +20,6 @@ main() {
   useHtmlEnhancedConfiguration();
 
   group('JsExpando', () {
-
     test('should access a JS simple property', () {
       var expando = new JsExpando<String>('foo');
       expect(expando[window], null);
@@ -39,7 +38,6 @@ main() {
           isTrue);
       expect(expando[window], same(foo));
     });
-
   });
 }
 

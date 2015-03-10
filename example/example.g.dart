@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-10T22:09:11.063Z
+// 2015-03-10T22:46:56.465Z
 
 part of js.example.js_proxy;
 
@@ -76,11 +76,19 @@ class JsFoo extends JsInterface implements _JsFoo {
 // **************************************************************************
 
 class JsBar extends JsInterface implements _JsBar {
-  JsBar.created(JsObject o) : super.created(o);
+  JsBar.created(JsObject o) : super.created(o) {
+    getState(this)[#a] = 0;
+  }
+
   external factory JsBar();
   external factory JsBar.named(int x, int y);
   JsBar m1() => ((e) => e == null ? null : new JsBar.created(e))(
       asJsObject(this).callMethod('m1'));
+
+  void set a(int a) {
+    getState(this)[#a] = a;
+  }
+  int get a => getState(this)[#a];
 }
 
 // **************************************************************************

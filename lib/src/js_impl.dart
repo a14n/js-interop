@@ -26,6 +26,19 @@ abstract class JsInterface {
       other is JsInterface && _jsObject == other._jsObject;
 }
 
+Expando<Map<Symbol, dynamic>> _STATE = new Expando();
+
+/// takes JsInterface|JsObject as parameter
+Map<Symbol, dynamic> getState(o) {
+  if (o is JsInterface) o = asJsObject(o);
+  var state = _STATE[o];
+  if (state == null) {
+    state = <Symbol, dynamic>{};
+    _STATE[o] = state;
+  }
+  return state;
+}
+
 /**
  * Converts a Dart object to a [JsObject] (or supported primitive) for sending
  * to JavaScript. [o] must be either a [JsInterface] or an exported Dart object.

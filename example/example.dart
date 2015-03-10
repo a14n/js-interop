@@ -33,10 +33,17 @@ abstract class _JsFoo {
 }
 
 @JsProxy(constructor: 'a.b.JsBar')
-abstract class _JsBar {
+abstract class _JsBar extends JsInterface {
+  _JsBar.created(JsObject o) : super.created(o) {
+    getState(this)[#a] = 0;
+  }
+
   external factory _JsBar();
   external factory _JsBar.named(int x, int y);
   JsBar m1();
+
+  void set a(int a) { getState(this)[#a] = a; }
+  int get a => getState(this)[#a];
 }
 
 @JsProxy()

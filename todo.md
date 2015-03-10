@@ -1,7 +1,11 @@
+- prefix of library
 - add factory for JsList
-- state with Expando<Map<String, dynamic>> on JsObject
+- JsGlobal
 - VarArgs
+- Enum ?
+- generate state in .created from initialized variables.
 - test on Google Maps
+- rename .created with .proxify
 - optim: `[toJs(a), toJs(b)]` instead of `[a, b].map(toJs).toList()`
 
 BAD IDEA
