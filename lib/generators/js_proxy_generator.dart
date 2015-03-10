@@ -21,7 +21,7 @@ class JsProxyGenerator extends Generator {
 
     if (element is ClassElement) {
       final jsProxyClass = getType(element.library, 'js.metadata', 'JsProxy');
-      final annotation = getProxyAnnotation(element, jsProxyClass);
+      final annotation = getProxyAnnotation(element.node, jsProxyClass);
 
       if (annotation == null) return null;
 
@@ -65,7 +65,7 @@ void initializeJavaScript({List<String> exclude, List<String> include}) {
 ''';
     for (ClassElement clazz in proxies) {
       final name = JsProxyClassGenerator.getNewClassName(clazz);
-      final jsProxy = getProxyAnnotation(clazz, jsProxyClass);
+      final jsProxy = getProxyAnnotation(clazz.node, jsProxyClass);
 
       if (jsProxy.anonymousObject) continue;
 
@@ -111,9 +111,7 @@ class JsProxyClassGenerator {
     }
 
     // remove JsProxy annotation
-    clazz.node.metadata
-        .where((e) => isAnnotationOfType(e.elementAnnotation, _jsProxyClass))
-        .forEach((e) => transformer.removeNode(e));
+    getAnnotations(clazz.node, _jsProxyClass).forEach(transformer.removeNode);
 
     // remove abstract
     transformer.removeToken(clazz.node.abstractKeyword);
@@ -176,7 +174,9 @@ class JsProxyClassGenerator {
 
     // generate abstract methods
     clazz.methods.where((e) => !e.isStatic).forEach((m) {
-      var call = "asJsObject(this).callMethod('${m.displayName}'";
+      final jsName = getNameAnnotation(m.node, _jsNameClass);
+      final name = jsName != null ? jsName.name : m.displayName;
+      var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
         call += ", [$parameterList].map(toJs).toList()";
@@ -189,6 +189,8 @@ class JsProxyClassGenerator {
         transformer.insertAt(
             m.node.end - 1, " => ${toDart(m.returnType, call)}");
       }
+
+      getAnnotations(m.node, _jsNameClass).forEach(transformer.removeNode);
     });
 
     return transformer.applyOn(clazz);
@@ -197,9 +199,12 @@ class JsProxyClassGenerator {
   void transformAbstractAccessors(
       Transformer transformer, Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
-      final name = accessor.isPrivate
-          ? accessor.displayName.substring(1)
-          : accessor.displayName;
+      final jsName = getNameAnnotation(accessor.node, _jsNameClass);
+      final name = jsName != null
+          ? jsName.name
+          : accessor.isPrivate
+              ? accessor.displayName.substring(1)
+              : accessor.displayName;
       String newFuncDecl;
       if (accessor.isGetter) {
         final getterBody = createGetterBody(accessor.returnType, name);
@@ -211,6 +216,9 @@ class JsProxyClassGenerator {
       }
       transformer.replace(
           accessor.node.end - 1, accessor.node.end, newFuncDecl);
+
+      getAnnotations(accessor.node, _jsNameClass)
+          .forEach(transformer.removeNode);
     });
   }
 
@@ -220,13 +228,20 @@ class JsProxyClassGenerator {
       final name = accessor.isPrivate
           ? accessor.displayName.substring(1)
           : accessor.displayName;
+      var jsName = getNameAnnotation(accessor.variable.node, _jsNameClass);
+      jsName = jsName != null
+          ? jsName
+          : getNameAnnotation(
+              accessor.variable.node.parent.parent, _jsNameClass);
+      jsName = jsName != null ? jsName.name : name;
+
       var code;
       if (accessor.isGetter) {
-        final getterBody = createGetterBody(accessor.returnType, name);
+        final getterBody = createGetterBody(accessor.returnType, jsName);
         code = "${accessor.returnType.displayName} get $name => $getterBody";
       } else if (accessor.isSetter) {
         final param = accessor.parameters.first;
-        final setterBody = createSetterBody(param, jsName: name);
+        final setterBody = createSetterBody(param, jsName: jsName);
         code = accessor.returnType.displayName +
             " set $name(${param.type.displayName} ${param.displayName})"
             "{ $setterBody }";
@@ -241,12 +256,7 @@ class JsProxyClassGenerator {
     final Set<VariableDeclarationList> varDeclLists =
         variables.map((e) => e.parent).toSet();
     varDeclLists.forEach((varDeclList) {
-      if (varDeclList.variables.every((e) => variables.contains(e))) {
-        transformer.removeNode(varDeclList.parent);
-      } else {
-        throw "Please don't mix variables initialized and uninitialized,"
-            " it's really a pain to handle :p";
-      }
+      transformer.removeNode(varDeclList.parent);
     });
   }
 
@@ -293,7 +303,8 @@ class JsProxyClassGenerator {
         return "$content";
       }
     }
-    return "toDart($content)";
+    return content;
+    // return "toDart($content)";
   }
 
   String toJs(DartType type, String content) {
@@ -313,12 +324,40 @@ class JsProxyClassGenerator {
   }
 }
 
-ClassElement getType(
-    LibraryElement libElement, String libName, String className) {
-  final lib = libElement.visibleLibraries.firstWhere((l) => l.name == libName,
-      orElse: () => null);
+JsProxy getProxyAnnotation(AnnotatedNode node, ClassElement jsProxyClass) {
+  final jsNames = getAnnotations(node, jsProxyClass);
+  if (jsNames.isEmpty) return null;
+  final a = jsNames.single;
 
-  if (lib == null) return null;
+  ConstructorElement e = a.element;
+  if (e.isDefaultConstructor) {
+    String constructor;
+    for (Expression e in a.arguments.arguments) {
+      if (e is NamedExpression) {
+        if (e.name.label.name == 'constructor' &&
+            e.expression is StringLiteral) {
+          StringLiteral s = e.expression;
+          constructor = s.stringValue;
+        }
+      }
+    }
+    return new JsProxy(constructor: constructor);
+  } else if (e.name == 'anonymous') {
+    return new JsProxy.anonymous();
+  }
 
-  return lib.getType(className);
+  return null;
+}
+
+JsName getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
+  final jsNames = getAnnotations(node, jsNameClass);
+  if (jsNames.isEmpty) return null;
+  final a = jsNames.single;
+  if (a.arguments.arguments.length == 1) {
+    var param = a.arguments.arguments.first;
+    if (param is StringLiteral) {
+      return new JsName(param.stringValue);
+    }
+  }
+  return null;
 }

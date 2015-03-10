@@ -7,11 +7,16 @@ import 'package:analyzer/src/generated/scanner.dart';
 
 import '../src/metadata.dart';
 
-LibraryElement getLib(Element element, String name) =>
-    element.library.visibleLibraries.firstWhere((l) => l.name == name);
+LibraryElement getLib(LibraryElement libElement, String name) =>
+    libElement.visibleLibraries.firstWhere((l) => l.name == name,
+        orElse: () => null);
 
-ClassElement getType(Element element, String libraryName, String className) =>
-    getLib(element, libraryName).getType(className);
+ClassElement getType(
+    LibraryElement libElement, String libName, String className) {
+  final lib = getLib(libElement, libName);
+  if (lib == null) return null;
+  return lib.getType(className);
+}
 
 bool isAnnotationOfType(
     ElementAnnotation annotation, ClassElement annotationClass) {
@@ -31,48 +36,19 @@ bool isAnnotationOfType(
   return type.isSubtypeOf(annotationClass.type);
 }
 
-JsProxy getProxyAnnotation(Element interface, ClassElement jsProxyClass) {
-  var node = interface.node;
+Iterable<Annotation> getAnnotations(
+    AnnotatedNode node, ClassElement clazz) sync* {
+  if (node == null || node.metadata == null) return;
   for (Annotation a in node.metadata) {
     var e = a.element;
-    if (e is ConstructorElement && e.type.returnType == jsProxyClass.type) {
-      if (e.isDefaultConstructor) {
-        String constructor;
-        for (Expression e in a.arguments.arguments) {
-          if (e is NamedExpression) {
-            if (e.name.label.name == 'constructor' &&
-                e.expression is StringLiteral) {
-              StringLiteral s = e.expression;
-              constructor = s.stringValue;
-            }
-          }
-        }
-        return new JsProxy(constructor: constructor);
-      } else if (e.name == 'anonymous') {
-        return new JsProxy.anonymous();
-      }
+    if (e is ConstructorElement && e.type.returnType == clazz.type) {
+      yield a;
     }
   }
-  return null;
-}
-
-JsName getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
-  for (Annotation a in node.metadata) {
-    var e = a.element;
-    if (e is ConstructorElement && e.type.returnType == jsNameClass.type) {
-      if (a.arguments.arguments.length == 1) {
-        var param = a.arguments.arguments.first;
-        if (param is StringLiteral) {
-          return new JsName(param.stringValue);
-        }
-      }
-    }
-  }
-  return null;
 }
 
 String getSourceCode(Element element) => element.source.contents.data.substring(
-      element.node.offset, element.node.end);
+    element.node.offset, element.node.end);
 
 class SourceTransformation {
   int begin;

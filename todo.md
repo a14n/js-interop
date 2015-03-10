@@ -1,4 +1,5 @@
-- @Name
+- add factory for JsList
+- state with Expando<Map<String, dynamic>> on JsObject
 - VarArgs
 - test on Google Maps
 - optim: `[toJs(a), toJs(b)]` instead of `[a, b].map(toJs).toList()`

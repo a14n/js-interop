@@ -9,9 +9,11 @@ part 'example.g.dart';
 abstract class _JsFoo {
   factory _JsFoo() = dynamic;
 
+  @JsName('_i')
   int i;
 
-  num k1, k2;
+  @JsName('k')
+  num k1, @JsName('k_2') k2;
   int j = null;
   bool get l;
 
@@ -26,6 +28,8 @@ abstract class _JsFoo {
   String m3();
   String m4(int a);
   int m5(int a, b);
+  @JsName('_m6')
+  int _m6(int a, b);
 }
 
 @JsProxy(constructor: 'a.b.JsBar')
