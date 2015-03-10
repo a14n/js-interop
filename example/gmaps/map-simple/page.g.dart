@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-08T21:15:46.518Z
+// 2015-03-10T06:46:08.965Z
 
 part of google_maps.sample.simple;
 
@@ -45,13 +45,13 @@ class LatLng extends JsInterface implements _LatLng {
           getPath('google.maps.LatLng'),
           [lat, lng, noWrap].map(toJs).toList()));
 
-  bool equals(LatLng other) => toDart(
-      unwrap(this).callMethod('equals', [other].map(toJs).toList())) as bool;
-  num get lat => unwrap(this).callMethod('lat');
-  num get lng => unwrap(this).callMethod('lng');
-  String toString() => toDart(unwrap(this).callMethod('toString')) as String;
-  String toUrlValue([num precision]) => toDart(unwrap(this).callMethod(
-      'toUrlValue', [precision].map(toJs).toList())) as String;
+  bool equals(LatLng other) =>
+      asJsObject(this).callMethod('equals', [other].map(toJs).toList());
+  num get lat => asJsObject(this).callMethod('lat');
+  num get lng => asJsObject(this).callMethod('lng');
+  String toString() => asJsObject(this).callMethod('toString');
+  String toUrlValue([num precision]) =>
+      asJsObject(this).callMethod('toUrlValue', [precision].map(toJs).toList());
 }
 
 // **************************************************************************
@@ -63,15 +63,76 @@ class MapOptions extends JsInterface implements _MapOptions {
   MapOptions.created(JsObject o) : super.created(o);
   MapOptions() : this.created(new JsObject(getPath('Object')));
   void set zoom(int _zoom) {
-    unwrap(this)['zoom'] = toJs(_zoom);
+    asJsObject(this)['zoom'] = _zoom;
   }
-  int get zoom => toDart(unwrap(this)['zoom']) as int;
+  int get zoom => asJsObject(this)['zoom'];
   void set center(LatLng _center) {
-    unwrap(this)['center'] = toJs(_center);
+    asJsObject(this)['center'] =
+        ((e) => e == null ? null : asJsObject(e))(_center);
   }
-  LatLng get center => toDart(unwrap(this)['center']) as LatLng;
+  LatLng get center => ((e) => e == null ? null : new LatLng.created(e))(
+      asJsObject(this)['center']);
   void set mapTypeId(String _mapTypeId) {
-    unwrap(this)['mapTypeId'] = toJs(_mapTypeId);
+    asJsObject(this)['mapTypeId'] = _mapTypeId;
   }
-  String get mapTypeId => toDart(unwrap(this)['mapTypeId']) as String;
+  String get mapTypeId => asJsObject(this)['mapTypeId'];
+}
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: abstract class _GEvent
+// **************************************************************************
+
+class GEvent extends JsInterface implements _GEvent {
+  GEvent.created(JsObject o) : super.created(o);
+  GEvent() : super.created(getPath('google.maps.event'));
+
+  MapsEventListener addDomListener(
+          dynamic instance, String eventName, Function handler,
+          [bool capture]) =>
+      ((e) => e == null ? null : new MapsEventListener.created(e))(
+          asJsObject(this).callMethod('addDomListener',
+              [instance, eventName, handler, capture].map(toJs).toList()));
+  MapsEventListener addDomListenerOnce(
+          dynamic instance, String eventName, Function handler,
+          [bool capture]) =>
+      ((e) => e == null ? null : new MapsEventListener.created(e))(
+          asJsObject(this).callMethod('addDomListenerOnce',
+              [instance, eventName, handler, capture].map(toJs).toList()));
+  MapsEventListener addListener(
+      dynamic instance, String eventName, Function handler) => ((e) =>
+          e == null ? null : new MapsEventListener.created(e))(
+      asJsObject(this).callMethod(
+          'addListener', [instance, eventName, handler].map(toJs).toList()));
+  MapsEventListener addListenerOnce(
+          dynamic instance, String eventName, Function handler) =>
+      ((e) => e == null ? null : new MapsEventListener.created(e))(
+          asJsObject(this).callMethod('addListenerOnce',
+              [instance, eventName, handler].map(toJs).toList()));
+  void clearInstanceListeners(dynamic instance) {
+    asJsObject(this).callMethod(
+        'clearInstanceListeners', [instance].map(toJs).toList());
+  }
+  void clearListeners(dynamic instance, String eventName) {
+    asJsObject(this).callMethod(
+        'clearListeners', [instance, eventName].map(toJs).toList());
+  }
+  void removeListener(MapsEventListener listener) {
+    asJsObject(this).callMethod(
+        'removeListener', [listener].map(toJs).toList());
+  }
+  void trigger(
+      dynamic instance, String eventName, /*@VarArgs()*/ List<dynamic> args) {
+    asJsObject(this).callMethod(
+        'trigger', [instance, eventName, args].map(toJs).toList());
+  }
+}
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: abstract class _MapsEventListener
+// **************************************************************************
+
+class MapsEventListener extends JsInterface implements _MapsEventListener {
+  MapsEventListener.created(JsObject o) : super.created(o);
 }

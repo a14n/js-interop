@@ -13,22 +13,17 @@ import 'package:js/src/js_list.dart';
 import 'dart:collection';
 export 'dart:js' show context, JsObject;
 
-const DART_OBJECT_PROPERTY = '__dart_object__';
-
 /**
  * The base class of Dart interfaces for JavaScript objects.
  */
 abstract class JsInterface {
-
   final JsObject _jsObject;
 
-  JsInterface.created(JsObject o) : _jsObject = o {
-    if (o[DART_OBJECT_PROPERTY] != null) {
-      throw new ArgumentError('JsObject is already wrapped');
-    }
-    _obj.callMethod('defineProperty', [o, DART_OBJECT_PROPERTY,
-         new JsObject(_obj)..['value'] = this]);
-  }
+  JsInterface.created(JsObject o) : _jsObject = o;
+
+  @override int get hashCode => _jsObject.hashCode;
+  @override bool operator ==(other) =>
+      other is JsInterface && _jsObject == other._jsObject;
 }
 
 /**
@@ -37,15 +32,18 @@ abstract class JsInterface {
  */
 dynamic toJs(dynamic o) {
   if (o == null) return o;
-  if (o is num || o is String || o is bool || o is DateTime
-      || o is JsObject) return o;
+  if (o is num ||
+      o is String ||
+      o is bool ||
+      o is DateTime ||
+      o is JsObject) return o;
 
-  if (o is JsInterface) return unwrap(o);
+  if (o is JsInterface) return asJsObject(o);
 
   return o;
 }
 
-JsObject unwrap(JsInterface o) => o._jsObject;
+JsObject asJsObject(JsInterface o) => o._jsObject;
 
 /**
  * Converts a JS value (primitive or [JsObject]) to Dart.
@@ -60,20 +58,15 @@ dynamic toDart(dynamic o) {
   if (o == null) return o;
 
   if (o is JsObject) {
-    var wrapper = o[DART_OBJECT_PROPERTY];
-    if (wrapper == null) {
-      if (o is JsArray) {
-        wrapper = new JsList.created(o);
-      } else {
-        // look up JsInterface factory
-        var jsConstructor = o['constructor'] as JsFunction;
-        var dartConstructor = _interfaceConstructors[jsConstructor];
-        if (dartConstructor != null) {
-          wrapper = dartConstructor(o);
-        }
-      }
-      if (wrapper != null) {
-        o[DART_OBJECT_PROPERTY] = wrapper;
+    var wrapper;
+    if (o is JsArray) {
+      wrapper = new JsList.created(o);
+    } else {
+      // look up JsInterface factory
+      var jsConstructor = o['constructor'] as JsFunction;
+      var dartConstructor = _interfaceConstructors[jsConstructor];
+      if (dartConstructor != null) {
+        wrapper = dartConstructor(o);
       }
     }
     if (wrapper != null) return wrapper;
@@ -99,7 +92,7 @@ dynamic jsify(data) {
     }
 
     if (o is JsInterface) {
-      return unwrap(o);
+      return asJsObject(o);
     } else if (o is Map) {
       final convertedMap = new JsObject(_obj);
       _convertedObjects[o] = convertedMap;
@@ -126,8 +119,8 @@ final Map<JsFunction, InterfaceFactory> _interfaceConstructors =
 
 typedef JsInterface InterfaceFactory(JsObject o);
 
-registerFactoryForJsConstructor(JsFunction constructor,
-    InterfaceFactory factory) {
+void registerFactoryForJsConstructor(
+    JsFunction constructor, InterfaceFactory factory) {
   _interfaceConstructors[constructor] = factory;
 }
 

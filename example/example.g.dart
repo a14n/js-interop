@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-08T21:14:11.333Z
+// 2015-03-10T06:45:48.868Z
 
 part of js.example.js_proxy;
 
@@ -34,38 +34,37 @@ class JsFoo extends JsInterface implements _JsFoo {
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 
   void set i(int _i) {
-    unwrap(this)['i'] = toJs(_i);
+    asJsObject(this)['i'] = _i;
   }
-  int get i => toDart(unwrap(this)['i']) as int;
+  int get i => asJsObject(this)['i'];
 
   void set k2(num _k2) {
-    unwrap(this)['k2'] = toJs(_k2);
+    asJsObject(this)['k2'] = _k2;
   }
-  num get k2 => toDart(unwrap(this)['k2']) as num;
+  num get k2 => asJsObject(this)['k2'];
   void set k1(num _k1) {
-    unwrap(this)['k1'] = toJs(_k1);
+    asJsObject(this)['k1'] = _k1;
   }
-  num get k1 => toDart(unwrap(this)['k1']) as num;
+  num get k1 => asJsObject(this)['k1'];
   int j = null;
-  bool get l => toDart(unwrap(this)['l']) as bool;
+  bool get l => asJsObject(this)['l'];
 
-  String get a => toDart(unwrap(this)['a']) as String;
+  String get a => asJsObject(this)['a'];
   void set a(String a) {
-    unwrap(this)['a'] = toJs(a);
+    asJsObject(this)['a'] = a;
   }
 
   String get b => '';
   void set b(String b) {}
 
-  m1() => toDart(unwrap(this).callMethod('m1')) as dynamic;
+  m1() => toDart(asJsObject(this).callMethod('m1'));
   void m2() {
-    unwrap(this).callMethod('m2');
+    asJsObject(this).callMethod('m2');
   }
-  String m3() => toDart(unwrap(this).callMethod('m3')) as String;
-  String m4(int a) =>
-      toDart(unwrap(this).callMethod('m4', [a].map(toJs).toList())) as String;
+  String m3() => asJsObject(this).callMethod('m3');
+  String m4(int a) => asJsObject(this).callMethod('m4', [a].map(toJs).toList());
   int m5(int a, b) =>
-      toDart(unwrap(this).callMethod('m5', [a, b].map(toJs).toList())) as int;
+      asJsObject(this).callMethod('m5', [a, b].map(toJs).toList());
 }
 
 // **************************************************************************
@@ -77,7 +76,8 @@ class JsBar extends JsInterface implements _JsBar {
   JsBar.created(JsObject o) : super.created(o);
   external factory JsBar();
   external factory JsBar.named(int x, int y);
-  JsBar m1() => toDart(unwrap(this).callMethod('m1')) as JsBar;
+  JsBar m1() => ((e) => e == null ? null : new JsBar.created(e))(
+      asJsObject(this).callMethod('m1'));
 }
 
 // **************************************************************************

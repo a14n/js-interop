@@ -20,13 +20,7 @@ class JsProxyGenerator extends Generator {
     }
 
     if (element is ClassElement) {
-      final libElement = element.library;
-      final jsMetadataLib = libElement.visibleLibraries.firstWhere(
-          (l) => l.name == 'js.metadata', orElse: () => null);
-
-      if (jsMetadataLib == null) return null;
-
-      final jsProxyClass = jsMetadataLib.getType('JsProxy');
+      final jsProxyClass = getType(element.library, 'js.metadata', 'JsProxy');
       final annotation = getProxyAnnotation(element, jsProxyClass);
 
       if (annotation == null) return null;
@@ -46,13 +40,8 @@ class InitializeJavascriptGenerator {
   InitializeJavascriptGenerator(this.libElement);
 
   String generate() {
-    final jsMetadataLib = libElement.visibleLibraries.firstWhere(
-        (l) => l.name == 'js.metadata', orElse: () => null);
-
-    if (jsMetadataLib == null) return null;
-
-    var jsProxyClass = jsMetadataLib.getType('JsProxy');
-    var jsNameClass = jsMetadataLib.getType('JsName');
+    final jsProxyClass = getType(libElement, 'js.metadata', 'JsProxy');
+    final jsNameClass = getType(libElement, 'js.metadata', 'JsName');
 
     var proxies = libElement.units
         .expand((e) => e.types)
@@ -90,15 +79,18 @@ void initializeJavaScript({List<String> exclude, List<String> include}) {
 }
 
 class JsProxyClassGenerator {
+  final LibraryElement lib;
   final ClassElement clazz;
   final JsProxy annotation;
   final transformer = new Transformer();
 
   ClassElement _jsProxyClass, _jsNameClass;
 
-  JsProxyClassGenerator(this.clazz, this.annotation) {
-    _jsProxyClass = getType(clazz, 'js.metadata', 'JsProxy');
-    _jsNameClass = getType(clazz, 'js.metadata', 'JsName');
+  JsProxyClassGenerator(ClassElement clazz, this.annotation)
+      : lib = clazz.library,
+        clazz = clazz {
+    _jsProxyClass = getType(lib, 'js.metadata', 'JsProxy');
+    _jsNameClass = getType(lib, 'js.metadata', 'JsName');
   }
 
   String generate() {
@@ -177,14 +169,14 @@ class JsProxyClassGenerator {
     transformAbstractAccessors(transformer,
         clazz.accessors.where((e) => !e.isStatic).where((e) => e.isAbstract));
 
-    transformInstanceVariables(transformer, clazz.accessors
+    transformInstanceVariables(lib, transformer, clazz.accessors
         .where((e) => !e.isStatic)
         .where((e) => e.isSynthetic)
         .where((e) => e.variable.initializer == null));
 
     // generate abstract methods
     clazz.methods.where((e) => !e.isStatic).forEach((m) {
-      var call = "unwrap(this).callMethod('${m.displayName}'";
+      var call = "asJsObject(this).callMethod('${m.displayName}'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
         call += ", [$parameterList].map(toJs).toList()";
@@ -222,8 +214,8 @@ class JsProxyClassGenerator {
     });
   }
 
-  void transformInstanceVariables(
-      Transformer transformer, Iterable<PropertyAccessorElement> accessors) {
+  void transformInstanceVariables(LibraryElement lib, Transformer transformer,
+      Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
       final name = accessor.isPrivate
           ? accessor.displayName.substring(1)
@@ -274,23 +266,59 @@ class JsProxyClassGenerator {
 
   static String getNewClassName(ClassElement clazz) =>
       clazz.displayName.substring(1);
+
+  String createGetterBody(DartType type, String name,
+      {String target: "asJsObject(this)"}) {
+    return toDart(type, "$target['$name']") + ';';
+  }
+
+  String createSetterBody(ParameterElement param,
+      {String target: "asJsObject(this)", String jsName}) {
+    final name = param.displayName;
+    final type = param.type;
+    jsName = jsName != null ? jsName : name;
+    return "$target['$jsName'] = " + toJs(type, name) + ';';
+  }
+
+  String toDart(DartType type, String content) {
+    if (!type.isDynamic) {
+      if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
+        return '((e) => e == null ? null : new $type.created(e))($content)';
+      }
+      if (type.isSubtypeOf(getType(lib, 'dart.core', 'num').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'String').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'bool').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'DateTime').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.js', 'JsObject').type)) {
+        return "$content";
+      }
+    }
+    return "toDart($content)";
+  }
+
+  String toJs(DartType type, String content) {
+    if (!type.isDynamic) {
+      if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
+        return '((e) => e == null ? null : asJsObject(e))($content)';
+      }
+      if (type.isSubtypeOf(getType(lib, 'dart.core', 'num').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'String').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'bool').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.core', 'DateTime').type) ||
+          type.isSubtypeOf(getType(lib, 'dart.js', 'JsObject').type)) {
+        return "$content";
+      }
+    }
+    return "toJs($content)";
+  }
 }
 
-String createGetterBody(DartType type, String name,
-    {String target: "unwrap(this)"}) {
-  return toDart(type, "$target['$name']") + ';';
-}
+ClassElement getType(
+    LibraryElement libElement, String libName, String className) {
+  final lib = libElement.visibleLibraries.firstWhere((l) => l.name == libName,
+      orElse: () => null);
 
-String createSetterBody(ParameterElement param,
-    {String target: "unwrap(this)", String jsName}) {
-  final name = param.displayName;
-  final type = param.type;
-  jsName = jsName != null ? jsName : name;
-  return "$target['$jsName'] = " + toJs(type, name) + ';';
-}
+  if (lib == null) return null;
 
-String toDart(DartType type, String content) {
-  return "toDart($content) as $type";
+  return lib.getType(className);
 }
-
-String toJs(DartType type, String content) => "toJs($content)";

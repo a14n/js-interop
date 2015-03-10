@@ -15,8 +15,8 @@ abstract class _LatLng extends JsInterface {
   factory _LatLng(num lat, num lng, [bool noWrap]) = dynamic;
 
   bool equals(LatLng other);
-  num get lat => unwrap(this).callMethod('lat');
-  num get lng => unwrap(this).callMethod('lng');
+  num get lat => asJsObject(this).callMethod('lat');
+  num get lng => asJsObject(this).callMethod('lng');
   String toString();
   String toUrlValue([num precision]);
 }
@@ -36,6 +36,28 @@ class MapTypeId {
   static final String TERRAIN = getPath('google.maps.MapTypeId')['TERRAIN'];
 }
 
+
+final GEvent event = new GEvent();
+
+@JsProxy.anonymous()
+abstract class _GEvent extends JsInterface {
+  _GEvent() : super.created(getPath('google.maps.event'));
+
+  MapsEventListener addDomListener(dynamic instance, String eventName, Function handler, [bool capture]);
+  MapsEventListener addDomListenerOnce(dynamic instance, String eventName, Function handler, [bool capture]);
+  MapsEventListener addListener(dynamic instance, String eventName, Function handler);
+  MapsEventListener addListenerOnce(dynamic instance, String eventName, Function handler);
+  void clearInstanceListeners(dynamic instance);
+  void clearListeners(dynamic instance, String eventName);
+  void removeListener(MapsEventListener listener);
+  void trigger(dynamic instance, String eventName, /*@VarArgs()*/ List<dynamic> args);
+}
+
+@JsProxy.anonymous()
+abstract class _MapsEventListener {
+}
+
+
 void main() {
   initializeJavaScript();
 
@@ -44,5 +66,6 @@ void main() {
     ..center = new LatLng(-34.397, 150.644)
     ..mapTypeId = MapTypeId.ROADMAP
     ;
-  new GMap(querySelector("#map_canvas"), mapOptions);
+  var map = new GMap(querySelector("#map_canvas"), mapOptions);
+  event.addListener(map, "zoom_changed", () => print(asJsObject(map).callMethod('getZoom')));
 }

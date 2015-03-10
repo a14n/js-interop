@@ -1,9 +1,6 @@
-- Xxx implements _Xxx
-- @override
-- inheritance with `factory XXX = dynamic`
 - @Name
+- VarArgs
 - test on Google Maps
-- optim: no `toDart` and `toJs` for bool, int, double, String...
 - optim: `[toJs(a), toJs(b)]` instead of `[a, b].map(toJs).toList()`
 
 BAD IDEA

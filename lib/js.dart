@@ -10,8 +10,16 @@ library js;
 
 export 'dart:js' show JsObject, context;
 
-export 'package:js/src/js_impl.dart' show JsInterface, JsGlobal, toJs, toDart,
-    registerJsConstructorForType, registerFactoryForJsConstructor, getPath, unwrap;
+export 'package:js/src/js_impl.dart'
+    show
+        JsInterface,
+        JsGlobal,
+        toJs,
+        toDart,
+        registerJsConstructorForType,
+        registerFactoryForJsConstructor,
+        getPath,
+        asJsObject;
 export 'package:js/src/js_expando.dart' show JsExpando;
 export 'package:js/src/js_list.dart' show JsList;
 export 'package:js/src/js_map.dart' show JsMap;
