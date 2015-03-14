@@ -1,5 +1,7 @@
+- tests
 - prefix of library
 - add factory for JsList
+- remove initializeJavaScript
 - JsGlobal
 - VarArgs
 - Enum ?

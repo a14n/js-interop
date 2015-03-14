@@ -225,15 +225,17 @@ class JsProxyClassGenerator {
   void transformInstanceVariables(LibraryElement lib, Transformer transformer,
       Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
-      final name = accessor.isPrivate
-          ? accessor.displayName.substring(1)
-          : accessor.displayName;
       var jsName = getNameAnnotation(accessor.variable.node, _jsNameClass);
       jsName = jsName != null
           ? jsName
           : getNameAnnotation(
               accessor.variable.node.parent.parent, _jsNameClass);
-      jsName = jsName != null ? jsName.name : name;
+      jsName = jsName != null
+          ? jsName.name
+          : accessor.isPrivate
+              ? accessor.displayName.substring(1)
+              : accessor.displayName;
+      var name = accessor.displayName;
 
       var code;
       if (accessor.isGetter) {
