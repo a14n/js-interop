@@ -37,12 +37,10 @@ class MapTypeId {
 }
 
 
-final GEvent event = new GEvent();
+final GEvent event = new GEvent.created(getPath('google.maps.event'));
 
 @JsProxy.anonymous()
-abstract class _GEvent extends JsInterface {
-  _GEvent() : super.created(getPath('google.maps.event'));
-
+abstract class _GEvent {
   MapsEventListener addDomListener(dynamic instance, String eventName, Function handler, [bool capture]);
   MapsEventListener addDomListenerOnce(dynamic instance, String eventName, Function handler, [bool capture]);
   MapsEventListener addListener(dynamic instance, String eventName, Function handler);

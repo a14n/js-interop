@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-10T06:46:08.965Z
+// 2015-03-16T07:48:26.110Z
 
 part of google_maps.sample.simple;
 
@@ -85,7 +85,6 @@ class MapOptions extends JsInterface implements _MapOptions {
 
 class GEvent extends JsInterface implements _GEvent {
   GEvent.created(JsObject o) : super.created(o);
-  GEvent() : super.created(getPath('google.maps.event'));
 
   MapsEventListener addDomListener(
           dynamic instance, String eventName, Function handler,

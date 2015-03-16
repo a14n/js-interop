@@ -2,10 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-/**
- * This library contains semi-private APIs for implementing typed interfaces and
- * exports.
- */
+/// This library contains semi-private APIs for implementing typed interfaces.
 library js.impl;
 
 import 'dart:js';
@@ -13,9 +10,9 @@ import 'package:js/src/js_list.dart';
 import 'dart:collection';
 export 'dart:js' show context, JsObject;
 
-/**
- * The base class of Dart interfaces for JavaScript objects.
- */
+JsObject _obj = context['Object'];
+
+/// The base class of Dart interfaces for JavaScript objects.
 abstract class JsInterface {
   final JsObject _jsObject;
 
@@ -25,6 +22,8 @@ abstract class JsInterface {
   @override bool operator ==(other) =>
       other is JsInterface && _jsObject == other._jsObject;
 }
+
+JsObject asJsObject(JsInterface o) => o._jsObject;
 
 Expando<Map<Symbol, dynamic>> _STATE = new Expando();
 
@@ -56,8 +55,6 @@ dynamic toJs(dynamic o) {
   return o;
 }
 
-JsObject asJsObject(JsInterface o) => o._jsObject;
-
 /**
  * Converts a JS value (primitive or [JsObject]) to Dart.
  *
@@ -87,8 +84,6 @@ dynamic toDart(dynamic o) {
 
   return o;
 }
-
-JsObject _obj = context['Object'];
 
 dynamic jsify(data) {
   if ((data is! Map) && (data is! Iterable)) {

@@ -297,16 +297,8 @@ class JsProxyClassGenerator {
       if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
         return '((e) => e == null ? null : new $type.created(e))($content)';
       }
-      if (type.isSubtypeOf(getType(lib, 'dart.core', 'num').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'String').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'bool').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'DateTime').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.js', 'JsObject').type)) {
-        return "$content";
-      }
     }
     return content;
-    // return "toDart($content)";
   }
 
   String toJs(DartType type, String content) {
@@ -314,15 +306,27 @@ class JsProxyClassGenerator {
       if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
         return '((e) => e == null ? null : asJsObject(e))($content)';
       }
-      if (type.isSubtypeOf(getType(lib, 'dart.core', 'num').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'String').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'bool').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.core', 'DateTime').type) ||
-          type.isSubtypeOf(getType(lib, 'dart.js', 'JsObject').type)) {
-        return "$content";
+    }
+    return content;
+  }
+
+  /// return [true] if the type is transferable through dart:js
+  /// (see https://api.dartlang.org/docs/channels/stable/latest/dart_js.html)
+  bool isTypeTransferable(DartType type) {
+    final transferables = const <String, List<String>>{
+      'dart.js': ['JsObject'],
+      'dart.core': ['num', 'bool', 'String', 'DateTime'],
+      'dart.dom.html': ['Blob', 'Event', 'ImageData', 'Node', 'Window'],
+      'dart.dom.indexed_db': ['KeyRange'],
+      'dart.typed_data': ['TypedData'],
+    };
+    for (final libName in transferables.keys) {
+      if (transferables[libName].any((className) =>
+          type.isSubtypeOf(getType(lib, libName, className).type))) {
+        return true;
       }
     }
-    return "toJs($content)";
+    return false;
   }
 }
 
