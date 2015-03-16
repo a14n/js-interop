@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-10T22:46:56.465Z
+// 2015-03-16T05:37:11.208Z
 
 part of js.example.js_proxy;
 
@@ -39,9 +39,9 @@ class JsFoo extends JsInterface implements _JsFoo {
   int get i => asJsObject(this)['_i'];
 
   void set k2(num _k2) {
-    asJsObject(this)['k_2'] = _k2;
+    asJsObject(this)['k'] = _k2;
   }
-  num get k2 => asJsObject(this)['k_2'];
+  num get k2 => asJsObject(this)['k'];
   void set k1(num _k1) {
     asJsObject(this)['k'] = _k1;
   }
@@ -77,7 +77,7 @@ class JsFoo extends JsInterface implements _JsFoo {
 
 class JsBar extends JsInterface implements _JsBar {
   JsBar.created(JsObject o) : super.created(o) {
-    getState(this)[#a] = 0;
+    getState(this).putIfAbsent(#a, () => 0);
   }
 
   external factory JsBar();

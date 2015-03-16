@@ -11,7 +11,7 @@ import 'package:js/js.dart';
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 
-part 'proxy_fields_test.g.dart';
+part 'proxy_accessors_test.g.dart';
 
 @JsProxy()
 abstract class _Class0 {
@@ -127,13 +127,13 @@ main() {
     expect(o.b, true);
   });
 
-  test('final fields should have getter but not setter', () {
+  test('final fields should generate getter but not setter', () {
     final clazz = reflectClass(ClassFinalField);
     expect(clazz.declarations.keys, contains(#i));
     expect(clazz.declarations.keys, isNot(contains(const Symbol('i='))));
   });
 
-  test('fields (not final) should have getter and setter', () {
+  test('fields (not final) should generate getter and setter', () {
     final clazz = reflectClass(ClassNotFinalField);
     expect(clazz.declarations.keys, contains(#i));
     expect(clazz.declarations.keys, contains(const Symbol('i=')));

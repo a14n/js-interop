@@ -13,7 +13,7 @@ abstract class _JsFoo {
   int i;
 
   @JsName('k')
-  num k1, @JsName('k_2') k2;
+  num k1, k2;
   int j = null;
   bool get l;
 
@@ -35,14 +35,16 @@ abstract class _JsFoo {
 @JsProxy(constructor: 'a.b.JsBar')
 abstract class _JsBar extends JsInterface {
   _JsBar.created(JsObject o) : super.created(o) {
-    getState(this)[#a] = 0;
+    getState(this).putIfAbsent(#a, () => 0);
   }
 
   external factory _JsBar();
   external factory _JsBar.named(int x, int y);
   JsBar m1();
 
-  void set a(int a) { getState(this)[#a] = a; }
+  void set a(int a) {
+    getState(this)[#a] = a;
+  }
   int get a => getState(this)[#a];
 }
 
