@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-16T07:58:06.875Z
+// 2015-03-17T18:14:06.648Z
 
 part of js.example.js_proxy;
 
@@ -59,8 +59,10 @@ class JsBar extends JsInterface implements _JsBar {
     getState(this).putIfAbsent(#a, () => 0);
   }
 
-  external factory JsBar();
-  external factory JsBar.named(int x, int y);
+  JsBar() : this.created(new JsObject(getPath('z.y.x.a.b.JsBar')));
+  JsBar.named(int x, int y) : this.created(
+          new JsObject(getPath('z.y.x.a.b.JsBar'), [x, y].map(toJs).toList()));
+
   JsBar m1() => ((e) => e == null ? null : new JsBar.created(e))(
       asJsObject(this).callMethod('m1'));
 
@@ -77,5 +79,29 @@ class JsBar extends JsInterface implements _JsBar {
 
 class JsBaz extends JsBar implements _JsBaz {
   JsBaz.created(JsObject o) : super.created(o);
-  external factory JsBaz();
+  JsBaz() : this.created(new JsObject(getPath('z.y.x.JsBaz')));
+}
+
+// **************************************************************************
+// Generator: Instance of 'JsProxyGenerator'
+// Target: abstract class __Context
+// **************************************************************************
+
+class _Context extends JsInterface implements __Context {
+  _Context.created(JsObject o) : super.created(o);
+  _Context() : this.created(getPath('z.y.x'));
+
+  int find(String a) =>
+      asJsObject(this).callMethod('find', [a].map(toJs).toList());
+
+  void set a(String _a) {
+    asJsObject(this)['a'] = _a;
+  }
+  String get a => asJsObject(this)['a'];
+
+  String get b => asJsObject(this)['b'];
+
+  set b(String b1) {
+    asJsObject(this)['b'] = b1;
+  }
 }

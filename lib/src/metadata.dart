@@ -16,16 +16,14 @@ library js.metadata;
  * all abstract methods defined on superclasses that extend JsInterface.
  */
 class JsProxy {
-  final bool anonymousObject;
-  final String constructor;
-  const JsProxy._(this.anonymousObject, this.constructor);
-  const JsProxy({String constructor}) : this._(false, constructor);
-  const JsProxy.anonymous() : this._(true, null);
+  final Kind kind;
+  const JsProxy._(this.kind);
+  const JsProxy() : this._(Kind.TYPED);
+  const JsProxy.anonymous() : this._(Kind.ANONYMOUS);
+  const JsProxy.global() : this._(Kind.GLOBAL);
 }
 
-class JsGlobal {
-  const JsGlobal();
-}
+enum Kind { TYPED, ANONYMOUS, GLOBAL }
 
 /// A metadata annotation that allows to customize the name used for method call
 /// or attribute access on the javascript side.

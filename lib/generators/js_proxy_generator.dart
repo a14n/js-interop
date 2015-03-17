@@ -65,6 +65,9 @@ class JsProxyClassGenerator {
     // remove JsProxy annotation
     getAnnotations(clazz.node, _jsProxyClass).forEach(transformer.removeNode);
 
+    // remove JsName annotation
+    getAnnotations(clazz.node, _jsNameClass).forEach(transformer.removeNode);
+
     // remove abstract
     transformer.removeToken(clazz.node.abstractKeyword);
 
@@ -73,11 +76,7 @@ class JsProxyClassGenerator {
         clazz.node.name.offset, clazz.node.name.end, newClassName);
 
     // generate constructors
-    final jsConstructor = annotation.anonymousObject
-        ? 'Object'
-        : getJsProxyConstructor(clazz, _jsNameClass, annotation);
     for (final constr in clazz.constructors) {
-      // check that there are only factory constructors that redirect to dynamic
       if (constr.isSynthetic) continue;
 
       // rename
@@ -91,7 +90,8 @@ class JsProxyClassGenerator {
         continue;
       }
 
-      var newJsObject = "new JsObject(getPath('$jsConstructor')";
+      final jsName = computeJsName(clazz, _jsNameClass, true);
+      var newJsObject = "new JsObject(getPath('$jsName')";
       if (constr.parameters.isNotEmpty) {
         final parameterList =
             constr.parameters.map((p) => p.displayName).join(', ');
@@ -103,6 +103,24 @@ class JsProxyClassGenerator {
       transformer.removeNode(constr.node.redirectedConstructor);
       transformer.insertAt(
           constr.node.end - 1, " : this.created($newJsObject)");
+    }
+
+    // generate the default constructor for global and anonymous
+    if ((annotation.kind == Kind.ANONYMOUS || annotation.kind == Kind.GLOBAL) &&
+        clazz.constructors.any((e) => e.isSynthetic)) {
+      final insertionIndex = clazz.constructors
+              .where((e) => !e.isSynthetic).isEmpty
+          ? clazz.node.leftBracket.end
+          : clazz.constructors.first.node.offset;
+      var jsObject;
+      if (annotation.kind == Kind.GLOBAL) {
+        final jsName = computeJsName(clazz, _jsNameClass, false);
+        jsObject = "getPath('$jsName')";
+      } else if (annotation.kind == Kind.ANONYMOUS) {
+        jsObject = "context['Object']";
+      }
+      transformer.insertAt(
+          insertionIndex, "$newClassName() : this.created($jsObject);\n");
     }
 
     // generate the constructor .created
@@ -214,18 +232,23 @@ class JsProxyClassGenerator {
     });
   }
 
-  static String getJsProxyConstructor(
-      ClassElement clazz, ClassElement jsNameClass, JsProxy jsProxyAnnotation) {
-    var jsConstructor = "";
-    final namespace =
+  static String computeJsName(
+      ClassElement clazz, ClassElement jsNameClass, bool useClassName) {
+    var name = "";
+
+    final nameOfLib =
         getNameAnnotation(clazz.library.unit.directives.first, jsNameClass);
-    if (namespace != null) jsConstructor += namespace.name + '.';
-    if (jsProxyAnnotation.constructor != null) {
-      jsConstructor += jsProxyAnnotation.constructor;
-    } else {
-      jsConstructor += getNewClassName(clazz);
+    if (nameOfLib != null) name += nameOfLib.name + '.';
+
+    final nameOfClass = getNameAnnotation(clazz.node, jsNameClass);
+    if (nameOfClass != null) {
+      name += nameOfClass.name;
+    } else if (useClassName) {
+      name += getNewClassName(clazz);
+    } else if (name.endsWith('.')){
+      name = name.substring(0, name.length - 1);
     }
-    return jsConstructor;
+    return name;
   }
 
   static String getNewClassName(ClassElement clazz) =>
@@ -289,19 +312,11 @@ JsProxy getProxyAnnotation(AnnotatedNode node, ClassElement jsProxyClass) {
 
   ConstructorElement e = a.element;
   if (e.isDefaultConstructor) {
-    String constructor;
-    for (Expression e in a.arguments.arguments) {
-      if (e is NamedExpression) {
-        if (e.name.label.name == 'constructor' &&
-            e.expression is StringLiteral) {
-          StringLiteral s = e.expression;
-          constructor = s.stringValue;
-        }
-      }
-    }
-    return new JsProxy(constructor: constructor);
+    return new JsProxy();
   } else if (e.name == 'anonymous') {
     return new JsProxy.anonymous();
+  } else if (e.name == 'global') {
+    return new JsProxy.global();
   }
 
   return null;

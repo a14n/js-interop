@@ -32,14 +32,16 @@ abstract class _JsFoo {
   int _m6(int a, b);
 }
 
-@JsProxy(constructor: 'a.b.JsBar')
+@JsName('a.b.JsBar')
+@JsProxy()
 abstract class _JsBar extends JsInterface {
   _JsBar.created(JsObject o) : super.created(o) {
     getState(this).putIfAbsent(#a, () => 0);
   }
 
-  external factory _JsBar();
-  external factory _JsBar.named(int x, int y);
+  factory _JsBar() = dynamic;
+  factory _JsBar.named(int x, int y) = dynamic;
+
   JsBar m1();
 
   void set a(int a) {
@@ -50,11 +52,11 @@ abstract class _JsBar extends JsInterface {
 
 @JsProxy()
 abstract class _JsBaz extends JsBar {
-  external factory _JsBaz();
+  factory _JsBaz() = dynamic;
 }
 
-@JsGlobal()
-abstract class _Context {
+@JsProxy.global()
+abstract class __Context {
   int find(String a);
 
   String a;
@@ -63,3 +65,11 @@ abstract class _Context {
 
   set b(String b1);
 }
+
+final _context = new _Context.created(context);
+
+final find = _context.find;
+String get a => _context.a;
+void set a(String _a) { _context.a = _a; }
+String get b => _context.b;
+void set b(String _b) { _context.b = _b; }

@@ -31,13 +31,14 @@ main() {
     });
 
     test('should access a JS simple property', () {
-      var expando = new JsExpando<Foo>('foo');
+      var expando = new JsExpando<Foo>(
+          'foo', new JsInterfaceCodec((o) => new Foo.created(o)));
       var foo = new Foo();
       expect(expando[window], null);
       expando[window] = foo;
       expect((js.context['foo'] as JsObject).instanceof(js.context['Foo']),
           isTrue);
-      expect(expando[window], same(foo));
+      expect(expando[window], equals(foo));
     });
   });
 }

@@ -21,4 +21,5 @@ export 'package:js/src/js_impl.dart'
 //export 'package:js/src/js_expando.dart' show JsExpando;
 export 'package:js/src/js_list.dart' show JsList;
 //export 'package:js/src/js_map.dart' show JsMap;
-export 'package:js/src/metadata.dart';
+export 'package:js/src/metadata.dart' hide Kind;
+export 'package:js/src/codec.dart' show JsInterfaceCodec;

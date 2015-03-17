@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-16T07:58:06.841Z
+// 2015-03-17T18:11:00.216Z
 
 part of google_maps.sample.simple;
 
@@ -41,7 +41,7 @@ class LatLng extends JsInterface implements _LatLng {
 
 class MapOptions extends JsInterface implements _MapOptions {
   MapOptions.created(JsObject o) : super.created(o);
-  MapOptions() : this.created(new JsObject(getPath('Object')));
+  MapOptions() : this.created(new JsObject(getPath('MapOptions')));
   void set zoom(int _zoom) {
     asJsObject(this)['zoom'] = _zoom;
   }
@@ -65,6 +65,7 @@ class MapOptions extends JsInterface implements _MapOptions {
 
 class GEvent extends JsInterface implements _GEvent {
   GEvent.created(JsObject o) : super.created(o);
+  GEvent() : this.created(context['Object']);
 
   MapsEventListener addDomListener(
           dynamic instance, String eventName, Function handler,
@@ -114,4 +115,5 @@ class GEvent extends JsInterface implements _GEvent {
 
 class MapsEventListener extends JsInterface implements _MapsEventListener {
   MapsEventListener.created(JsObject o) : super.created(o);
+  MapsEventListener() : this.created(context['Object']);
 }

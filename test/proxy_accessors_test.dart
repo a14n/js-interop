@@ -23,28 +23,32 @@ abstract class _Class0 {
   final bool b;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassFinalField {
   factory _ClassFinalField() = dynamic;
 
   final int i;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassNotFinalField {
   factory _ClassNotFinalField() = dynamic;
 
   int i;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassPrivateField {
   factory _ClassPrivateField() = dynamic;
 
   int _i;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassRenamedField {
   factory _ClassRenamedField() = dynamic;
 
@@ -52,7 +56,8 @@ abstract class _ClassRenamedField {
   int iBis;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassRenamedPrivateField {
   factory _ClassRenamedPrivateField() = dynamic;
 
@@ -60,35 +65,40 @@ abstract class _ClassRenamedPrivateField {
   int _iBis;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithGetter {
   factory _ClassWithGetter() = dynamic;
 
   int get i;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithSetter {
   factory _ClassWithSetter() = dynamic;
 
   set i(int i);
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithPrivateGetter {
   factory _ClassWithPrivateGetter() = dynamic;
 
   int get _i;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithPrivateSetter {
   factory _ClassWithPrivateSetter() = dynamic;
 
   set _i(int i);
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithRenamedGetter {
   factory _ClassWithRenamedGetter() = dynamic;
 
@@ -96,7 +106,8 @@ abstract class _ClassWithRenamedGetter {
   int get iBis;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _ClassWithRenamedSetter {
   factory _ClassWithRenamedSetter() = dynamic;
 

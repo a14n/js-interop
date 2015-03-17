@@ -23,12 +23,14 @@ abstract class _Class1 {
   factory _Class1(String s) = dynamic;
 }
 
-@JsProxy(constructor: 'Class0')
+@JsName('Class0')
+@JsProxy()
 abstract class _Class0Alias {
   factory _Class0Alias() = dynamic;
 }
 
-@JsProxy(constructor: 'my.package.Class2')
+@JsName('my.package.Class2')
+@JsProxy()
 abstract class _Class2 {
   factory _Class2() = dynamic;
 }
