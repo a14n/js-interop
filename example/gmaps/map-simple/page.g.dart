@@ -1,27 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-16T07:48:26.110Z
+// 2015-03-16T07:58:06.841Z
 
 part of google_maps.sample.simple;
-
-// **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
-// Target: library google_maps.sample.simple
-// **************************************************************************
-
-void initializeJavaScript({List<String> exclude, List<String> include}) {
-  bool accept(String name) => (include != null && include.contains(name)) ||
-      (include == null && exclude != null && !exclude.contains(name));
-
-  void register(String name, JsInterface f(JsObject o)) =>
-      registerFactoryForJsConstructor(getPath(name), f);
-
-  void mayRegister(String name, JsInterface f(JsObject o)) {
-    if (accept(name)) register(name, f);
-  }
-
-  mayRegister('google.maps.Map', (o) => new GMap.created(o));
-  mayRegister('google.maps.LatLng', (o) => new LatLng.created(o));
-}
 
 // **************************************************************************
 // Generator: Instance of 'JsProxyGenerator'

@@ -4,10 +4,13 @@
 
 library js.js_object_map;
 
+import 'dart:convert';
 import 'dart:collection' show Maps, MapMixin;
 import 'dart:js';
 
-import 'package:js/src/js_impl.dart';
+import 'package:js/src/js_impl.dart' show JsInterface;
+
+final JsObject _obj = context['Object'];
 
 /**
  * A [Map] interface wrapper for [JsObject]s.
@@ -20,25 +23,21 @@ import 'package:js/src/js_impl.dart';
  * key '__proto__' is disallowed.
  */
 class JsMap<V> extends JsInterface with MapMixin<String, V> {
-  static final _obj = context['Object'];
-
   final JsObject _o;
+  final Codec<V, dynamic> _codec;
 
   /**
    * Creates an instance backed by a new JavaScript object whose prototype is
    * Object.
    */
-  JsMap() : this.created(new JsObject(_obj));
-
-  /**
-   * Creates an instance by deep converting [map] to JavaScript with [jsify].
-   */
-  JsMap.jsify(Map<String, dynamic> map) : this.created(jsify(map));
+  JsMap(Codec<V, dynamic> codec) : this.created(new JsObject(_obj), codec);
 
   /**
    * Creates an instance backed by the JavaScript object [o].
    */
-  JsMap.created(JsObject o) : _o = o, super.created(o);
+  JsMap.created(JsObject o, this._codec)
+      : _o = o,
+        super.created(o);
 
   void _checkKey(String key) {
     if (key == '__proto__') {
@@ -47,23 +46,23 @@ class JsMap<V> extends JsInterface with MapMixin<String, V> {
   }
 
   @override
-  V operator [](String key) => toDart(_o[key]) as V;
+  V operator [](String key) => _codec.decode(_o[key]);
 
   @override
   void operator []=(String key, V value) {
     _checkKey(key);
-    _o[key] = toJs(value);
+    _o[key] = _codec.encode(value);
   }
 
   @override
   V remove(String key) {
     final value = this[key];
     _o.deleteProperty(key);
-    return value as V;
+    return value;
   }
 
   @override
-  Iterable<String> get keys => _obj.callMethod('keys', [_o]) as List<String>;
+  Iterable<String> get keys => _obj.callMethod('keys', [_o]);
 
   @override
   bool containsKey(String key) => _o.hasProperty(key);
@@ -71,13 +70,13 @@ class JsMap<V> extends JsInterface with MapMixin<String, V> {
   @override
   V putIfAbsent(String key, V ifAbsent()) {
     _checkKey(key);
-    return Maps.putIfAbsent(this, key, ifAbsent) as V;
+    return Maps.putIfAbsent(this, key, ifAbsent);
   }
 
   @override
   void addAll(Map<String, V> other) {
     if (other != null) {
-      other.forEach((k,v) => this[k] = v);
+      other.forEach((k, v) => this[k] = v);
     }
   }
 

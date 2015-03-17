@@ -1,37 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-16T05:49:31.672Z
+// 2015-03-16T07:58:06.952Z
 
 part of js.test.proxy_instantiation_test;
-
-// **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
-// Target: library js.test.proxy_instantiation_test
-// **************************************************************************
-
-void initializeJavaScript({List<String> exclude, List<String> include}) {
-  bool accept(String name) => (include != null && include.contains(name)) ||
-      (include == null && exclude != null && !exclude.contains(name));
-
-  void register(String name, JsInterface f(JsObject o)) =>
-      registerFactoryForJsConstructor(getPath(name), f);
-
-  void mayRegister(String name, JsInterface f(JsObject o)) {
-    if (accept(name)) register(name, f);
-  }
-
-  mayRegister('Class0', (o) => new Class0.created(o));
-  mayRegister('Class0', (o) => new ClassFinalField.created(o));
-  mayRegister('Class0', (o) => new ClassNotFinalField.created(o));
-  mayRegister('Class0', (o) => new ClassPrivateField.created(o));
-  mayRegister('Class0', (o) => new ClassRenamedField.created(o));
-  mayRegister('Class0', (o) => new ClassRenamedPrivateField.created(o));
-  mayRegister('Class0', (o) => new ClassWithGetter.created(o));
-  mayRegister('Class0', (o) => new ClassWithSetter.created(o));
-  mayRegister('Class0', (o) => new ClassWithPrivateGetter.created(o));
-  mayRegister('Class0', (o) => new ClassWithPrivateSetter.created(o));
-  mayRegister('Class0', (o) => new ClassWithRenamedGetter.created(o));
-  mayRegister('Class0', (o) => new ClassWithRenamedSetter.created(o));
-}
 
 // **************************************************************************
 // Generator: Instance of 'JsProxyGenerator'

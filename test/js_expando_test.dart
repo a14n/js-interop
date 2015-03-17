@@ -10,6 +10,7 @@ import 'dart:js' as js;
 // these imports instead of js.dart so the transformer doesn't kick in and
 // remove mirrors
 import 'package:js/js.dart';
+import 'package:js/src/js_expando.dart';
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';

@@ -4,7 +4,10 @@
 
 library js.js_expando;
 
-import 'package:js/js.dart';
+import 'dart:convert';
+
+import 'package:js/js.dart' show JsObject;
+import 'codec.dart';
 
 /**
  * A [JsExpando] allows access to a JavaScript property of browser objects in a
@@ -15,8 +18,9 @@ import 'package:js/js.dart';
  */
 class JsExpando<T> {
   final String propertyName;
+  final Codec<T, dynamic> _codec;
 
-  JsExpando(this.propertyName);
+  JsExpando(this.propertyName, [this._codec = const IdentityCodec()]);
 
   /**
    * Returns the value of [propertyName] for the JavaScript object corresponding
@@ -25,7 +29,7 @@ class JsExpando<T> {
   T operator [](Object object) {
     var jso = (object is JsObject) ? object
         : new JsObject.fromBrowserObject(object);
-    return toDart(jso[propertyName]) as T;
+    return _codec.decode(jso[propertyName]);
   }
 
   /**
@@ -36,6 +40,6 @@ class JsExpando<T> {
   void operator []=(Object object, T value) {
     var jso = (object is JsObject) ? object
         : new JsObject.fromBrowserObject(object);
-    jso[propertyName] = toJs(value);
+    jso[propertyName] = _codec.encode(value);
   }
 }

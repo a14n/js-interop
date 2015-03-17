@@ -15,10 +15,6 @@ class JsProxyGenerator extends Generator {
   const JsProxyGenerator();
 
   Future<String> generate(Element element) async {
-    if (element is LibraryElement) {
-      return new InitializeJavascriptGenerator(element).generate();
-    }
-
     if (element is ClassElement) {
       final jsProxyClass = getType(element.library, 'js.metadata', 'JsProxy');
       final annotation = getProxyAnnotation(element.node, jsProxyClass);
@@ -31,50 +27,6 @@ class JsProxyGenerator extends Generator {
     }
 
     return null;
-  }
-}
-
-class InitializeJavascriptGenerator {
-  LibraryElement libElement;
-
-  InitializeJavascriptGenerator(this.libElement);
-
-  String generate() {
-    final jsProxyClass = getType(libElement, 'js.metadata', 'JsProxy');
-    final jsNameClass = getType(libElement, 'js.metadata', 'JsName');
-
-    var proxies = libElement.units
-        .expand((e) => e.types)
-        .where((ClassElement e) =>
-            e.metadata.any((md) => isAnnotationOfType(md, jsProxyClass)));
-
-    if (proxies.isEmpty) return null;
-
-    var ouput = '''
-void initializeJavaScript({List<String> exclude, List<String> include}) {
-  bool accept(String name) => (include != null && include.contains(name)) ||
-      (include == null && exclude != null && !exclude.contains(name));
-
-  void register(String name, JsInterface f(JsObject o)) =>
-      registerFactoryForJsConstructor(getPath(name), f);
-
-  void mayRegister(String name, JsInterface f(JsObject o)) {
-      if(accept(name))register(name, f);
-  }
-
-''';
-    for (ClassElement clazz in proxies) {
-      final name = JsProxyClassGenerator.getNewClassName(clazz);
-      final jsProxy = getProxyAnnotation(clazz.node, jsProxyClass);
-
-      if (jsProxy.anonymousObject) continue;
-
-      final constructor = JsProxyClassGenerator.getJsProxyConstructor(
-          clazz, jsNameClass, jsProxy);
-      ouput += "mayRegister('$constructor', (o) => new $name.created(o));";
-    }
-    ouput += '}';
-    return ouput;
   }
 }
 
@@ -314,11 +266,11 @@ class JsProxyClassGenerator {
   /// (see https://api.dartlang.org/docs/channels/stable/latest/dart_js.html)
   bool isTypeTransferable(DartType type) {
     final transferables = const <String, List<String>>{
-      'dart.js': ['JsObject'],
-      'dart.core': ['num', 'bool', 'String', 'DateTime'],
-      'dart.dom.html': ['Blob', 'Event', 'ImageData', 'Node', 'Window'],
-      'dart.dom.indexed_db': ['KeyRange'],
-      'dart.typed_data': ['TypedData'],
+      'dart.js': const ['JsObject'],
+      'dart.core': const ['num', 'bool', 'String', 'DateTime'],
+      'dart.dom.html': const ['Blob', 'Event', 'ImageData', 'Node', 'Window'],
+      'dart.dom.indexed_db': const ['KeyRange'],
+      'dart.typed_data': const ['TypedData'],
     };
     for (final libName in transferables.keys) {
       if (transferables[libName].any((className) =>

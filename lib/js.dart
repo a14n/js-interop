@@ -17,11 +17,8 @@ export 'package:js/src/js_impl.dart'
         getState,
         JsGlobal,
         JsInterface,
-        registerJsConstructorForType,
-        registerFactoryForJsConstructor,
-        toJs,
-        toDart;
-export 'package:js/src/js_expando.dart' show JsExpando;
+        toJs;
+//export 'package:js/src/js_expando.dart' show JsExpando;
 export 'package:js/src/js_list.dart' show JsList;
-export 'package:js/src/js_map.dart' show JsMap;
+//export 'package:js/src/js_map.dart' show JsMap;
 export 'package:js/src/metadata.dart';

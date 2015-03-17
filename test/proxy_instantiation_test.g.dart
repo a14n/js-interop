@@ -1,29 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-14T13:18:10.558Z
+// 2015-03-16T07:58:06.890Z
 
 part of js.test.proxy_instantiation_test;
-
-// **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
-// Target: library js.test.proxy_instantiation_test
-// **************************************************************************
-
-void initializeJavaScript({List<String> exclude, List<String> include}) {
-  bool accept(String name) => (include != null && include.contains(name)) ||
-      (include == null && exclude != null && !exclude.contains(name));
-
-  void register(String name, JsInterface f(JsObject o)) =>
-      registerFactoryForJsConstructor(getPath(name), f);
-
-  void mayRegister(String name, JsInterface f(JsObject o)) {
-    if (accept(name)) register(name, f);
-  }
-
-  mayRegister('Class0', (o) => new Class0.created(o));
-  mayRegister('Class1', (o) => new Class1.created(o));
-  mayRegister('Class0', (o) => new Class0Alias.created(o));
-  mayRegister('my.package.Class2', (o) => new Class2.created(o));
-}
 
 // **************************************************************************
 // Generator: Instance of 'JsProxyGenerator'

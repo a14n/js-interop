@@ -4,10 +4,11 @@
 
 library js.js_list;
 
+import 'dart:convert';
 import 'dart:collection';
 import 'dart:js';
 
-import 'js_impl.dart';
+import 'js_impl.dart' show JsInterface;
 
 /**
  * A [List] interface wrapper for [JsArray]s.
@@ -17,45 +18,45 @@ import 'js_impl.dart';
  * when accessed.
  */
 class JsList<E> extends JsInterface with ListMixin<E> {
-  JsArray _o;
+  final JsArray _o;
+  final Codec<E, dynamic> _codec;
 
   /**
    * Creates an instance backed by a new JavaScript Array.
    */
-  JsList() : this.created(new JsArray());
-
-  /**
-   * Creates an instance by deep converting [list] to JavaScript with [jsify].
-   */
-  JsList.jsify(List<E> list) : this.created(jsify(list));
+  JsList(Codec<E, dynamic> codec) : this.created(new JsArray(), codec);
 
   /**
    * Creates an instance backed by the JavaScript object [o].
    */
-  JsList.created(JsArray o) : _o = o, super.created(o);
+  JsList.created(JsArray o, this._codec)
+      : _o = o,
+        super.created(o);
 
   @override
   int get length => _o.length;
 
   @override
-  void set length(int length) { _o.length = length; }
+  void set length(int length) {
+    _o.length = length;
+  }
 
   @override
-  E operator [](index) => toDart(_o[index]) as E;
+  E operator [](index) => _codec.decode(_o[index]);
 
   @override
   void operator []=(int index, E value) {
-    _o[index] = toJs(value);
+    _o[index] = _codec.encode(value);
   }
 
   @override
   void add(E value) {
-    _o.add(toJs(value));
+    _o.add(_codec.encode(value));
   }
 
   @override
   void addAll(Iterable<E> iterable) {
-    _o.addAll(iterable.map(toJs));
+    _o.addAll(iterable.map(_codec.encode));
   }
 
   @override
@@ -66,18 +67,18 @@ class JsList<E> extends JsInterface with ListMixin<E> {
 
   @override
   void insert(int index, E element) {
-    _o.insert(index, toJs(element));
+    _o.insert(index, _codec.encode(element));
   }
 
   @override
-  E removeAt(int index) => toDart(_o.removeAt(index)) as E;
+  E removeAt(int index) => _codec.decode(_o.removeAt(index));
 
   @override
-  E removeLast() => toDart(_o.removeLast()) as E;
+  E removeLast() => _codec.decode(_o.removeLast());
 
   @override
   void setRange(int start, int end, Iterable<E> iterable, [int startFrom = 0]) {
-    _o.setRange(start, end, iterable.map(toJs), startFrom);
+    _o.setRange(start, end, iterable.map(_codec.encode), startFrom);
   }
 
   @override

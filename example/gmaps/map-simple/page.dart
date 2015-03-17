@@ -57,8 +57,6 @@ abstract class _MapsEventListener {
 
 
 void main() {
-  initializeJavaScript();
-
   final mapOptions = new MapOptions()
     ..zoom = 8
     ..center = new LatLng(-34.397, 150.644)
