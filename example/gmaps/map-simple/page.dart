@@ -1,3 +1,4 @@
+@JsName('google.maps')
 library google_maps.sample.simple;
 
 import 'dart:html';
@@ -6,13 +7,12 @@ import 'package:js/js.dart';
 part 'page.g.dart';
 
 
-@JsName('google.maps.Map')
+@JsName('Map')
 @JsProxy()
 abstract class _GMap {
   factory _GMap(Node mapDiv, [MapOptions opts]) = dynamic;
 }
 
-@JsName('google.maps.LatLng')
 @JsProxy()
 abstract class _LatLng extends JsInterface {
   factory _LatLng(num lat, num lng, [bool noWrap]) = dynamic;
@@ -41,7 +41,7 @@ class MapTypeId {
 
 final GEvent event = new GEvent();
 
-@JsName('google.maps.event')
+@JsName('event')
 @JsProxy.anonymous()
 abstract class _GEvent {
   MapsEventListener addDomListener(dynamic instance, String eventName, Function handler, [bool capture]);

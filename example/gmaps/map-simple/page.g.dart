@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-17T18:11:00.216Z
+// 2015-03-18T07:30:18.968Z
 
 part of google_maps.sample.simple;
 
@@ -41,7 +41,7 @@ class LatLng extends JsInterface implements _LatLng {
 
 class MapOptions extends JsInterface implements _MapOptions {
   MapOptions.created(JsObject o) : super.created(o);
-  MapOptions() : this.created(new JsObject(getPath('MapOptions')));
+  MapOptions() : this.created(new JsObject(getPath('google.maps.MapOptions')));
   void set zoom(int _zoom) {
     asJsObject(this)['zoom'] = _zoom;
   }
