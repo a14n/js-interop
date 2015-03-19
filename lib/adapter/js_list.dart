@@ -2,13 +2,13 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library js.js_list;
+library js.adapter.list;
 
 import 'dart:convert';
 import 'dart:collection';
 import 'dart:js';
 
-import 'js_impl.dart' show JsInterface;
+import 'package:js/js.dart' show JsInterface;
 
 /**
  * A [List] interface wrapper for [JsArray]s.

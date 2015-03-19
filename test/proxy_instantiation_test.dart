@@ -13,26 +13,22 @@ import 'package:unittest/html_config.dart';
 
 part 'proxy_instantiation_test.g.dart';
 
-@JsProxy()
-abstract class _Class0 {
-  factory _Class0() = dynamic;
+abstract class _Class0 implements JsInterface {
+  external factory _Class0();
 }
 
-@JsProxy()
-abstract class _Class1 {
-  factory _Class1(String s) = dynamic;
+abstract class _Class1 implements JsInterface {
+  external factory _Class1(String s);
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _Class0Alias {
-  factory _Class0Alias() = dynamic;
+abstract class _Class0Alias implements JsInterface {
+  external factory _Class0Alias();
 }
 
 @JsName('my.package.Class2')
-@JsProxy()
-abstract class _Class2 {
-  factory _Class2() = dynamic;
+abstract class _Class2 implements JsInterface {
+  external factory _Class2();
 }
 
 main() {
@@ -81,5 +77,4 @@ main() {
     expect(jsO, new isInstanceOf<js.JsObject>());
     expect(js.context.callMethod('isClass2', [jsO]), true);
   });
-
 }

@@ -2,13 +2,13 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library js.js_object_map;
+library js.adapter.object_as_map;
 
 import 'dart:convert';
 import 'dart:collection' show Maps, MapMixin;
 import 'dart:js';
 
-import 'package:js/src/js_impl.dart' show JsInterface;
+import 'package:js/js.dart' show JsInterface;
 
 final JsObject _obj = context['Object'];
 
@@ -22,7 +22,7 @@ final JsObject _obj = context['Object'];
  * Keys must be [String] because they are used as JavaScript property names. The
  * key '__proto__' is disallowed.
  */
-class JsMap<V> extends JsInterface with MapMixin<String, V> {
+class JsObjectAsMap<V> extends JsInterface with MapMixin<String, V> {
   final JsObject _o;
   final Codec<V, dynamic> _codec;
 
@@ -30,12 +30,13 @@ class JsMap<V> extends JsInterface with MapMixin<String, V> {
    * Creates an instance backed by a new JavaScript object whose prototype is
    * Object.
    */
-  JsMap(Codec<V, dynamic> codec) : this.created(new JsObject(_obj), codec);
+  JsObjectAsMap(Codec<V, dynamic> codec)
+      : this.created(new JsObject(_obj), codec);
 
   /**
    * Creates an instance backed by the JavaScript object [o].
    */
-  JsMap.created(JsObject o, this._codec)
+  JsObjectAsMap.created(JsObject o, this._codec)
       : _o = o,
         super.created(o);
 

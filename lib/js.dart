@@ -1,25 +1,45 @@
-// Copyright (c) 2013, the Dart project authors.  Please see the AUTHORS file
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-/**
- * The js library allows Dart library authors to export their APIs to JavaScript
- * and to define Dart interfaces for JavaScript objects.
- */
+/// The js library allows Dart library authors to define Dart interfaces for
+/// JavaScript objects.
 library js;
 
+import 'dart:js';
 export 'dart:js' show JsObject, context;
 
-export 'package:js/src/js_impl.dart'
-    show
-        asJsObject,
-        getPath,
-        getState,
-        JsGlobal,
-        JsInterface,
-        toJs;
-//export 'package:js/src/js_expando.dart' show JsExpando;
-export 'package:js/src/js_list.dart' show JsList;
-//export 'package:js/src/js_map.dart' show JsMap;
-export 'package:js/src/metadata.dart' hide Kind;
-export 'package:js/src/codec.dart' show JsInterfaceCodec;
+final JsObject _obj = context['Object'];
+
+/// The base class of Dart interfaces for JavaScript objects.
+abstract class JsInterface {
+  final JsObject _jsObject;
+
+  JsInterface.created(JsObject o) : _jsObject = o;
+
+  @override int get hashCode => _jsObject.hashCode;
+  @override bool operator ==(other) =>
+      other is JsInterface && _jsObject == other._jsObject;
+}
+
+JsObject asJsObject(JsInterface o) => o._jsObject;
+
+dynamic toJs(dynamic o) => o is JsInterface ? asJsObject(o) : o;
+
+JsObject getPath(String path) =>
+    path.split('.').fold(context, (JsObject o, p) => o[p]);
+
+/// A metadata annotation that allows to customize the name used for method call
+/// or attribute access on the javascript side.
+class JsName {
+  final String name;
+  const JsName(this.name);
+}
+
+class _Anonymous {
+  const _Anonymous();
+}
+
+/// This means that the Js object is a anonymous js object. That is it is
+/// created with `new Object()`.
+const _Anonymous anonymous = const _Anonymous();

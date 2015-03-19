@@ -13,9 +13,8 @@ import 'package:unittest/html_config.dart';
 
 part 'proxy_accessors_test.g.dart';
 
-@JsProxy()
-abstract class _Class0 {
-  factory _Class0() = dynamic;
+abstract class _Class0 implements JsInterface {
+  external factory _Class0();
 
   final int i;
   final double d;
@@ -24,92 +23,81 @@ abstract class _Class0 {
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassFinalField {
-  factory _ClassFinalField() = dynamic;
+abstract class _ClassFinalField implements JsInterface {
+  external factory _ClassFinalField();
 
   final int i;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassNotFinalField {
-  factory _ClassNotFinalField() = dynamic;
+abstract class _ClassNotFinalField implements JsInterface {
+  external factory _ClassNotFinalField();
 
   int i;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassPrivateField {
-  factory _ClassPrivateField() = dynamic;
+abstract class _ClassPrivateField implements JsInterface {
+  external factory _ClassPrivateField();
 
   int _i;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassRenamedField {
-  factory _ClassRenamedField() = dynamic;
+abstract class _ClassRenamedField implements JsInterface {
+  external factory _ClassRenamedField();
 
   @JsName('i')
   int iBis;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassRenamedPrivateField {
-  factory _ClassRenamedPrivateField() = dynamic;
+abstract class _ClassRenamedPrivateField implements JsInterface {
+  external factory _ClassRenamedPrivateField();
 
   @JsName('i')
   int _iBis;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithGetter {
-  factory _ClassWithGetter() = dynamic;
+abstract class _ClassWithGetter implements JsInterface {
+  external factory _ClassWithGetter();
 
   int get i;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithSetter {
-  factory _ClassWithSetter() = dynamic;
+abstract class _ClassWithSetter implements JsInterface {
+  external factory _ClassWithSetter();
 
   set i(int i);
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithPrivateGetter {
-  factory _ClassWithPrivateGetter() = dynamic;
+abstract class _ClassWithPrivateGetter implements JsInterface {
+  external factory _ClassWithPrivateGetter();
 
   int get _i;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithPrivateSetter {
-  factory _ClassWithPrivateSetter() = dynamic;
+abstract class _ClassWithPrivateSetter implements JsInterface {
+  external factory _ClassWithPrivateSetter();
 
   set _i(int i);
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithRenamedGetter {
-  factory _ClassWithRenamedGetter() = dynamic;
+abstract class _ClassWithRenamedGetter implements JsInterface {
+  external factory _ClassWithRenamedGetter();
 
   @JsName('i')
   int get iBis;
 }
 
 @JsName('Class0')
-@JsProxy()
-abstract class _ClassWithRenamedSetter {
-  factory _ClassWithRenamedSetter() = dynamic;
+abstract class _ClassWithRenamedSetter implements JsInterface {
+  external factory _ClassWithRenamedSetter();
 
   @JsName('i')
   set iBis(int i);

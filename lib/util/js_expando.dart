@@ -7,7 +7,7 @@ library js.js_expando;
 import 'dart:convert';
 
 import 'package:js/js.dart' show JsObject;
-import 'codec.dart';
+import 'package:js/util/codec.dart';
 
 /**
  * A [JsExpando] allows access to a JavaScript property of browser objects in a

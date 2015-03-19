@@ -1,13 +1,17 @@
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 @JsName('z.y.x')
 library js.example.js_proxy;
 
 import 'package:js/js.dart';
+import 'package:js/util/state.dart';
 
 part 'example.g.dart';
 
-@JsProxy()
-abstract class _JsFoo {
-  factory _JsFoo() = dynamic;
+abstract class _JsFoo implements JsInterface {
+  external factory _JsFoo();
 
   @JsName('_i')
   int i;
@@ -33,7 +37,6 @@ abstract class _JsFoo {
 }
 
 @JsName('a.b.JsBar')
-@JsProxy()
 abstract class _JsBar extends JsInterface {
   _JsBar.created(JsObject o) : super.created(o) {
     getState(this).putIfAbsent(#a, () => 0);
@@ -50,13 +53,11 @@ abstract class _JsBar extends JsInterface {
   int get a => getState(this)[#a];
 }
 
-@JsProxy()
 abstract class _JsBaz extends JsBar {
   factory _JsBaz() = dynamic;
 }
 
-@JsProxy.global()
-abstract class __Context {
+abstract class __Context implements JsInterface {
   int find(String a);
 
   String a;

@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-17T17:40:24.366Z
+// 2015-03-19T20:54:33.449Z
 
 part of js.test.proxy_instantiation_test;
 

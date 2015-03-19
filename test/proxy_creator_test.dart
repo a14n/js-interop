@@ -1,4 +1,4 @@
-// Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
@@ -12,15 +12,17 @@ main() {
 
     test('should accept simple name', () {
       expect(createProxySkeleton('MyClass'), '''
-@JsProxy(constructor: 'MyClass')
-abstract class _MyClass {
+@JsName('MyClass')
+abstract class _MyClass implements JsInterface {
+  external factory _MyClass();
 }''');
     });
 
     test('should accept qualified name', () {
       expect(createProxySkeleton('a.b.MyClass'), '''
-@JsProxy(constructor: 'a.b.MyClass')
-abstract class _MyClass {
+@JsName('a.b.MyClass')
+abstract class _MyClass implements JsInterface {
+  external factory _MyClass();
 }''');
     });
 

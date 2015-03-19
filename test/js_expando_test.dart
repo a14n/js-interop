@@ -10,15 +10,16 @@ import 'dart:js' as js;
 // these imports instead of js.dart so the transformer doesn't kick in and
 // remove mirrors
 import 'package:js/js.dart';
-import 'package:js/src/js_expando.dart';
+import 'package:js/util/codec.dart';
+import 'package:js/util/js_expando.dart';
 
 import 'package:unittest/unittest.dart';
-import 'package:unittest/html_enhanced_config.dart';
+import 'package:unittest/html_config.dart';
 
 part 'js_expando_test.g.dart';
 
 main() {
-  useHtmlEnhancedConfiguration();
+  useHtmlConfiguration();
 
   group('JsExpando', () {
     test('should access a JS simple property', () {
@@ -43,7 +44,6 @@ main() {
   });
 }
 
-@JsProxy()
-abstract class _Foo {
-  factory _Foo() = dynamic;
+abstract class _Foo implements JsInterface {
+  external factory _Foo();
 }

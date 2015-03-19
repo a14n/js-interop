@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-17T18:14:06.648Z
+// 2015-03-19T20:48:29.376Z
 
 part of js.example.js_proxy;
 
@@ -59,9 +59,8 @@ class JsBar extends JsInterface implements _JsBar {
     getState(this).putIfAbsent(#a, () => 0);
   }
 
-  JsBar() : this.created(new JsObject(getPath('z.y.x.a.b.JsBar')));
-  JsBar.named(int x, int y) : this.created(
-          new JsObject(getPath('z.y.x.a.b.JsBar'), [x, y].map(toJs).toList()));
+  factory JsBar() = dynamic;
+  factory JsBar.named(int x, int y) = dynamic;
 
   JsBar m1() => ((e) => e == null ? null : new JsBar.created(e))(
       asJsObject(this).callMethod('m1'));
@@ -79,7 +78,7 @@ class JsBar extends JsInterface implements _JsBar {
 
 class JsBaz extends JsBar implements _JsBaz {
   JsBaz.created(JsObject o) : super.created(o);
-  JsBaz() : this.created(new JsObject(getPath('z.y.x.JsBaz')));
+  factory JsBaz() = dynamic;
 }
 
 // **************************************************************************
@@ -89,7 +88,6 @@ class JsBaz extends JsBar implements _JsBaz {
 
 class _Context extends JsInterface implements __Context {
   _Context.created(JsObject o) : super.created(o);
-  _Context() : this.created(getPath('z.y.x'));
 
   int find(String a) =>
       asJsObject(this).callMethod('find', [a].map(toJs).toList());

@@ -1,3 +1,7 @@
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 library js.generator.js_proxy;
 
 import 'dart:async';
@@ -8,7 +12,6 @@ import 'package:analyzer/src/generated/element.dart';
 
 import 'package:source_gen/source_gen.dart';
 
-import '../src/metadata.dart';
 import 'util.dart';
 
 class JsProxyGenerator extends Generator {
@@ -16,14 +19,14 @@ class JsProxyGenerator extends Generator {
 
   Future<String> generate(Element element) async {
     if (element is ClassElement) {
-      final jsProxyClass = getType(element.library, 'js.metadata', 'JsProxy');
-      final annotation = getProxyAnnotation(element.node, jsProxyClass);
+      if (element.unit.element.name.endsWith('.g.dart')) return null;
 
-      if (annotation == null) return null;
+      final jsInterfaceClass = getType(element.library, 'js', 'JsInterface');
+      if (!element.type.isSubtypeOf(jsInterfaceClass.type)) return null;
 
       if (!element.isPrivate) throw '$element must be private';
 
-      return new JsProxyClassGenerator(element, annotation).generate();
+      return new JsProxyClassGenerator(element).generate();
     }
 
     return null;
@@ -33,16 +36,14 @@ class JsProxyGenerator extends Generator {
 class JsProxyClassGenerator {
   final LibraryElement lib;
   final ClassElement clazz;
-  final JsProxy annotation;
   final transformer = new Transformer();
 
-  ClassElement _jsProxyClass, _jsNameClass;
+  ClassElement _jsNameClass;
 
-  JsProxyClassGenerator(ClassElement clazz, this.annotation)
+  JsProxyClassGenerator(ClassElement clazz)
       : lib = clazz.library,
         clazz = clazz {
-    _jsProxyClass = getType(lib, 'js.metadata', 'JsProxy');
-    _jsNameClass = getType(lib, 'js.metadata', 'JsName');
+    _jsNameClass = getType(lib, 'js', 'JsName');
   }
 
   String generate() {
@@ -53,8 +54,30 @@ class JsProxyClassGenerator {
       transformer.insertAt(
           clazz.node.leftBracket.offset, ' implements ${clazz.displayName}');
     } else {
-      transformer.insertAt(
-          clazz.node.implementsClause.end, ', ${clazz.displayName}');
+      var interfaceCount = clazz.node.implementsClause.interfaces.length;
+      // remove implement JsInterface
+      clazz.node.implementsClause.interfaces
+          .where((e) => e.name.name == 'JsInterface')
+          .forEach((e) {
+        interfaceCount--;
+        if (clazz.node.implementsClause.interfaces.length == 1) {
+          transformer.removeNode(e);
+        } else {
+          final index = clazz.node.implementsClause.interfaces.indexOf(e);
+          int begin, end;
+          if (index == 0) {
+            begin = e.offset;
+            end = clazz.node.implementsClause.interfaces[1].offset;
+          } else {
+            begin = clazz.node.implementsClause.interfaces[index - 1].end;
+            end = e.end;
+          }
+          transformer.removeBetween(begin, end);
+        }
+      });
+
+      transformer.insertAt(clazz.node.implementsClause.end,
+          (interfaceCount > 0 ? ', ' : '') + clazz.displayName);
     }
 
     // add JsInterface extension
@@ -62,11 +85,11 @@ class JsProxyClassGenerator {
       transformer.insertAt(clazz.node.name.end, ' extends JsInterface');
     }
 
-    // remove JsProxy annotation
-    getAnnotations(clazz.node, _jsProxyClass).forEach(transformer.removeNode);
-
     // remove JsName annotation
     getAnnotations(clazz.node, _jsNameClass).forEach(transformer.removeNode);
+
+    // remove anonymous annotation
+    removeAnonymousAnnotation();
 
     // remove abstract
     transformer.removeToken(clazz.node.abstractKeyword);
@@ -83,44 +106,35 @@ class JsProxyClassGenerator {
       transformer.replace(constr.node.returnType.offset,
           constr.node.returnType.end, newClassName);
 
-      // generate only factory redirected constructor for dynamic
+      // generate only external factory constructor
       if (!constr.isFactory ||
-          constr.node.redirectedConstructor == null ||
-          constr.node.redirectedConstructor.type.name.name != 'dynamic') {
+          constr.node.externalKeyword == null ||
+          constr.node.initializers.isNotEmpty) {
         continue;
       }
 
-      final jsName = computeJsName(clazz, _jsNameClass, true);
-      var newJsObject = "new JsObject(getPath('$jsName')";
-      if (constr.parameters.isNotEmpty) {
-        final parameterList =
-            constr.parameters.map((p) => p.displayName).join(', ');
-        newJsObject += ", [$parameterList].map(toJs).toList()";
+      var newJsObject = "new JsObject(";
+      if (anonymousAnnotations.isNotEmpty) {
+        if (constr.parameters.isNotEmpty) {
+          throw '@anonymous JsInterface can not have constructor with '
+              'parameters';
+        }
+        newJsObject += "context['Object']";
+      } else {
+        final jsName = computeJsName(clazz, _jsNameClass, true);
+        newJsObject += "getPath('$jsName')";
+        if (constr.parameters.isNotEmpty) {
+          final parameterList =
+              constr.parameters.map((p) => p.displayName).join(', ');
+          newJsObject += ", [$parameterList].map(toJs).toList()";
+        }
       }
       newJsObject += ")";
+
       transformer.removeToken(constr.node.factoryKeyword);
-      transformer.removeToken(constr.node.separator);
-      transformer.removeNode(constr.node.redirectedConstructor);
+      transformer.removeToken(constr.node.externalKeyword);
       transformer.insertAt(
           constr.node.end - 1, " : this.created($newJsObject)");
-    }
-
-    // generate the default constructor for global and anonymous
-    if ((annotation.kind == Kind.ANONYMOUS || annotation.kind == Kind.GLOBAL) &&
-        clazz.constructors.any((e) => e.isSynthetic)) {
-      final insertionIndex = clazz.constructors
-              .where((e) => !e.isSynthetic).isEmpty
-          ? clazz.node.leftBracket.end
-          : clazz.constructors.first.node.offset;
-      var jsObject;
-      if (annotation.kind == Kind.GLOBAL) {
-        final jsName = computeJsName(clazz, _jsNameClass, false);
-        jsObject = "getPath('$jsName')";
-      } else if (annotation.kind == Kind.ANONYMOUS) {
-        jsObject = "context['Object']";
-      }
-      transformer.insertAt(
-          insertionIndex, "$newClassName() : this.created($jsObject);\n");
     }
 
     // generate the constructor .created
@@ -134,10 +148,10 @@ class JsProxyClassGenerator {
     }
 
     // generate properties
-    transformAbstractAccessors(transformer,
+    transformAbstractAccessors(
         clazz.accessors.where((e) => !e.isStatic).where((e) => e.isAbstract));
 
-    transformInstanceVariables(lib, transformer, clazz.accessors
+    transformInstanceVariables(clazz.accessors
         .where((e) => !e.isStatic)
         .where((e) => e.isSynthetic)
         .where((e) => e.variable.initializer == null));
@@ -145,7 +159,7 @@ class JsProxyClassGenerator {
     // generate abstract methods
     clazz.methods.where((e) => !e.isStatic).forEach((m) {
       final jsName = getNameAnnotation(m.node, _jsNameClass);
-      final name = jsName != null ? jsName.name : m.displayName;
+      final name = jsName != null ? jsName : m.displayName;
       var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
@@ -166,12 +180,21 @@ class JsProxyClassGenerator {
     return transformer.applyOn(clazz);
   }
 
-  void transformAbstractAccessors(
-      Transformer transformer, Iterable<PropertyAccessorElement> accessors) {
+  Iterable<Annotation> get anonymousAnnotations => clazz.node.metadata
+      .where((a) {
+    var e = a.element;
+    return e.library.name == 'js' && e.name == 'anonymous';
+  });
+
+  void removeAnonymousAnnotation() {
+    anonymousAnnotations.forEach(transformer.removeNode);
+  }
+
+  void transformAbstractAccessors(Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
       final jsName = getNameAnnotation(accessor.node, _jsNameClass);
       final name = jsName != null
-          ? jsName.name
+          ? jsName
           : accessor.isPrivate
               ? accessor.displayName.substring(1)
               : accessor.displayName;
@@ -192,8 +215,7 @@ class JsProxyClassGenerator {
     });
   }
 
-  void transformInstanceVariables(LibraryElement lib, Transformer transformer,
-      Iterable<PropertyAccessorElement> accessors) {
+  void transformInstanceVariables(Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
       var jsName = getNameAnnotation(accessor.variable.node, _jsNameClass);
       jsName = jsName != null
@@ -201,7 +223,7 @@ class JsProxyClassGenerator {
           : getNameAnnotation(
               accessor.variable.node.parent.parent, _jsNameClass);
       jsName = jsName != null
-          ? jsName.name
+          ? jsName
           : accessor.isPrivate
               ? accessor.displayName.substring(1)
               : accessor.displayName;
@@ -238,14 +260,14 @@ class JsProxyClassGenerator {
 
     final nameOfLib =
         getNameAnnotation(clazz.library.unit.directives.first, jsNameClass);
-    if (nameOfLib != null) name += nameOfLib.name + '.';
+    if (nameOfLib != null) name += nameOfLib + '.';
 
     final nameOfClass = getNameAnnotation(clazz.node, jsNameClass);
     if (nameOfClass != null) {
-      name += nameOfClass.name;
+      name += nameOfClass;
     } else if (useClassName) {
       name += getNewClassName(clazz);
-    } else if (name.endsWith('.')){
+    } else if (name.endsWith('.')) {
       name = name.substring(0, name.length - 1);
     }
     return name;
@@ -269,7 +291,7 @@ class JsProxyClassGenerator {
 
   String toDart(DartType type, String content) {
     if (!type.isDynamic) {
-      if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
+      if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
         return '((e) => e == null ? null : new $type.created(e))($content)';
       }
     }
@@ -278,7 +300,7 @@ class JsProxyClassGenerator {
 
   String toJs(DartType type, String content) {
     if (!type.isDynamic) {
-      if (type.isSubtypeOf(getType(lib, 'js.impl', 'JsInterface').type)) {
+      if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
         return '((e) => e == null ? null : asJsObject(e))($content)';
       }
     }
@@ -305,31 +327,14 @@ class JsProxyClassGenerator {
   }
 }
 
-JsProxy getProxyAnnotation(AnnotatedNode node, ClassElement jsProxyClass) {
-  final jsNames = getAnnotations(node, jsProxyClass);
-  if (jsNames.isEmpty) return null;
-  final a = jsNames.single;
-
-  ConstructorElement e = a.element;
-  if (e.isDefaultConstructor) {
-    return new JsProxy();
-  } else if (e.name == 'anonymous') {
-    return new JsProxy.anonymous();
-  } else if (e.name == 'global') {
-    return new JsProxy.global();
-  }
-
-  return null;
-}
-
-JsName getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
+String getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
   final jsNames = getAnnotations(node, jsNameClass);
   if (jsNames.isEmpty) return null;
   final a = jsNames.single;
   if (a.arguments.arguments.length == 1) {
     var param = a.arguments.arguments.first;
     if (param is StringLiteral) {
-      return new JsName(param.stringValue);
+      return param.stringValue;
     }
   }
   return null;

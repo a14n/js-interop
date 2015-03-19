@@ -7,7 +7,8 @@ library js.proxy_creator;
 String createProxySkeleton(String name) {
   final className = '_' + name.substring(name.lastIndexOf('.') + 1);
   return '''
-@JsProxy(constructor: '$name')
-abstract class $className {
+@JsName('$name')
+abstract class $className implements JsInterface {
+  external factory $className();
 }''';
 }

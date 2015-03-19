@@ -1,14 +1,11 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:50:17.741Z
+// 2015-03-19T21:00:04.319Z
 
-part of js.test.js_expando_test;
+part of js;
 
 // **************************************************************************
 // Generator: Instance of 'JsProxyGenerator'
-// Target: abstract class _Foo
+// Target: abstract class JsInterface
 // **************************************************************************
 
-class Foo extends JsInterface implements _Foo {
-  Foo.created(JsObject o) : super.created(o);
-  Foo() : this.created(new JsObject(getPath('Foo')));
-}
+// Error: JsInterface must be private

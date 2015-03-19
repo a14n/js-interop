@@ -1,11 +1,13 @@
-library js.util;
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+library js.generator.util;
 
 import 'package:analyzer/analyzer.dart';
 import 'package:analyzer/src/generated/ast.dart';
 import 'package:analyzer/src/generated/element.dart';
 import 'package:analyzer/src/generated/scanner.dart';
-
-import '../src/metadata.dart';
 
 LibraryElement getLib(LibraryElement libElement, String name) =>
     libElement.visibleLibraries.firstWhere((l) => l.name == name,
