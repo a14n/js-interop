@@ -19,8 +19,10 @@ abstract class _LatLng implements JsInterface {
   external factory _LatLng(num lat, num lng, [bool noWrap]);
 
   bool equals(LatLng other);
-  num get lat => asJsObject(this).callMethod('lat');
-  num get lng => asJsObject(this).callMethod('lng');
+  num get lat => _lat();
+  num _lat();
+  num get lng => _lng();
+  num _lng();
   String toString();
   String toUrlValue([num precision]);
 }

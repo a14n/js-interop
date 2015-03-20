@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:52:44.208Z
+// 2015-03-20T21:53:12.577Z
 
 part of js.test.proxy_instantiation_test;
 
@@ -23,6 +23,7 @@ class Class0 extends JsInterface implements _Class0 {
 // Target: abstract class _ClassFinalField
 // **************************************************************************
 
+@JsName('Class0')
 class ClassFinalField extends JsInterface implements _ClassFinalField {
   ClassFinalField.created(JsObject o) : super.created(o);
   ClassFinalField() : this.created(new JsObject(getPath('Class0')));
@@ -35,6 +36,7 @@ class ClassFinalField extends JsInterface implements _ClassFinalField {
 // Target: abstract class _ClassNotFinalField
 // **************************************************************************
 
+@JsName('Class0')
 class ClassNotFinalField extends JsInterface implements _ClassNotFinalField {
   ClassNotFinalField.created(JsObject o) : super.created(o);
   ClassNotFinalField() : this.created(new JsObject(getPath('Class0')));
@@ -50,6 +52,7 @@ class ClassNotFinalField extends JsInterface implements _ClassNotFinalField {
 // Target: abstract class _ClassPrivateField
 // **************************************************************************
 
+@JsName('Class0')
 class ClassPrivateField extends JsInterface implements _ClassPrivateField {
   ClassPrivateField.created(JsObject o) : super.created(o);
   ClassPrivateField() : this.created(new JsObject(getPath('Class0')));
@@ -65,6 +68,7 @@ class ClassPrivateField extends JsInterface implements _ClassPrivateField {
 // Target: abstract class _ClassRenamedField
 // **************************************************************************
 
+@JsName('Class0')
 class ClassRenamedField extends JsInterface implements _ClassRenamedField {
   ClassRenamedField.created(JsObject o) : super.created(o);
   ClassRenamedField() : this.created(new JsObject(getPath('Class0')));
@@ -80,6 +84,7 @@ class ClassRenamedField extends JsInterface implements _ClassRenamedField {
 // Target: abstract class _ClassRenamedPrivateField
 // **************************************************************************
 
+@JsName('Class0')
 class ClassRenamedPrivateField extends JsInterface
     implements _ClassRenamedPrivateField {
   ClassRenamedPrivateField.created(JsObject o) : super.created(o);
@@ -96,6 +101,7 @@ class ClassRenamedPrivateField extends JsInterface
 // Target: abstract class _ClassWithGetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithGetter extends JsInterface implements _ClassWithGetter {
   ClassWithGetter.created(JsObject o) : super.created(o);
   ClassWithGetter() : this.created(new JsObject(getPath('Class0')));
@@ -108,6 +114,7 @@ class ClassWithGetter extends JsInterface implements _ClassWithGetter {
 // Target: abstract class _ClassWithSetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithSetter extends JsInterface implements _ClassWithSetter {
   ClassWithSetter.created(JsObject o) : super.created(o);
   ClassWithSetter() : this.created(new JsObject(getPath('Class0')));
@@ -122,6 +129,7 @@ class ClassWithSetter extends JsInterface implements _ClassWithSetter {
 // Target: abstract class _ClassWithPrivateGetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithPrivateGetter extends JsInterface
     implements _ClassWithPrivateGetter {
   ClassWithPrivateGetter.created(JsObject o) : super.created(o);
@@ -135,6 +143,7 @@ class ClassWithPrivateGetter extends JsInterface
 // Target: abstract class _ClassWithPrivateSetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithPrivateSetter extends JsInterface
     implements _ClassWithPrivateSetter {
   ClassWithPrivateSetter.created(JsObject o) : super.created(o);
@@ -150,6 +159,7 @@ class ClassWithPrivateSetter extends JsInterface
 // Target: abstract class _ClassWithRenamedGetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithRenamedGetter extends JsInterface
     implements _ClassWithRenamedGetter {
   ClassWithRenamedGetter.created(JsObject o) : super.created(o);
@@ -163,6 +173,7 @@ class ClassWithRenamedGetter extends JsInterface
 // Target: abstract class _ClassWithRenamedSetter
 // **************************************************************************
 
+@JsName('Class0')
 class ClassWithRenamedSetter extends JsInterface
     implements _ClassWithRenamedSetter {
   ClassWithRenamedSetter.created(JsObject o) : super.created(o);

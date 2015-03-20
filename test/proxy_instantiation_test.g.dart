@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:54:33.449Z
+// 2015-03-20T21:53:12.520Z
 
 part of js.test.proxy_instantiation_test;
 
@@ -29,6 +29,7 @@ class Class1 extends JsInterface implements _Class1 {
 // Target: abstract class _Class0Alias
 // **************************************************************************
 
+@JsName('Class0')
 class Class0Alias extends JsInterface implements _Class0Alias {
   Class0Alias.created(JsObject o) : super.created(o);
   Class0Alias() : this.created(new JsObject(getPath('Class0')));
@@ -39,6 +40,7 @@ class Class0Alias extends JsInterface implements _Class0Alias {
 // Target: abstract class _Class2
 // **************************************************************************
 
+@JsName('my.package.Class2')
 class Class2 extends JsInterface implements _Class2 {
   Class2.created(JsObject o) : super.created(o);
   Class2() : this.created(new JsObject(getPath('my.package.Class2')));

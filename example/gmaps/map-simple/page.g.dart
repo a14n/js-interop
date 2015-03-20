@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:46:44.627Z
+// 2015-03-20T21:53:12.452Z
 
 part of google_maps.sample.simple;
 
@@ -8,6 +8,7 @@ part of google_maps.sample.simple;
 // Target: abstract class _GMap
 // **************************************************************************
 
+@JsName('Map')
 class GMap extends JsInterface implements _GMap {
   GMap.created(JsObject o) : super.created(o);
   GMap(Node mapDiv, [MapOptions opts]) : this.created(new JsObject(
@@ -27,8 +28,10 @@ class LatLng extends JsInterface implements _LatLng {
 
   bool equals(LatLng other) =>
       asJsObject(this).callMethod('equals', [other].map(toJs).toList());
-  num get lat => asJsObject(this).callMethod('lat');
-  num get lng => asJsObject(this).callMethod('lng');
+  num get lat => _lat();
+  num _lat() => asJsObject(this).callMethod('_lat');
+  num get lng => _lng();
+  num _lng() => asJsObject(this).callMethod('_lng');
   String toString() => asJsObject(this).callMethod('toString');
   String toUrlValue([num precision]) =>
       asJsObject(this).callMethod('toUrlValue', [precision].map(toJs).toList());
@@ -39,6 +42,7 @@ class LatLng extends JsInterface implements _LatLng {
 // Target: abstract class _MapOptions
 // **************************************************************************
 
+@anonymous
 class MapOptions extends JsInterface implements _MapOptions {
   MapOptions.created(JsObject o) : super.created(o);
   MapOptions() : this.created(new JsObject(context['Object']));

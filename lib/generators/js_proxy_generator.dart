@@ -85,12 +85,6 @@ class JsProxyClassGenerator {
       transformer.insertAt(clazz.node.name.end, ' extends JsInterface');
     }
 
-    // remove JsName annotation
-    getAnnotations(clazz.node, _jsNameClass).forEach(transformer.removeNode);
-
-    // remove anonymous annotation
-    removeAnonymousAnnotation();
-
     // remove abstract
     transformer.removeToken(clazz.node.abstractKeyword);
 

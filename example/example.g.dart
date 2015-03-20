@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:48:29.376Z
+// 2015-03-20T21:53:12.505Z
 
 part of js.example.js_proxy;
 
@@ -54,6 +54,7 @@ class JsFoo extends JsInterface implements _JsFoo {
 // Target: abstract class _JsBar
 // **************************************************************************
 
+@JsName('a.b.JsBar')
 class JsBar extends JsInterface implements _JsBar {
   JsBar.created(JsObject o) : super.created(o) {
     getState(this).putIfAbsent(#a, () => 0);
