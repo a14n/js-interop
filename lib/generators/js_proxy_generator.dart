@@ -153,7 +153,11 @@ class JsProxyClassGenerator {
     // generate abstract methods
     clazz.methods.where((e) => !e.isStatic && e.isAbstract).forEach((m) {
       final jsName = getNameAnnotation(m.node, _jsNameClass);
-      final name = jsName != null ? jsName : m.displayName;
+      final name = jsName != null
+          ? jsName
+          : m.isPrivate
+              ? m.displayName.substring(1)
+              : m.displayName;
       var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
