@@ -5,6 +5,7 @@
 library js.util.codec;
 
 import 'dart:convert';
+export 'dart:convert' show Codec;
 
 import 'package:js/js.dart';
 
@@ -40,10 +41,54 @@ class JsInterfaceEncoder<T extends JsInterface> extends Converter<T, JsObject> {
 }
 
 class JsInterfaceDecoder<T extends JsInterface> extends Converter<JsObject, T> {
-  JsInterfaceFactory _factory;
+  final JsInterfaceFactory _factory;
 
   JsInterfaceDecoder(this._factory);
 
   @override
   T convert(JsObject input) => input == null ? null : _factory(input);
+}
+
+class BiMapCodec<S, T> extends Codec<S, T> {
+  final Converter<T, S> decoder;
+  final Converter<S, T> encoder;
+
+  BiMapCodec(Map<S, T> map)
+      : decoder = new BiMapConverter<T, S>(
+          new Map<T, S>.fromIterables(map.values, map.keys)),
+        encoder = new BiMapConverter<S, T>(map);
+}
+
+class BiMapConverter<S, T> extends Converter<S, T> {
+  final Map<S, T> _map;
+
+  BiMapConverter(this._map);
+
+  @override
+  T convert(S input) => _map[input];
+}
+
+class ChainedCodec<S, T> extends Codec<S, T> {
+  final Converter<T, S> decoder;
+  final Converter<S, T> encoder;
+
+  ChainedCodec(List<Codec<S, T>> codecs)
+      : decoder = new ChainedConverter<T, S>(codecs.map((c) => c.decoder)),
+        encoder = new ChainedConverter<S, T>(codecs.map((c) => c.encoder));
+}
+class ChainedConverter<S, T> extends Converter<S, T> {
+  final Iterable<Converter<S, T>> _converters;
+
+  ChainedConverter(this._converters);
+
+  @override
+  T convert(S input) {
+    for (final converter in _converters) {
+      try {
+        final converted = converter.convert(input);
+        if (converted != null) return converted;
+      } on CastError {}
+    }
+    throw new StateError('no converter to handle $input');
+  }
 }
