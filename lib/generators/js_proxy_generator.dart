@@ -155,9 +155,7 @@ class JsProxyClassGenerator {
       final jsName = getNameAnnotation(m.node, _jsNameClass);
       final name = jsName != null
           ? jsName
-          : m.isPrivate
-              ? m.displayName.substring(1)
-              : m.displayName;
+          : m.isPrivate ? m.displayName.substring(1) : m.displayName;
       var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
         final parameterList = m.parameters.map((p) => p.displayName).join(', ');
@@ -215,11 +213,11 @@ class JsProxyClassGenerator {
 
   void transformInstanceVariables(Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
+      final VariableDeclarationList varDeclList = accessor.variable.node.parent;
       var jsName = getNameAnnotation(accessor.variable.node, _jsNameClass);
       jsName = jsName != null
           ? jsName
-          : getNameAnnotation(
-              accessor.variable.node.parent.parent, _jsNameClass);
+          : getNameAnnotation(varDeclList.parent, _jsNameClass);
       jsName = jsName != null
           ? jsName
           : accessor.isPrivate
@@ -230,15 +228,14 @@ class JsProxyClassGenerator {
       var code;
       if (accessor.isGetter) {
         final getterBody = createGetterBody(accessor.returnType, jsName);
-        code = "${accessor.returnType.displayName} get $name => $getterBody";
+        code = "${varDeclList.type.name.name} get $name => $getterBody";
       } else if (accessor.isSetter) {
         final param = accessor.parameters.first;
         final setterBody = createSetterBody(param, jsName: jsName);
         code = accessor.returnType.displayName +
-            " set $name(${param.type.displayName} ${param.displayName})"
+            " set $name(${varDeclList.type.name.name} ${param.displayName})"
             "{ $setterBody }";
       }
-      VariableDeclarationList varDeclList = accessor.variable.node.parent;
       transformer.insertAt(varDeclList.end + 1, code);
     });
 
@@ -297,12 +294,13 @@ class JsProxyClassGenerator {
   }
 
   String toJs(DartType type, String content) {
-    if (!type.isDynamic) {
-      if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
-        return '((e) => e == null ? null : asJsObject(e))($content)';
-      }
+    if (type.isDynamic) {
+      return 'toJs($content)';
+    } else if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
+      return '((e) => e == null ? null : asJsObject(e))($content)';
+    } else {
+      return content;
     }
-    return content;
   }
 
   /// return [true] if the type is transferable through dart:js

@@ -7,7 +7,7 @@
 library js;
 
 import 'dart:js';
-export 'dart:js' show JsObject, context;
+export 'dart:js';
 
 final JsObject _obj = context['Object'];
 
