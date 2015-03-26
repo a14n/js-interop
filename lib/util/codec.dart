@@ -68,27 +68,52 @@ class BiMapConverter<S, T> extends Converter<S, T> {
   T convert(S input) => _map[input];
 }
 
-class ChainedCodec<S, T> extends Codec<S, T> {
-  final Converter<T, S> decoder;
-  final Converter<S, T> encoder;
+class ChainedCodec extends Codec {
+  final Converter decoder;
+  final Converter encoder;
 
-  ChainedCodec(List<Codec<S, T>> codecs)
-      : decoder = new ChainedConverter<T, S>(codecs.map((c) => c.decoder)),
-        encoder = new ChainedConverter<S, T>(codecs.map((c) => c.encoder));
+  final List<_Codec> _codecs;
+
+  ChainedCodec() : this._(<_Codec>[]);
+  ChainedCodec._(List<_Codec> _codecs)
+      : _codecs = _codecs,
+        decoder = new ChainedConverter(_codecs, false),
+        encoder = new ChainedConverter(_codecs, true);
+
+  void add(
+      Predicate acceptEncodedValue, Predicate acceptDecodedValue, Codec codec) {
+    _codecs.add(new _Codec(acceptEncodedValue, acceptDecodedValue, codec));
+  }
 }
-class ChainedConverter<S, T> extends Converter<S, T> {
-  final Iterable<Converter<S, T>> _converters;
 
-  ChainedConverter(this._converters);
+typedef bool Predicate(o);
+class _Codec {
+  Predicate acceptEncodedValue;
+  Predicate acceptDecodedValue;
+  Codec codec;
+  _Codec(this.acceptEncodedValue, this.acceptDecodedValue, this.codec);
+}
+
+class ChainedConverter extends Converter {
+  final List<_Codec> _codecs;
+  final bool encoder;
+
+  ChainedConverter(this._codecs, this.encoder);
 
   @override
-  T convert(S input) {
-    for (final converter in _converters) {
-      try {
-        final converted = converter.convert(input);
-        if (converted != null) return converted;
-      } on CastError {}
+  convert(input) {
+    for (final codec in _codecs) {
+      var value;
+      if (encoder && codec.acceptDecodedValue(input)) {
+        value = codec.codec.encode(input);
+      }
+      if (!encoder && codec.acceptEncodedValue(input)) {
+        value =  codec.codec.decode(input);
+      }
+      if (value != null) {
+        return value;
+      }
     }
-    throw new StateError('no converter to handle $input');
+    return input;
   }
 }
