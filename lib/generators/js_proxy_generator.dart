@@ -228,12 +228,12 @@ class JsProxyClassGenerator {
       var code;
       if (accessor.isGetter) {
         final getterBody = createGetterBody(accessor.returnType, jsName);
-        code = "${varDeclList.type.name.name} get $name => $getterBody";
+        code = "${varDeclList.type} get $name => $getterBody";
       } else if (accessor.isSetter) {
         final param = accessor.parameters.first;
         final setterBody = createSetterBody(param, jsName: jsName);
         code = accessor.returnType.displayName +
-            " set $name(${varDeclList.type.name.name} ${param.displayName})"
+            " set $name(${varDeclList.type} ${param.displayName})"
             "{ $setterBody }";
       }
       transformer.insertAt(varDeclList.end + 1, code);
@@ -288,6 +288,19 @@ class JsProxyClassGenerator {
     if (!type.isDynamic) {
       if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
         return '((e) => e == null ? null : new $type.created(e))($content)';
+      } else if (isListType(type)) {
+        final typeParam = (type as InterfaceType).typeArguments.first;
+        if (isJsInterfaceType(typeParam)) {
+          var output = '''
+((e) {
+  if (e == null) return null;
+  return new JsList.created(e,
+      new JsInterfaceCodec((o) => new $typeParam.created(o)));
+})($content)''';
+          return output;
+        } else {
+          return "$content as JsArray";
+        }
       }
     }
     return content;
@@ -296,12 +309,27 @@ class JsProxyClassGenerator {
   String toJs(DartType type, String content) {
     if (type.isDynamic) {
       return 'toJs($content)';
-    } else if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
+    } else if (isJsInterfaceType(type)) {
       return '((e) => e == null ? null : asJsObject(e))($content)';
+    } else if (isListType(type)) {
+      final typeParam = (type as InterfaceType).typeArguments.first;
+      return '''
+((e) {
+  if (e == null) return null;
+  if (e is JsInterface) return asJsObject(e);
+  return new JsArray.from(${isTypeTransferable(typeParam) ? 'e' : 'e.map(toJs)'});
+})($content)''';
     } else {
       return content;
     }
   }
+
+  bool isJsInterfaceType(DartType type) => !type.isDynamic &&
+      type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);
+
+  bool isListType(DartType type) => type.isSubtypeOf(
+      getType(lib, 'dart.core', 'List').type
+          .substitute4([DynamicTypeImpl.instance]));
 
   /// return [true] if the type is transferable through dart:js
   /// (see https://api.dartlang.org/docs/channels/stable/latest/dart_js.html)
@@ -314,6 +342,7 @@ class JsProxyClassGenerator {
       'dart.typed_data': const ['TypedData'],
     };
     for (final libName in transferables.keys) {
+      if (getLib(lib, libName) == null) continue;
       if (transferables[libName].any((className) =>
           type.isSubtypeOf(getType(lib, libName, className).type))) {
         return true;

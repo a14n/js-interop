@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-20T21:53:12.505Z
+// 2015-03-26T20:20:34.247Z
 
 part of js.example.js_proxy;
 
@@ -11,6 +11,35 @@ part of js.example.js_proxy;
 class JsFoo extends JsInterface implements _JsFoo {
   JsFoo.created(JsObject o) : super.created(o);
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
+
+  void set l1(List _l1) {
+    asJsObject(this)['l1'] = ((e) {
+      if (e == null) return null;
+      if (e is JsInterface) return asJsObject(e);
+      return new JsArray.from(e);
+    })(_l1);
+  }
+  List get l1 => asJsObject(this)['l1'] as JsArray;
+  void set l2(List<num> _l2) {
+    asJsObject(this)['l2'] = ((e) {
+      if (e == null) return null;
+      if (e is JsInterface) return asJsObject(e);
+      return new JsArray.from(e);
+    })(_l2);
+  }
+  List<num> get l2 => asJsObject(this)['l2'] as JsArray;
+  void set l3(List<JsFoo> _l3) {
+    asJsObject(this)['l3'] = ((e) {
+      if (e == null) return null;
+      if (e is JsInterface) return asJsObject(e);
+      return new JsArray.from(e.map(toJs));
+    })(_l3);
+  }
+  List<JsFoo> get l3 => ((e) {
+    if (e == null) return null;
+    return new JsList.created(
+        e, new JsInterfaceCodec((o) => new JsFoo.created(o)));
+  })(asJsObject(this)['l3']);
 
   void set i(int _i) {
     asJsObject(this)['_i'] = _i;

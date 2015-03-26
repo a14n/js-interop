@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-20T21:53:12.452Z
+// 2015-03-26T20:27:47.821Z
 
 part of google_maps.sample.simple;
 
@@ -29,9 +29,9 @@ class LatLng extends JsInterface implements _LatLng {
   bool equals(LatLng other) =>
       asJsObject(this).callMethod('equals', [other].map(toJs).toList());
   num get lat => _lat();
-  num _lat() => asJsObject(this).callMethod('_lat');
+  num _lat() => asJsObject(this).callMethod('lat');
   num get lng => _lng();
-  num _lng() => asJsObject(this).callMethod('_lng');
+  num _lng() => asJsObject(this).callMethod('lng');
   String toString() => asJsObject(this).callMethod('toString');
   String toUrlValue([num precision]) =>
       asJsObject(this).callMethod('toUrlValue', [precision].map(toJs).toList());

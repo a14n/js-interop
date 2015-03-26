@@ -13,6 +13,10 @@ part 'example.g.dart';
 abstract class _JsFoo implements JsInterface {
   external factory _JsFoo();
 
+  List l1;
+  List<num> l2;
+  List<JsFoo> l3;
+
   @JsName('_i')
   int i;
 
