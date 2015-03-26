@@ -5,13 +5,13 @@
 library js.test.proxy_creator_test;
 
 import 'package:unittest/unittest.dart';
-import 'package:js/proxy_creator.dart';
+import 'package:js/js_interface_creator.dart';
 
 main() {
-  group('Proxy creation', () {
+  group('JsInterface creation', () {
 
     test('should accept simple name', () {
-      expect(createProxySkeleton('MyClass'), '''
+      expect(createInterfaceSkeleton('MyClass'), '''
 @JsName('MyClass')
 abstract class _MyClass implements JsInterface {
   external factory _MyClass();
@@ -19,7 +19,7 @@ abstract class _MyClass implements JsInterface {
     });
 
     test('should accept qualified name', () {
-      expect(createProxySkeleton('a.b.MyClass'), '''
+      expect(createInterfaceSkeleton('a.b.MyClass'), '''
 @JsName('a.b.MyClass')
 abstract class _MyClass implements JsInterface {
   external factory _MyClass();

@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-20T21:53:12.577Z
+// 2015-03-26T21:43:16.757Z
 
 part of js.test.proxy_instantiation_test;
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Class0
 // **************************************************************************
 
@@ -19,7 +19,7 @@ class Class0 extends JsInterface implements _Class0 {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassFinalField
 // **************************************************************************
 
@@ -32,7 +32,7 @@ class ClassFinalField extends JsInterface implements _ClassFinalField {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassNotFinalField
 // **************************************************************************
 
@@ -48,7 +48,7 @@ class ClassNotFinalField extends JsInterface implements _ClassNotFinalField {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassPrivateField
 // **************************************************************************
 
@@ -64,7 +64,7 @@ class ClassPrivateField extends JsInterface implements _ClassPrivateField {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassRenamedField
 // **************************************************************************
 
@@ -80,7 +80,7 @@ class ClassRenamedField extends JsInterface implements _ClassRenamedField {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassRenamedPrivateField
 // **************************************************************************
 
@@ -97,7 +97,7 @@ class ClassRenamedPrivateField extends JsInterface
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithGetter
 // **************************************************************************
 
@@ -110,7 +110,7 @@ class ClassWithGetter extends JsInterface implements _ClassWithGetter {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithSetter
 // **************************************************************************
 
@@ -125,7 +125,7 @@ class ClassWithSetter extends JsInterface implements _ClassWithSetter {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithPrivateGetter
 // **************************************************************************
 
@@ -139,7 +139,7 @@ class ClassWithPrivateGetter extends JsInterface
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithPrivateSetter
 // **************************************************************************
 
@@ -155,7 +155,7 @@ class ClassWithPrivateSetter extends JsInterface
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithRenamedGetter
 // **************************************************************************
 
@@ -169,7 +169,7 @@ class ClassWithRenamedGetter extends JsInterface
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _ClassWithRenamedSetter
 // **************************************************************************
 

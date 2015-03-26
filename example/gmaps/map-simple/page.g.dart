@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-26T20:27:47.821Z
+// 2015-03-26T21:43:16.621Z
 
 part of google_maps.sample.simple;
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _GMap
 // **************************************************************************
 
@@ -16,7 +16,7 @@ class GMap extends JsInterface implements _GMap {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _LatLng
 // **************************************************************************
 
@@ -38,7 +38,7 @@ class LatLng extends JsInterface implements _LatLng {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _MapOptions
 // **************************************************************************
 
@@ -64,7 +64,7 @@ class MapOptions extends JsInterface implements _MapOptions {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _GEvent
 // **************************************************************************
 
@@ -113,7 +113,7 @@ class GEvent extends JsInterface implements _GEvent {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _MapsEventListener
 // **************************************************************************
 

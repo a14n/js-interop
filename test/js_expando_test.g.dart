@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-19T20:50:17.741Z
+// 2015-03-26T21:43:16.697Z
 
 part of js.test.js_expando_test;
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Foo
 // **************************************************************************
 

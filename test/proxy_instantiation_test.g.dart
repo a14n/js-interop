@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-20T21:53:12.520Z
+// 2015-03-26T21:43:16.688Z
 
 part of js.test.proxy_instantiation_test;
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Class0
 // **************************************************************************
 
@@ -14,7 +14,7 @@ class Class0 extends JsInterface implements _Class0 {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Class1
 // **************************************************************************
 
@@ -25,7 +25,7 @@ class Class1 extends JsInterface implements _Class1 {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Class0Alias
 // **************************************************************************
 
@@ -36,7 +36,7 @@ class Class0Alias extends JsInterface implements _Class0Alias {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _Class2
 // **************************************************************************
 

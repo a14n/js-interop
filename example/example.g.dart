@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-26T20:20:34.247Z
+// 2015-03-26T21:43:16.670Z
 
 part of js.example.js_proxy;
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _JsFoo
 // **************************************************************************
 
@@ -79,7 +79,7 @@ class JsFoo extends JsInterface implements _JsFoo {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _JsBar
 // **************************************************************************
 
@@ -102,7 +102,7 @@ class JsBar extends JsInterface implements _JsBar {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class _JsBaz
 // **************************************************************************
 
@@ -112,7 +112,7 @@ class JsBaz extends JsBar implements _JsBaz {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsProxyGenerator'
+// Generator: Instance of 'JsInterfaceGenerator'
 // Target: abstract class __Context
 // **************************************************************************
 

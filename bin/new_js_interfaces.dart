@@ -2,11 +2,11 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:js/proxy_creator.dart';
+import 'package:js/js_interface_creator.dart';
 
 main(List<String> args) {
   if (args.isEmpty) {
     print('You must provide one or more class names as arguments');
   }
-  print(args.map(createProxySkeleton).join('\n\n'));
+  print(args.map(createInterfaceSkeleton).join('\n\n'));
 }

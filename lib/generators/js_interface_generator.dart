@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library js.generator.js_proxy;
+library js.generator.js_interface;
 
 import 'dart:async';
 
@@ -14,8 +14,8 @@ import 'package:source_gen/source_gen.dart';
 
 import 'util.dart';
 
-class JsProxyGenerator extends Generator {
-  const JsProxyGenerator();
+class JsInterfaceGenerator extends Generator {
+  const JsInterfaceGenerator();
 
   Future<String> generate(Element element) async {
     if (element is ClassElement) {
@@ -26,21 +26,21 @@ class JsProxyGenerator extends Generator {
 
       if (!element.isPrivate) throw '$element must be private';
 
-      return new JsProxyClassGenerator(element).generate();
+      return new JsInterfaceClassGenerator(element).generate();
     }
 
     return null;
   }
 }
 
-class JsProxyClassGenerator {
+class JsInterfaceClassGenerator {
   final LibraryElement lib;
   final ClassElement clazz;
   final transformer = new Transformer();
 
   ClassElement _jsNameClass;
 
-  JsProxyClassGenerator(ClassElement clazz)
+  JsInterfaceClassGenerator(ClassElement clazz)
       : lib = clazz.library,
         clazz = clazz {
     _jsNameClass = getType(lib, 'js', 'JsName');
