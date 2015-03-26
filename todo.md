@@ -1,9 +1,9 @@
 - tests
 - prefix of library
-- add factory for JsList
 - VarArgs
 - Enum ?
 - generate code for static members (see Marker.MAX_ZINDEX)
+- generate code for top level members
 - generate state in .created from initialized variables?
 - test on Google Maps
 - optim: `[toJs(a), toJs(b)]` instead of `[a, b].map(toJs).toList()`
