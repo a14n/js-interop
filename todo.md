@@ -1,14 +1,17 @@
 - tests
 - prefix of library
-- VarArgs
-- Enum ?
+- named parameters to anonymous object
+- Enum ? generate codec @jsEnum(mapping: const {Enum.V1:'v1name'})
 - generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members
 - generate state in .created from initialized variables?
 - test on Google Maps
 - optim: `[toJs(a), toJs(b)]` instead of `[a, b].map(toJs).toList()`
 
+
+
 BAD IDEA
+- VarArgs ? see http://dartbug.com/16253
 - JsGlobal: not for the moment use a private template and bind top level to it.
 - use Expando<JsObject> instead of JsInterface._jsObject ? => NO because 
 inheritance will hurt super.created() vs. super.WAT ??? 
