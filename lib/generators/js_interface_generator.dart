@@ -294,8 +294,8 @@ class JsInterfaceClassGenerator {
           var output = '''
 ((e) {
   if (e == null) return null;
-  return new JsList.created(e,
-      new JsInterfaceCodec((o) => new $typeParam.created(o)));
+  return new JsList<$typeParam>.created(e,
+      new JsInterfaceCodec<$typeParam>((o) => new $typeParam.created(o)));
 })($content)''';
           return output;
         } else {

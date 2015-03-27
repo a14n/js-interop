@@ -23,13 +23,13 @@ class IdentityConverter<T> extends Converter<T, T> {
   T convert(T input) => input;
 }
 
-typedef JsInterface JsInterfaceFactory(JsObject o);
+typedef T JsInterfaceFactory<T extends JsInterface>(JsObject o);
 
 class JsInterfaceCodec<T extends JsInterface> extends Codec<T, JsObject> {
   final Converter<JsObject, T> decoder;
   final Converter<T, JsObject> encoder = const JsInterfaceEncoder();
 
-  JsInterfaceCodec(JsInterfaceFactory factory)
+  JsInterfaceCodec(JsInterfaceFactory<T> factory)
       : decoder = new JsInterfaceDecoder<T>(factory);
 }
 
@@ -41,7 +41,7 @@ class JsInterfaceEncoder<T extends JsInterface> extends Converter<T, JsObject> {
 }
 
 class JsInterfaceDecoder<T extends JsInterface> extends Converter<JsObject, T> {
-  final JsInterfaceFactory _factory;
+  final JsInterfaceFactory<T> _factory;
 
   JsInterfaceDecoder(this._factory);
 
@@ -108,7 +108,7 @@ class ChainedConverter extends Converter {
         value = codec.codec.encode(input);
       }
       if (!encoder && codec.acceptEncodedValue(input)) {
-        value =  codec.codec.decode(input);
+        value = codec.codec.decode(input);
       }
       if (value != null) {
         return value;
