@@ -18,14 +18,12 @@ class JsInterfaceGenerator extends Generator {
   const JsInterfaceGenerator();
 
   Future<String> generate(Element element) async {
-    if (element is ClassElement) {
+    // JsInterface
+    final jsInterfaceClass = getType(element.library, 'js', 'JsInterface');
+    if (element is ClassElement &&
+        element.type.isSubtypeOf(jsInterfaceClass.type)) {
       if (element.unit.element.name.endsWith('.g.dart')) return null;
-
-      final jsInterfaceClass = getType(element.library, 'js', 'JsInterface');
-      if (!element.type.isSubtypeOf(jsInterfaceClass.type)) return null;
-
       if (!element.isPrivate) throw '$element must be private';
-
       return new JsInterfaceClassGenerator(element).generate();
     }
 
@@ -47,7 +45,7 @@ class JsInterfaceClassGenerator {
   }
 
   String generate() {
-    final newClassName = getNewClassName(clazz);
+    final newClassName = getPublicClassName(clazz);
 
     // add implements to make analyzer happy
     if (clazz.node.implementsClause == null) {
@@ -261,15 +259,15 @@ class JsInterfaceClassGenerator {
     if (nameOfClass != null) {
       name += nameOfClass;
     } else if (useClassName) {
-      name += getNewClassName(clazz);
+      name += getPublicClassName(clazz);
     } else if (name.endsWith('.')) {
       name = name.substring(0, name.length - 1);
     }
     return name;
   }
 
-  static String getNewClassName(ClassElement clazz) =>
-      clazz.displayName.substring(1);
+  static String getPublicClassName(ClassElement clazz) =>
+      clazz.isPrivate ? clazz.displayName.substring(1) : clazz.displayName;
 
   String createGetterBody(DartType type, String name,
       {String target: "asJsObject(this)"}) {
@@ -288,16 +286,27 @@ class JsInterfaceClassGenerator {
     if (!type.isDynamic) {
       if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
         return '((e) => e == null ? null : new $type.created(e))($content)';
+      } else if (isJsEnum(type)) {
+        final values = getEnumValues(type.element);
+        final jsPath =
+            computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
+        return '''
+((e) {
+  if (e == null) return null;
+  final path = getPath('$jsPath');
+  ${values.map((e) => "if (e == path['$e']) return $type.$e;").join('\n')}
+})($content)''';
       } else if (isListType(type)) {
         final typeParam = (type as InterfaceType).typeArguments.first;
-        if (isJsInterfaceType(typeParam)) {
-          var output = '''
+        if (isJsInterfaceType(typeParam) ||
+            isListType(typeParam) ||
+            isJsEnum(typeParam)) {
+          return '''
 ((e) {
   if (e == null) return null;
   return new JsList<$typeParam>.created(e,
-      new JsInterfaceCodec<$typeParam>((o) => new $typeParam.created(o)));
+      new JsInterfaceCodec<$typeParam>((o) => ${toDart(typeParam, 'o')}));
 })($content)''';
-          return output;
         } else {
           return "$content as JsArray";
         }
@@ -306,11 +315,29 @@ class JsInterfaceClassGenerator {
     return content;
   }
 
+  Iterable<String> getEnumValues(ClassElement element) {
+//        EnumDeclaration enumDecl = type.element.node;
+//        return enumDecl.constants.map((e)=>e.name.name);
+    return element.fields.map((f) => f.name).toList()
+      ..remove('index')
+      ..remove('values');
+  }
+
   String toJs(DartType type, String content) {
     if (type.isDynamic) {
       return 'toJs($content)';
     } else if (isJsInterfaceType(type)) {
       return '((e) => e == null ? null : asJsObject(e))($content)';
+    } else if (isJsEnum(type)) {
+      final values = getEnumValues(type.element);
+      final jsPath =
+          computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
+      return '''
+((e) {
+  if (e == null) return null;
+  final path = getPath('$jsPath');
+  ${values.map((e) => "if (e == $type.$e) return path['$e'];").join('\n')}
+})($content)''';
     } else if (isListType(type)) {
       final typeParam = (type as InterfaceType).typeArguments.first;
       return '''
@@ -323,6 +350,13 @@ class JsInterfaceClassGenerator {
       return content;
     }
   }
+
+  bool isJsEnum(DartType type) =>
+      type.element is ClassElement && (type.element as ClassElement).isEnum;
+// TODO(aa) report type.element.node is null
+//  &&
+//      getAnnotations(
+//          type.element.node, getType(lib, 'js', 'JsEnum')).isNotEmpty;
 
   bool isJsInterfaceType(DartType type) => !type.isDynamic &&
       type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);

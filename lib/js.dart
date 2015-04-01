@@ -32,6 +32,12 @@ dynamic toJs(dynamic o) => o is JsInterface ? asJsObject(o) : o;
 JsObject getPath(String path) =>
     path.split('.').fold(context, (JsObject o, p) => o[p]);
 
+/// A metadata annotation that mark an enum as a set of values.
+class JsEnum<T> {
+  final Map<T, String> names;
+  const JsEnum({this.names});
+}
+
 /// A metadata annotation that allows to customize the name used for method call
 /// or attribute access on the javascript side.
 class JsName {
