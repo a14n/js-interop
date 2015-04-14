@@ -9,106 +9,92 @@ export 'dart:convert' show Codec;
 
 import 'package:js/js.dart';
 
-class IdentityCodec<T> extends Codec<T, T> {
-  final Converter<T, T> decoder = const IdentityConverter();
-  final Converter<T, T> encoder = const IdentityConverter();
+typedef bool Predicate<T>(T o);
+typedef T Factory<S, T>(S o);
 
-  const IdentityCodec();
-}
-
-class IdentityConverter<T> extends Converter<T, T> {
-  const IdentityConverter();
-
-  @override
-  T convert(T input) => input;
-}
-
-typedef T JsInterfaceFactory<T extends JsInterface>(JsObject o);
-
-class JsInterfaceCodec<T extends JsInterface> extends Codec<T, JsObject> {
-  final Converter<JsObject, T> decoder;
-  final Converter<T, JsObject> encoder = const JsInterfaceEncoder();
-
-  JsInterfaceCodec(JsInterfaceFactory<T> factory)
-      : decoder = new JsInterfaceDecoder<T>(factory);
-}
-
-class JsInterfaceEncoder<T extends JsInterface> extends Converter<T, JsObject> {
-  const JsInterfaceEncoder();
-
-  @override
-  JsObject convert(T input) => input == null ? null : asJsObject(input);
-}
-
-class JsInterfaceDecoder<T extends JsInterface> extends Converter<JsObject, T> {
-  final JsInterfaceFactory<T> _factory;
-
-  JsInterfaceDecoder(this._factory);
-
-  @override
-  T convert(JsObject input) => input == null ? null : _factory(input);
-}
-
-class BiMapCodec<S, T> extends Codec<S, T> {
-  final Converter<T, S> decoder;
+class ConditionalCodec<S, T> extends Codec<S, T> {
   final Converter<S, T> encoder;
+  final Converter<T, S> decoder;
+  final Predicate acceptEncodedValue;
+  final Predicate acceptDecodedValue;
 
-  BiMapCodec(Map<S, T> map)
-      : decoder = new BiMapConverter<T, S>(
-          new Map<T, S>.fromIterables(map.values, map.keys)),
-        encoder = new BiMapConverter<S, T>(map);
+  ConditionalCodec._(this.encoder, this.decoder, this.acceptEncodedValue,
+      this.acceptDecodedValue);
+  ConditionalCodec(Converter<S, T> encoder, Converter<T, S> decoder,
+      {Predicate acceptEncodedValue, Predicate acceptDecodedValue})
+      : this._(encoder, decoder,
+          acceptEncodedValue != null ? acceptEncodedValue : (o) => o is T,
+          acceptDecodedValue != null ? acceptDecodedValue : (o) => o is S);
+  ConditionalCodec.fromFactories(Factory<S, T> encode, Factory<T, S> decode,
+      {Predicate acceptEncodedValue, Predicate acceptDecodedValue})
+      : this(new _Converter<S, T>(encode), new _Converter<T, S>(decode),
+          acceptEncodedValue: acceptEncodedValue,
+          acceptDecodedValue: acceptDecodedValue);
 }
 
-class BiMapConverter<S, T> extends Converter<S, T> {
-  final Map<S, T> _map;
+class _Converter<S, T> extends Converter<S, T> {
+  final Factory<S, T> _factory;
 
-  BiMapConverter(this._map);
+  _Converter(this._factory);
 
   @override
-  T convert(S input) => _map[input];
+  T convert(S input) => input == null ? null : _factory(input);
 }
 
-class ChainedCodec extends Codec {
-  final Converter decoder;
-  final Converter encoder;
+class IdentityCodec<T> extends ConditionalCodec<T, T> {
+  IdentityCodec() : super.fromFactories((T o) => o, (T o) => o);
+}
 
-  final List<_Codec> _codecs;
+class JsInterfaceCodec<T extends JsInterface>
+    extends ConditionalCodec<T, JsObject> {
+  JsInterfaceCodec(Factory<JsObject, T> decode,
+      [Predicate<JsObject> acceptEncodedValue])
+      : super.fromFactories((T o) => asJsObject(o), decode,
+          acceptEncodedValue: acceptEncodedValue);
+}
 
-  ChainedCodec() : this._(<_Codec>[]);
-  ChainedCodec._(List<_Codec> _codecs)
+class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
+  JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories((o) =>
+              o is JsInterface ? asJsObject(o) : new JsArray.from(o.map(toJs)),
+          (o) => new JsList.created(o, codec));
+}
+
+class BiMapCodec<S, T> extends ConditionalCodec<S, T> {
+  BiMapCodec._(Map<S, T> encode, Map<T, S> decode)
+      : super.fromFactories((S o) => encode[o], (T o) => decode[o]);
+  BiMapCodec(Map<S, T> map)
+      : this._(map, new Map<T, S>.fromIterables(map.values, map.keys));
+}
+
+class ChainedCodec extends ConditionalCodec {
+  final List<ConditionalCodec> _codecs;
+
+  ChainedCodec() : this._(<ConditionalCodec>[]);
+  ChainedCodec._(List<ConditionalCodec> _codecs)
       : _codecs = _codecs,
-        decoder = new ChainedConverter(_codecs, false),
-        encoder = new ChainedConverter(_codecs, true);
+        super(new _ChainedConverter(_codecs, true),
+            new _ChainedConverter(_codecs, false));
 
-  void add(
-      Predicate acceptEncodedValue, Predicate acceptDecodedValue, Codec codec) {
-    _codecs.add(new _Codec(acceptEncodedValue, acceptDecodedValue, codec));
+  void add(ConditionalCodec codec) {
+    _codecs.add(codec);
   }
 }
 
-typedef bool Predicate(o);
-class _Codec {
-  Predicate acceptEncodedValue;
-  Predicate acceptDecodedValue;
-  Codec codec;
-  _Codec(this.acceptEncodedValue, this.acceptDecodedValue, this.codec);
-}
-
-class ChainedConverter extends Converter {
-  final List<_Codec> _codecs;
+class _ChainedConverter extends Converter {
+  final List<ConditionalCodec> _codecs;
   final bool encoder;
 
-  ChainedConverter(this._codecs, this.encoder);
+  _ChainedConverter(this._codecs, this.encoder);
 
   @override
   convert(input) {
     for (final codec in _codecs) {
       var value;
       if (encoder && codec.acceptDecodedValue(input)) {
-        value = codec.codec.encode(input);
+        value = codec.encode(input);
       }
       if (!encoder && codec.acceptEncodedValue(input)) {
-        value = codec.codec.decode(input);
+        value = codec.decode(input);
       }
       if (value != null) {
         return value;

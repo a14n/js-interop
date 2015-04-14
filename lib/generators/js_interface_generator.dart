@@ -255,7 +255,7 @@ class JsInterfaceClassGenerator {
         getNameAnnotation(clazz.library.unit.directives.first, jsNameClass);
     if (nameOfLib != null) name += nameOfLib + '.';
 
-    final nameOfClass = getNameAnnotation(clazz.node, jsNameClass);
+    final nameOfClass = getNameAnnotation(getClassNode(clazz), jsNameClass);
     if (nameOfClass != null) {
       name += nameOfClass;
     } else if (useClassName) {
@@ -264,6 +264,13 @@ class JsInterfaceClassGenerator {
       name = name.substring(0, name.length - 1);
     }
     return name;
+  }
+
+  // workaround issue 23071
+  static AnnotatedNode getClassNode(ClassElement clazz) {
+    if (!clazz.isEnum) return clazz.node;
+    return clazz.library.units.expand((u) => u.node.declarations
+        .where((d) => d is EnumDeclaration && d.name.name == clazz.name)).first;
   }
 
   static String getPublicClassName(ClassElement clazz) =>
@@ -298,14 +305,12 @@ class JsInterfaceClassGenerator {
 })($content)''';
       } else if (isListType(type)) {
         final typeParam = (type as InterfaceType).typeArguments.first;
-        if (isJsInterfaceType(typeParam) ||
-            isListType(typeParam) ||
-            isJsEnum(typeParam)) {
+        final codec = getCodec(typeParam);
+        if (codec != null) {
           return '''
 ((e) {
   if (e == null) return null;
-  return new JsList<$typeParam>.created(e,
-      new JsInterfaceCodec<$typeParam>((o) => ${toDart(typeParam, 'o')}));
+  return new JsList<$typeParam>.created(e, $codec);
 })($content)''';
         } else {
           return "$content as JsArray";
@@ -313,6 +318,21 @@ class JsInterfaceClassGenerator {
       }
     }
     return content;
+  }
+
+  String getCodec(DartType type) {
+    if (isJsInterfaceType(type) || isListType(type)) {
+      return 'new JsInterfaceCodec<$type>((o) => ${toDart(type, 'o')})';
+    } else if (isJsEnum(type)) {
+      final values = getEnumValues(type.element);
+      final jsPath =
+          computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
+      return '''
+new BiMapCodec<$type, dynamic>({
+${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
+})''';
+    }
+    return null;
   }
 
   Iterable<String> getEnumValues(ClassElement element) {
