@@ -372,11 +372,8 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
   }
 
   Iterable<String> getEnumValues(ClassElement element) {
-//        EnumDeclaration enumDecl = type.element.node;
-//        return enumDecl.constants.map((e)=>e.name.name);
-    return element.fields.map((f) => f.name).toList()
-      ..remove('index')
-      ..remove('values');
+    EnumDeclaration enumDecl = getClassNode(element);
+    return enumDecl.constants.map((e) => e.name.name);
   }
 
   String toJs(DartType type, String content) {
