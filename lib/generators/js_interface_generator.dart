@@ -323,18 +323,27 @@ class JsInterfaceClassGenerator {
         if (returnCodec == null && paramCodecs.every((c) => c == null)) {
           return content;
         } else {
-          final params = type.parameters.map((p) {
+          var paramChanges = '';
+          type.parameters.forEach((p) {
             final codec = getCodec(p.type);
-            if (codec == null) return 'p_' + p.name;
-            else return '$codec.encode(${'p_' + p.name})';
+            if (codec != null)  {
+              paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
+            }
           });
-          var call = 'f(${params.join(', ')})';
-          if (returnCodec != null) call = '$returnCodec.decode($call)';
+          var call = 'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
+          if (returnCodec != null) {
+            call = 'final result = $call; return $returnCodec.decode(result);';
+          } else if (!type.returnType.isVoid) {
+            call = 'return $call;';
+          } else {
+            call = '$call;';
+          }
           return '''
 ((f) {
   if (f == null) return null;
   return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
-    ${type.returnType.isVoid ? '' : 'return'} $call;
+    $paramChanges
+    $call
   };
 })($content)''';
         }
@@ -398,18 +407,27 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
       if (returnCodec == null && paramCodecs.every((c) => c == null)) {
         return content;
       } else {
-        final params = type.parameters.map((p) {
+        var paramChanges = '';
+        type.parameters.forEach((p) {
           final codec = getCodec(p.type);
-          if (codec == null) return 'p_' + p.name;
-          else return '$codec.decode(${'p_' + p.name})';
+          if (codec != null)  {
+            paramChanges += 'p_${p.name} = $codec.decode(p_${p.name});';
+          }
         });
-        var call = 'f(${params.join(', ')})';
-        if (returnCodec != null) call = '$returnCodec.encode($call)';
+        var call = 'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
+        if (returnCodec != null) {
+          call = 'final result = $call; return $returnCodec.encode(result);';
+        } else if (!type.returnType.isVoid) {
+          call = 'return $call;';
+        } else {
+          call = '$call;';
+        }
         return '''
 ((f) {
   if (f == null) return null;
   return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
-    ${type.returnType.isVoid ? '' : 'return'} $call;
+    $paramChanges
+    $call
   };
 })($content)''';
       }
