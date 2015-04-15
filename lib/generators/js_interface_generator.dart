@@ -326,11 +326,12 @@ class JsInterfaceClassGenerator {
           var paramChanges = '';
           type.parameters.forEach((p) {
             final codec = getCodec(p.type);
-            if (codec != null)  {
+            if (codec != null) {
               paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
             }
           });
-          var call = 'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
+          var call =
+              'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
           if (returnCodec != null) {
             call = 'final result = $call; return $returnCodec.decode(result);';
           } else if (!type.returnType.isVoid) {
@@ -410,7 +411,7 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
         var paramChanges = '';
         type.parameters.forEach((p) {
           final codec = getCodec(p.type);
-          if (codec != null)  {
+          if (codec != null) {
             paramChanges += 'p_${p.name} = $codec.decode(p_${p.name});';
           }
         });
