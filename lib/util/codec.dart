@@ -54,8 +54,10 @@ class JsInterfaceCodec<T extends JsInterface>
 }
 
 class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
-  JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories((o) =>
-              o is JsInterface ? asJsObject(o) : new JsArray.from(o.map(toJs)),
+  JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories(
+          (o) => o is JsInterface
+              ? asJsObject(o)
+              : new JsArray.from(o.map(codec.encode)),
           (o) => new JsList.created(o, codec));
 }
 
