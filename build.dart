@@ -5,7 +5,5 @@ import 'package:source_gen/source_gen.dart';
 
 void main(List<String> args) {
   build(args, const [const JsInterfaceGenerator()],
-      librarySearchPaths: ['example', 'test']).then((msg) {
-    print(msg);
-  });
+      librarySearchPaths: ['example', 'test']).then(print);
 }
