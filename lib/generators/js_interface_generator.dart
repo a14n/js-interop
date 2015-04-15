@@ -116,9 +116,10 @@ class JsInterfaceClassGenerator {
         final jsName = computeJsName(clazz, _jsNameClass, true);
         newJsObject += "getPath('$jsName')";
         if (constr.parameters.isNotEmpty) {
-          final parameterList =
-              constr.parameters.map((p) => p.displayName).join(', ');
-          newJsObject += ", [$parameterList].map(toJs).toList()";
+          final parameterList = constr.parameters
+              .map((p) => toJs(p.type, p.displayName))
+              .join(', ');
+          newJsObject += ", [$parameterList]";
         }
       }
       newJsObject += ")";
@@ -156,8 +157,9 @@ class JsInterfaceClassGenerator {
           : m.isPrivate ? m.displayName.substring(1) : m.displayName;
       var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
-        final parameterList = m.parameters.map((p) => p.displayName).join(', ');
-        call += ", [$parameterList].map(toJs).toList()";
+        final parameterList =
+            m.parameters.map((p) => toJs(p.type, p.displayName)).join(', ');
+        call += ", [$parameterList]";
       }
       call += ")";
 
@@ -315,14 +317,38 @@ class JsInterfaceClassGenerator {
         } else {
           return "$content as JsArray";
         }
+      } else if (type is FunctionType) {
+        final returnCodec = getCodec(type.returnType);
+        final paramCodecs = type.parameters.map((p) => p.type).map(getCodec);
+        if (returnCodec == null && paramCodecs.every((c) => c == null)) {
+          return content;
+        } else {
+          final params = type.parameters.map((p) {
+            final codec = getCodec(p.type);
+            if (codec == null) return 'p_' + p.name;
+            else return '$codec.encode(${'p_' + p.name})';
+          });
+          var call = 'f(${params.join(', ')})';
+          if (returnCodec != null) call = '$returnCodec.decode($call)';
+          return '''
+((f) {
+  if (f == null) return null;
+  return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
+    ${type.returnType.isVoid ? '' : 'return'} $call;
+  };
+})($content)''';
+        }
       }
     }
     return content;
   }
 
   String getCodec(DartType type) {
-    if (isJsInterfaceType(type) || isListType(type)) {
+    if (isJsInterfaceType(type)) {
       return 'new JsInterfaceCodec<$type>((o) => ${toDart(type, 'o')})';
+    } else if (isListType(type)) {
+      final typeParam = (type as InterfaceType).typeArguments.first;
+      return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
     } else if (isJsEnum(type)) {
       final values = getEnumValues(type.element);
       final jsPath =
@@ -366,9 +392,31 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
   if (e is JsInterface) return asJsObject(e);
   return new JsArray.from(${isTypeTransferable(typeParam) ? 'e' : 'e.map(toJs)'});
 })($content)''';
-    } else {
+    } else if (type is FunctionType) {
+      final returnCodec = getCodec(type.returnType);
+      final paramCodecs = type.parameters.map((p) => p.type).map(getCodec);
+      if (returnCodec == null && paramCodecs.every((c) => c == null)) {
+        return content;
+      } else {
+        final params = type.parameters.map((p) {
+          final codec = getCodec(p.type);
+          if (codec == null) return 'p_' + p.name;
+          else return '$codec.decode(${'p_' + p.name})';
+        });
+        var call = 'f(${params.join(', ')})';
+        if (returnCodec != null) call = '$returnCodec.encode($call)';
+        return '''
+((f) {
+  if (f == null) return null;
+  return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
+    ${type.returnType.isVoid ? '' : 'return'} $call;
+  };
+})($content)''';
+      }
+    } else if (isTypeTransferable(type)) {
       return content;
     }
+    return 'toJs($content)';
   }
 
   bool isJsEnum(DartType type) =>
@@ -381,7 +429,7 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
   bool isJsInterfaceType(DartType type) => !type.isDynamic &&
       type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);
 
-  bool isListType(DartType type) => type.isSubtypeOf(
+  bool isListType(DartType type) => !type.isDynamic && type.isSubtypeOf(
       getType(lib, 'dart.core', 'List').type
           .substitute4([DynamicTypeImpl.instance]));
 

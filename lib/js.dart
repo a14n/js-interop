@@ -10,7 +10,7 @@ import 'dart:js';
 
 export 'dart:js';
 export 'adapter/js_list.dart';
-export 'util/codec.dart' show JsInterfaceCodec;
+export 'util/codec.dart' show BiMapCodec, JsInterfaceCodec, JsListCodec;
 
 final JsObject _obj = context['Object'];
 
