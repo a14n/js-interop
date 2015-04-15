@@ -75,6 +75,10 @@ final _context = new _Context.created(context);
 
 final find = _context.find;
 String get a => _context.a;
-void set a(String _a) { _context.a = _a; }
+void set a(String _a) {
+  _context.a = _a;
+}
 String get b => _context.b;
-void set b(String _b) { _context.b = _b; }
+void set b(String _b) {
+  _context.b = _b;
+}

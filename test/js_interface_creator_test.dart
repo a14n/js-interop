@@ -9,7 +9,6 @@ import 'package:js/js_interface_creator.dart';
 
 main() {
   group('JsInterface creation', () {
-
     test('should accept simple name', () {
       expect(createInterfaceSkeleton('MyClass'), '''
 @JsName('MyClass')
@@ -25,6 +24,5 @@ abstract class _MyClass implements JsInterface {
   external factory _MyClass();
 }''');
     });
-
   });
 }
