@@ -12,30 +12,23 @@ import 'package:js/js.dart' show JsInterface;
 
 final JsObject _obj = context['Object'];
 
-/**
- * A [Map] interface wrapper for [JsObject]s.
- *
- * Values returned from this map are automatically converted to JavaScript with
- * the [toJs] function when added, and to Dart with the [toDart] funtion when
- * accessed.
- *
- * Keys must be [String] because they are used as JavaScript property names. The
- * key '__proto__' is disallowed.
- */
+/// A [Map] interface wrapper for [JsObject]s.
+///
+/// Values returned from this map are automatically converted to JavaScript with
+/// the [Codec] provided when building the instance.
+///
+/// Keys must be [String] because they are used as JavaScript property names.
+/// The key `__proto__` is disallowed.
 class JsObjectAsMap<V> extends JsInterface with MapMixin<String, V> {
   final JsObject _o;
   final Codec<V, dynamic> _codec;
 
-  /**
-   * Creates an instance backed by a new JavaScript object whose prototype is
-   * Object.
-   */
+  /// Creates an instance backed by a new JavaScript object whose prototype is
+  /// Object.
   JsObjectAsMap(Codec<V, dynamic> codec)
       : this.created(new JsObject(_obj), codec);
 
-  /**
-   * Creates an instance backed by the JavaScript object [o].
-   */
+  /// Creates an instance backed by the JavaScript object [o].
   JsObjectAsMap.created(JsObject o, this._codec)
       : _o = o,
         super.created(o);

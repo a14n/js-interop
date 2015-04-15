@@ -10,25 +10,18 @@ import 'dart:js';
 
 import 'package:js/js.dart' show JsInterface;
 
-/**
- * A [List] interface wrapper for [JsArray]s.
- *
- * Elements of this list are automatically converted to JavaScript with the
- * [toJs] function when added, and converted to Dart with the [toDart] funtion
- * when accessed.
- */
+/// A [List] interface wrapper for [JsArray]s.
+///
+/// Elements of this list are automatically converted to JavaScript with the
+/// [Codec] provided when building the instance.
 class JsList<E> extends JsInterface with ListMixin<E> {
   final JsArray _o;
   final Codec<E, dynamic> _codec;
 
-  /**
-   * Creates an instance backed by a new JavaScript Array.
-   */
+  /// Creates an instance backed by a new JavaScript Array.
   JsList(Codec<E, dynamic> codec) : this.created(new JsArray(), codec);
 
-  /**
-   * Creates an instance backed by the JavaScript object [o].
-   */
+  /// Creates an instance backed by the JavaScript object [o].
   JsList.created(JsArray o, this._codec)
       : _o = o,
         super.created(o);

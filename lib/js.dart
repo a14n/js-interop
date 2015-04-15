@@ -25,10 +25,14 @@ abstract class JsInterface {
       other is JsInterface && _jsObject == other._jsObject;
 }
 
+/// Returns the underlying [JsObject] corresponding to the non nullable [o].
 JsObject asJsObject(JsInterface o) => o._jsObject;
 
+/// Returns the underlying [JsObject] corresponding to [o] when [o] is a
+/// [JsInterface] or [o] in other cases.
 dynamic toJs(dynamic o) => o is JsInterface ? asJsObject(o) : o;
 
+/// Return the [JsObject] targeted by the [path].
 JsObject getPath(String path) =>
     path.split('.').fold(context, (JsObject o, p) => o[p]);
 
@@ -40,6 +44,8 @@ class JsEnum<T> {
 
 /// A metadata annotation that allows to customize the name used for method call
 /// or attribute access on the javascript side.
+///
+/// You can use it on libraries, classes, members.
 class JsName {
   final String name;
   const JsName(this.name);
@@ -49,6 +55,6 @@ class _Anonymous {
   const _Anonymous();
 }
 
-/// This means that the Js object is a anonymous js object. That is it is
-/// created with `new Object()`.
+/// A metadata annotation used to indicate that the Js object is a anonymous js
+/// object. That is it is created with `new Object()`.
 const _Anonymous anonymous = const _Anonymous();

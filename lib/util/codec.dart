@@ -9,9 +9,14 @@ export 'dart:convert' show Codec;
 
 import 'package:js/js.dart';
 
+/// Determines a true or false value for a given input.
 typedef bool Predicate<T>(T o);
+
+/// Provides a [T] object from [S].
 typedef T Factory<S, T>(S o);
 
+/// A [Codec] that provides additionnal functions to ensure the encoded/decoded
+/// values are supported.
 class ConditionalCodec<S, T> extends Codec<S, T> {
   final Converter<S, T> encoder;
   final Converter<T, S> decoder;
@@ -41,10 +46,13 @@ class _Converter<S, T> extends Converter<S, T> {
   T convert(S input) => input == null ? null : _factory(input);
 }
 
+/// A [ConditionalCodec] that accepts only [T] values and does not do any
+/// transformations.
 class IdentityCodec<T> extends ConditionalCodec<T, T> {
   IdentityCodec() : super.fromFactories((T o) => o, (T o) => o);
 }
 
+/// A [ConditionalCodec] that handles a given kind of [JsInterface].
 class JsInterfaceCodec<T extends JsInterface>
     extends ConditionalCodec<T, JsObject> {
   JsInterfaceCodec(Factory<JsObject, T> decode,
@@ -53,6 +61,7 @@ class JsInterfaceCodec<T extends JsInterface>
           acceptEncodedValue: acceptEncodedValue);
 }
 
+/// A [ConditionalCodec] that handles [List].
 class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
   JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories(
           (o) => o is JsInterface
@@ -61,6 +70,7 @@ class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
           (o) => new JsList.created(o, codec));
 }
 
+/// A [ConditionalCodec] used for union types.
 class BiMapCodec<S, T> extends ConditionalCodec<S, T> {
   BiMapCodec._(Map<S, T> encode, Map<T, S> decode)
       : super.fromFactories((S o) => encode[o], (T o) => decode[o]);

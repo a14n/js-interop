@@ -8,7 +8,8 @@ import 'dart:async';
 
 typedef _EventSinkCallback<T>(EventSink<T> eventSink);
 
-/// Utility class to create streams from event retrieve with subscribe/unsubscribe
+/// Utility class to create streams from event retrieve with
+/// `subscribe`/`unsubscribe`.
 class SubscribeStreamProvider<T> implements EventSink<T> {
   final _EventSinkCallback<T> subscribe;
   final _EventSinkCallback<T> unsubscribe;
