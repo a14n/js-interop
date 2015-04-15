@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-26T21:43:16.688Z
+// 2015-04-15T15:56:28.095Z
 
 part of js.test.proxy_instantiation_test;
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _Class0
 // **************************************************************************
 
@@ -14,18 +14,17 @@ class Class0 extends JsInterface implements _Class0 {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _Class1
 // **************************************************************************
 
 class Class1 extends JsInterface implements _Class1 {
   Class1.created(JsObject o) : super.created(o);
-  Class1(String s)
-      : this.created(new JsObject(getPath('Class1'), [s].map(toJs).toList()));
+  Class1(String s) : this.created(new JsObject(getPath('Class1'), [s]));
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _Class0Alias
 // **************************************************************************
 
@@ -36,7 +35,7 @@ class Class0Alias extends JsInterface implements _Class0Alias {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _Class2
 // **************************************************************************
 

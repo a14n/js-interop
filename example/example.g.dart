@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-03-27T13:25:13.227Z
+// 2015-04-15T15:56:27.998Z
 
 part of js.example.js_proxy;
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _JsFoo
 // **************************************************************************
 
@@ -37,8 +37,8 @@ class JsFoo extends JsInterface implements _JsFoo {
   }
   List<JsFoo> get l3 => ((e) {
     if (e == null) return null;
-    return new JsList<JsFoo>.created(
-        e, new JsInterfaceCodec<JsFoo>((o) => new JsFoo.created(o)));
+    return new JsList<JsFoo>.created(e, new JsInterfaceCodec<JsFoo>(
+        (o) => ((e) => e == null ? null : new JsFoo.created(e))(o)));
   })(asJsObject(this)['l3']);
 
   void set i(int _i) {
@@ -70,16 +70,14 @@ class JsFoo extends JsInterface implements _JsFoo {
     asJsObject(this).callMethod('m2');
   }
   String m3() => asJsObject(this).callMethod('m3');
-  String m4(int a) => asJsObject(this).callMethod('m4', [a].map(toJs).toList());
-  int m5(int a, b) =>
-      asJsObject(this).callMethod('m5', [a, b].map(toJs).toList());
+  String m4(int a) => asJsObject(this).callMethod('m4', [a]);
+  int m5(int a, b) => asJsObject(this).callMethod('m5', [a, toJs(b)]);
 
-  int _m6(int a, b) =>
-      asJsObject(this).callMethod('_m6', [a, b].map(toJs).toList());
+  int _m6(int a, b) => asJsObject(this).callMethod('_m6', [a, toJs(b)]);
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _JsBar
 // **************************************************************************
 
@@ -102,7 +100,7 @@ class JsBar extends JsInterface implements _JsBar {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class _JsBaz
 // **************************************************************************
 
@@ -112,15 +110,14 @@ class JsBaz extends JsBar implements _JsBaz {
 }
 
 // **************************************************************************
-// Generator: Instance of 'JsInterfaceGenerator'
+// Generator: JsInterfaceGenerator
 // Target: abstract class __Context
 // **************************************************************************
 
 class _Context extends JsInterface implements __Context {
   _Context.created(JsObject o) : super.created(o);
 
-  int find(String a) =>
-      asJsObject(this).callMethod('find', [a].map(toJs).toList());
+  int find(String a) => asJsObject(this).callMethod('find', [a]);
 
   void set a(String _a) {
     asJsObject(this)['a'] = _a;
