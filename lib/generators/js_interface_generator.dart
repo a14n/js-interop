@@ -419,18 +419,19 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
     return 'toJs($content)';
   }
 
-  bool isJsEnum(DartType type) =>
-      type.element is ClassElement && (type.element as ClassElement).isEnum;
-// TODO(aa) report type.element.node is null
-//  &&
-//      getAnnotations(
-//          type.element.node, getType(lib, 'js', 'JsEnum')).isNotEmpty;
+  bool isJsEnum(DartType type) {
+    final element = type.element;
+    if (element is! ClassElement) return false;
+    if (!element.isEnum) return false;
+    return getAnnotations(
+        getClassNode(element), getType(lib, 'js', 'JsEnum')).isNotEmpty;
+  }
 
   bool isJsInterfaceType(DartType type) => !type.isDynamic &&
       type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);
 
-  bool isListType(DartType type) => !type.isDynamic && type.isSubtypeOf(
-      getType(lib, 'dart.core', 'List').type
+  bool isListType(DartType type) => !type.isDynamic &&
+      type.isSubtypeOf(getType(lib, 'dart.core', 'List').type
           .substitute4([DynamicTypeImpl.instance]));
 
   /// return [true] if the type is transferable through dart:js
