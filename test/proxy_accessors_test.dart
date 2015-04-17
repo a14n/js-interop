@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library js.test.proxy_instantiation_test;
+library js.test.proxy_accessors_test;
 
 import 'dart:mirrors';
 
@@ -17,9 +17,6 @@ abstract class _Class0 implements JsInterface {
   external factory _Class0();
 
   final int i;
-  final double d;
-  final String s;
-  final bool b;
 }
 
 @JsName('Class0')
@@ -109,21 +106,6 @@ main() {
   test('int fields are supported', () {
     final o = new Class0();
     expect(o.i, 1);
-  });
-
-  test('double fields are supported', () {
-    final o = new Class0();
-    expect(o.d, 1.2);
-  });
-
-  test('String fields are supported', () {
-    final o = new Class0();
-    expect(o.s, 's');
-  });
-
-  test('bool fields are supported', () {
-    final o = new Class0();
-    expect(o.b, true);
   });
 
   test('final fields should generate getter but not setter', () {

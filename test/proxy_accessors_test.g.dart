@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-15T15:56:28.088Z
+// 2015-04-17T15:58:19.325Z
 
-part of js.test.proxy_instantiation_test;
+part of js.test.proxy_accessors_test;
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
@@ -13,9 +13,6 @@ class Class0 extends JsInterface implements _Class0 {
   Class0() : this.created(new JsObject(getPath('Class0')));
 
   int get i => asJsObject(this)['i'];
-  double get d => asJsObject(this)['d'];
-  String get s => asJsObject(this)['s'];
-  bool get b => asJsObject(this)['b'];
 }
 
 // **************************************************************************
