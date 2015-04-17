@@ -20,6 +20,14 @@ A.prototype.toColor = function(colorAsString) {
   }
   return null;
 }
+A.prototype.execute = function(f) {
+  return f(this.b);
+}
+A.prototype.getBisFunc = function() {
+  return function(b) {
+    return new B(b.v + 'Bis');
+  };
+}
 
 B = function(v) {
   this.v = v;

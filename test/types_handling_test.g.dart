@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-17T20:54:55.307Z
+// 2015-04-17T21:21:12.784Z
 
 part of js.test.types_handling_test;
 
@@ -55,6 +55,43 @@ class A extends JsInterface implements _A {
     if (e == path['GREEN']) return Color.GREEN;
     if (e == path['BLUE']) return Color.BLUE;
   })(asJsObject(this).callMethod('toColor', [s]));
+
+  B execute(B f(B b)) => ((e) => e == null ? null : new B.created(e))(
+      asJsObject(this).callMethod('execute', [
+    ((f) {
+      if (f == null) return null;
+      return (p_b) {
+        p_b = new JsInterfaceCodec<B>(
+            (o) => ((e) => e == null ? null : new B.created(e))(o)).decode(p_b);
+        final result = f(p_b);
+        return new JsInterfaceCodec<B>(
+                (o) => ((e) => e == null ? null : new B.created(e))(o))
+            .encode(result);
+      };
+    })(f)
+  ]));
+
+  BisFunc getBisFunc() => ((JsFunction f) {
+    if (f == null) return null;
+    return (p_b) {
+      p_b = new JsInterfaceCodec<B>(
+          (o) => ((e) => e == null ? null : new B.created(e))(o)).encode(p_b);
+      final result = f.apply([p_b]);
+      return new JsInterfaceCodec<B>(
+              (o) => ((e) => e == null ? null : new B.created(e))(o))
+          .decode(result);
+    };
+  })(asJsObject(this).callMethod('getBisFunc'));
+
+  void set simpleFunc(SimpleFunc _simpleFunc) {
+    asJsObject(this)['simpleFunc'] = _simpleFunc;
+  }
+  SimpleFunc get simpleFunc => ((JsFunction f) {
+    if (f == null) return null;
+    return (p_i) {
+      return f.apply([p_i]);
+    };
+  })(asJsObject(this)['simpleFunc']);
 }
 
 // **************************************************************************

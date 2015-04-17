@@ -319,35 +319,30 @@ class JsInterfaceClassGenerator {
         }
       } else if (type is FunctionType) {
         final returnCodec = getCodec(type.returnType);
-        final paramCodecs = type.parameters.map((p) => p.type).map(getCodec);
-        if (returnCodec == null && paramCodecs.every((c) => c == null)) {
-          return content;
-        } else {
-          var paramChanges = '';
-          type.parameters.forEach((p) {
-            final codec = getCodec(p.type);
-            if (codec != null) {
-              paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
-            }
-          });
-          var call =
-              'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
-          if (returnCodec != null) {
-            call = 'final result = $call; return $returnCodec.decode(result);';
-          } else if (!type.returnType.isVoid) {
-            call = 'return $call;';
-          } else {
-            call = '$call;';
+        var paramChanges = '';
+        type.parameters.forEach((p) {
+          final codec = getCodec(p.type);
+          if (codec != null) {
+            paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
           }
-          return '''
-((f) {
+        });
+        var call =
+            'f.apply([${type.parameters.map((p) => 'p_' + p.name).join(', ')}])';
+        if (returnCodec != null) {
+          call = 'final result = $call; return $returnCodec.decode(result);';
+        } else if (!type.returnType.isVoid) {
+          call = 'return $call;';
+        } else {
+          call = '$call;';
+        }
+        return '''
+((JsFunction f) {
   if (f == null) return null;
   return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
     $paramChanges
     $call
   };
 })($content)''';
-        }
       }
     }
     return content;

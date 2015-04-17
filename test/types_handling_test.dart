@@ -14,6 +14,10 @@ part 'types_handling_test.g.dart';
 @JsEnum()
 enum Color { RED, GREEN, BLUE }
 
+typedef String SimpleFunc(int i);
+
+typedef B BisFunc(B b);
+
 abstract class _A implements JsInterface {
   external factory _A();
 
@@ -23,6 +27,12 @@ abstract class _A implements JsInterface {
 
   String toColorString(Color c);
   Color toColor(String s);
+
+  B execute(B f(B b));
+
+  BisFunc getBisFunc();
+
+  SimpleFunc simpleFunc;
 }
 
 abstract class _B implements JsInterface {
@@ -72,5 +82,17 @@ main() {
     expect(asJsObject(o)['li'], new isInstanceOf<JsArray>());
     expect(asJsObject(o)['li'].length, 1);
     expect(asJsObject(o)['li'], [1]);
+  });
+
+  test('Function should be wrap/unwrap', () {
+    final o = new A();
+    expect(o.execute((b) => new B('t')).toString(), 't');
+    expect((o.getBisFunc()(new B('a'))).toString(), 'aBis');
+
+    o.simpleFunc = (int i) => '$i';
+    expect(asJsObject(o).callMethod('simpleFunc', [4]), '4');
+
+    asJsObject(o)['simpleFunc'] = (int i) => '$i$i';
+    expect(o.simpleFunc(3), '33');
   });
 }
