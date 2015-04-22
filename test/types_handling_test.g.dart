@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-17T21:21:12.784Z
+// 2015-04-22T13:45:20.035Z
 
 part of js.test.types_handling_test;
 
@@ -46,6 +46,7 @@ class A extends JsInterface implements _A {
       if (e == Color.RED) return path['RED'];
       if (e == Color.GREEN) return path['GREEN'];
       if (e == Color.BLUE) return path['BLUE'];
+      if (e == Color.WHITE) return path['white'];
     })(c)
   ]);
   Color toColor(String s) => ((e) {
@@ -54,6 +55,7 @@ class A extends JsInterface implements _A {
     if (e == path['RED']) return Color.RED;
     if (e == path['GREEN']) return Color.GREEN;
     if (e == path['BLUE']) return Color.BLUE;
+    if (e == path['white']) return Color.WHITE;
   })(asJsObject(this).callMethod('toColor', [s]));
 
   B execute(B f(B b)) => ((e) => e == null ? null : new B.created(e))(

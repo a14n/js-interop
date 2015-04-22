@@ -47,48 +47,50 @@ class JsInterfaceClassGenerator {
   String generate() {
     final newClassName = getPublicClassName(clazz);
 
+    final ClassDeclaration classNode = clazz.node;
+
     // add implements to make analyzer happy
-    if (clazz.node.implementsClause == null) {
+    if (classNode.implementsClause == null) {
       transformer.insertAt(
-          clazz.node.leftBracket.offset, ' implements ${clazz.displayName}');
+          classNode.leftBracket.offset, ' implements ${clazz.displayName}');
     } else {
-      var interfaceCount = clazz.node.implementsClause.interfaces.length;
+      var interfaceCount = classNode.implementsClause.interfaces.length;
       // remove implement JsInterface
-      clazz.node.implementsClause.interfaces
+      classNode.implementsClause.interfaces
           .where((e) => e.name.name == 'JsInterface')
           .forEach((e) {
         interfaceCount--;
-        if (clazz.node.implementsClause.interfaces.length == 1) {
+        if (classNode.implementsClause.interfaces.length == 1) {
           transformer.removeNode(e);
         } else {
-          final index = clazz.node.implementsClause.interfaces.indexOf(e);
+          final index = classNode.implementsClause.interfaces.indexOf(e);
           int begin, end;
           if (index == 0) {
             begin = e.offset;
-            end = clazz.node.implementsClause.interfaces[1].offset;
+            end = classNode.implementsClause.interfaces[1].offset;
           } else {
-            begin = clazz.node.implementsClause.interfaces[index - 1].end;
+            begin = classNode.implementsClause.interfaces[index - 1].end;
             end = e.end;
           }
           transformer.removeBetween(begin, end);
         }
       });
 
-      transformer.insertAt(clazz.node.implementsClause.end,
+      transformer.insertAt(classNode.implementsClause.end,
           (interfaceCount > 0 ? ', ' : '') + clazz.displayName);
     }
 
     // add JsInterface extension
-    if (clazz.node.extendsClause == null) {
-      transformer.insertAt(clazz.node.name.end, ' extends JsInterface');
+    if (classNode.extendsClause == null) {
+      transformer.insertAt(classNode.name.end, ' extends JsInterface');
     }
 
     // remove abstract
-    transformer.removeToken(clazz.node.abstractKeyword);
+    transformer.removeToken(classNode.abstractKeyword);
 
     // rename class
     transformer.replace(
-        clazz.node.name.offset, clazz.node.name.end, newClassName);
+        classNode.name.offset, classNode.name.end, newClassName);
 
     // generate constructors
     for (final constr in clazz.constructors) {
@@ -134,7 +136,7 @@ class JsInterfaceClassGenerator {
     if (!clazz.constructors.any((e) => e.name == 'created')) {
       final insertionIndex = clazz.constructors
               .where((e) => !e.isSynthetic).isEmpty
-          ? clazz.node.leftBracket.end
+          ? classNode.leftBracket.end
           : clazz.constructors.first.node.offset;
       transformer.insertAt(insertionIndex,
           '$newClassName.created(JsObject o) : super.created(o);\n');
@@ -303,7 +305,7 @@ class JsInterfaceClassGenerator {
 ((e) {
   if (e == null) return null;
   final path = getPath('$jsPath');
-  ${values.map((e) => "if (e == path['$e']) return $type.$e;").join('\n')}
+  ${values.map((e) => "if (e == path['${getRealEnumNameValue(type, e)}']) return $type.$e;").join('\n')}
 })($content)''';
       } else if (isListType(type)) {
         final typeParam = (type as InterfaceType).typeArguments.first;
@@ -358,15 +360,34 @@ class JsInterfaceClassGenerator {
       final values = getEnumValues(type.element);
       final jsPath =
           computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
-      return '''
-new BiMapCodec<$type, dynamic>({
-${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
-})''';
-    }else if (type is FunctionType) {
+      final mapContent = values
+          .map((e) =>
+              "$type.$e: getPath('$jsPath')['${getRealEnumNameValue(type, e)}']")
+          .join(',');
+      return 'new BiMapCodec<$type, dynamic>({$mapContent})';
+    } else if (type is FunctionType) {
       // TODO(aa) type for Function can be "int -> String" : create typedef
       return 'new FunctionCodec/*<$type>*/((o) => ${toJs(type, 'o')}, (o) => ${toDart(type, 'o')})';
     }
     return null;
+  }
+
+  String getRealEnumNameValue(DartType type, String enumName) {
+    final a = getAnnotations(
+        getClassNode(type.element), getType(lib, 'js', 'JsEnum')).single;
+    if (a.arguments.arguments.length == 1) {
+      var param = a.arguments.arguments.first;
+      if (param is NamedExpression &&
+          param.name.label.name == "names" &&
+          param.expression is MapLiteral) {
+        for (final e in param.expression.entries) {
+          if (e.key.toString() == '$type.$enumName') {
+            return (e.value as StringLiteral).stringValue;
+          }
+        }
+      }
+    }
+    return enumName;
   }
 
   Iterable<String> getEnumValues(ClassElement element) {
@@ -387,7 +408,7 @@ ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
 ((e) {
   if (e == null) return null;
   final path = getPath('$jsPath');
-  ${values.map((e) => "if (e == $type.$e) return path['$e'];").join('\n')}
+  ${values.map((e) => "if (e == $type.$e) return path['${getRealEnumNameValue(type, e)}'];").join('\n')}
 })($content)''';
     } else if (isListType(type)) {
       final typeParam = (type as InterfaceType).typeArguments.first;

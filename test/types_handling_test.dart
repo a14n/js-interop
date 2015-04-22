@@ -11,8 +11,8 @@ import 'package:unittest/html_config.dart';
 
 part 'types_handling_test.g.dart';
 
-@JsEnum()
-enum Color { RED, GREEN, BLUE }
+@JsEnum(names: const {Color.WHITE: 'white'})
+enum Color { RED, GREEN, BLUE, WHITE }
 
 typedef String SimpleFunc(int i);
 
@@ -48,6 +48,13 @@ main() {
     final o = new A();
     expect(o.toColor('green'), Color.GREEN);
     expect(o.toColorString(Color.BLUE), 'blue');
+  });
+
+  test('enum annotated with @JsEnum should take care of names specific value',
+      () {
+    final o = new A();
+    expect(o.toColor('white'), Color.WHITE);
+    expect(o.toColorString(Color.WHITE), 'white');
   });
 
   test('JsInterface should be wrap/unwrap', () {
