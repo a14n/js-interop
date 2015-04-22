@@ -1,11 +1,11 @@
-- tests
-- prefix of library
-- named parameters to anonymous object
 - Enum ? generate codec @jsEnum(mapping: const {Enum.V1:'v1name'})
+- handle Map<String, ?> (see FusionTablesMouseEvent.row)
 - generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members
+- named parameters to anonymous object
 - generate state in .created from initialized variables?
 - test on Google Maps
+- prefix of library
 
 
 

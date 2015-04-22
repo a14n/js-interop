@@ -362,6 +362,9 @@ class JsInterfaceClassGenerator {
 new BiMapCodec<$type, dynamic>({
 ${values.map((e) => "$type.$e: getPath('$jsPath')['$e']").join(',')}
 })''';
+    }else if (type is FunctionType) {
+      // TODO(aa) type for Function can be "int -> String" : create typedef
+      return 'new FunctionCodec/*<$type>*/((o) => ${toJs(type, 'o')}, (o) => ${toDart(type, 'o')})';
     }
     return null;
   }

@@ -78,6 +78,14 @@ class BiMapCodec<S, T> extends ConditionalCodec<S, T> {
       : this._(map, new Map<T, S>.fromIterables(map.values, map.keys));
 }
 
+/// A [ConditionalCodec] that handles function.
+class FunctionCodec<T extends Function>
+    extends ConditionalCodec<T, JsFunction> {
+  FunctionCodec(Factory<T, dynamic /*JsFunction|Function*/ > encode,
+      Factory<JsFunction, T> decode)
+      : super.fromFactories(encode, decode);
+}
+
 class ChainedCodec extends ConditionalCodec {
   final List<ConditionalCodec> _codecs;
 
