@@ -21,6 +21,9 @@ typedef B BisFunc(B b);
 abstract class _A implements JsInterface {
   external factory _A();
 
+  Gender gender;
+  List<Gender> genders;
+
   B b;
   List<B> bs;
   List<int> li;
@@ -41,6 +44,19 @@ abstract class _B implements JsInterface {
   String toString();
 }
 
+@JsCodec(#genderCodec)
+enum Gender { MALE, FEMALE }
+
+final genderCodec = new BiMapCodec<Gender, String>(
+    {Gender.MALE: "male", Gender.FEMALE: "female",});
+
+abstract class _C implements JsInterface {
+  external factory _C();
+
+  Gender gender;
+  List<Gender> genders;
+}
+
 main() {
   useHtmlConfiguration();
 
@@ -55,6 +71,19 @@ main() {
     final o = new A();
     expect(o.toColor('white'), Color.WHITE);
     expect(o.toColorString(Color.WHITE), 'white');
+  });
+
+  test('enum annotated with @JsCodec should use this codec', () {
+    final o = new C();
+
+    expect(o.gender, Gender.MALE);
+    o.gender = Gender.FEMALE;
+    expect(o.gender, Gender.FEMALE);
+
+    expect(o.genders, [Gender.FEMALE, Gender.FEMALE]);
+    o.genders.addAll([Gender.MALE, Gender.FEMALE]);
+    expect(
+        o.genders, [Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE]);
   });
 
   test('JsInterface should be wrap/unwrap', () {

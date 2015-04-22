@@ -1,4 +1,3 @@
-- Enum ? generate codec @jsEnum(mapping: const {Enum.V1:'v1name'})
 - handle Map<String, ?> (see FusionTablesMouseEvent.row)
 - generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members

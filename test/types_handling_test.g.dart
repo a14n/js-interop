@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-22T13:45:20.035Z
+// 2015-04-22T20:27:29.686Z
 
 part of js.test.types_handling_test;
 
@@ -12,6 +12,22 @@ class A extends JsInterface implements _A {
   A.created(JsObject o) : super.created(o);
   A() : this.created(new JsObject(getPath('A')));
 
+  void set gender(Gender _gender) {
+    asJsObject(this)['gender'] = genderCodec.encode(_gender);
+  }
+  Gender get gender => genderCodec.decode(asJsObject(this)['gender']);
+  void set genders(List<Gender> _genders) {
+    asJsObject(this)['genders'] = ((e) {
+      if (e == null) return null;
+      if (e is JsInterface) return asJsObject(e);
+      return new JsArray.from(e.map(genderCodec.encode));
+    })(_genders);
+  }
+  List<Gender> get genders => ((e) {
+    if (e == null) return null;
+    return new JsList<Gender>.created(e, genderCodec);
+  })(asJsObject(this)['genders']);
+
   void set b(B _b) {
     asJsObject(this)['b'] = ((e) => e == null ? null : asJsObject(e))(_b);
   }
@@ -21,7 +37,8 @@ class A extends JsInterface implements _A {
     asJsObject(this)['bs'] = ((e) {
       if (e == null) return null;
       if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(toJs));
+      return new JsArray.from(e.map(new JsInterfaceCodec<B>(
+          (o) => ((e) => e == null ? null : new B.created(e))(o)).encode));
     })(_bs);
   }
   List<B> get bs => ((e) {
@@ -106,4 +123,30 @@ class B extends JsInterface implements _B {
   B(String v) : this.created(new JsObject(getPath('B'), [v]));
 
   String toString() => asJsObject(this).callMethod('toString');
+}
+
+// **************************************************************************
+// Generator: JsInterfaceGenerator
+// Target: abstract class _C
+// **************************************************************************
+
+class C extends JsInterface implements _C {
+  C.created(JsObject o) : super.created(o);
+  C() : this.created(new JsObject(getPath('C')));
+
+  void set gender(Gender _gender) {
+    asJsObject(this)['gender'] = genderCodec.encode(_gender);
+  }
+  Gender get gender => genderCodec.decode(asJsObject(this)['gender']);
+  void set genders(List<Gender> _genders) {
+    asJsObject(this)['genders'] = ((e) {
+      if (e == null) return null;
+      if (e is JsInterface) return asJsObject(e);
+      return new JsArray.from(e.map(genderCodec.encode));
+    })(_genders);
+  }
+  List<Gender> get genders => ((e) {
+    if (e == null) return null;
+    return new JsList<Gender>.created(e, genderCodec);
+  })(asJsObject(this)['genders']);
 }

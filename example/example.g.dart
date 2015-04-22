@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-15T15:56:27.998Z
+// 2015-04-22T20:51:19.694Z
 
 part of js.example.js_proxy;
 
@@ -32,7 +32,8 @@ class JsFoo extends JsInterface implements _JsFoo {
     asJsObject(this)['l3'] = ((e) {
       if (e == null) return null;
       if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(toJs));
+      return new JsArray.from(e.map(new JsInterfaceCodec<JsFoo>(
+          (o) => ((e) => e == null ? null : new JsFoo.created(e))(o)).encode));
     })(_l3);
   }
   List<JsFoo> get l3 => ((e) {
