@@ -1,3 +1,4 @@
+- implements all unimplemented methods
 - handle Map<String, ?> (see FusionTablesMouseEvent.row)
 - generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members

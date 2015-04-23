@@ -1,15 +1,14 @@
 // Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-
+@TestOn("browser")
 library js.test.proxy_instantiation_test;
 
 import 'dart:js' as js;
 
 import 'package:js/js.dart';
 
-import 'package:unittest/unittest.dart';
-import 'package:unittest/html_config.dart';
+import 'package:test/test.dart';
 
 part 'proxy_instantiation_test.g.dart';
 
@@ -32,8 +31,6 @@ abstract class _Class2 implements JsInterface {
 }
 
 main() {
-  useHtmlConfiguration();
-
   test('Class0 should be instantiable', () {
     final o = new Class0();
     final jsO = asJsObject(o);

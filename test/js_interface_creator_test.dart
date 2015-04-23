@@ -4,7 +4,7 @@
 
 library js.test.proxy_creator_test;
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:js/js_interface_creator.dart';
 
 main() {

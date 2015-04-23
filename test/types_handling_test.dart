@@ -1,13 +1,12 @@
 // Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-
+@TestOn("browser")
 library js.test.types_handling_test;
 
 import 'package:js/js.dart';
 
-import 'package:unittest/unittest.dart';
-import 'package:unittest/html_config.dart';
+import 'package:test/test.dart';
 
 part 'types_handling_test.g.dart';
 
@@ -58,8 +57,6 @@ abstract class _C implements JsInterface {
 }
 
 main() {
-  useHtmlConfiguration();
-
   test('enum annotated with @JsEnum should be supported', () {
     final o = new A();
     expect(o.toColor('green'), Color.GREEN);
