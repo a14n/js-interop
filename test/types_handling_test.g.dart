@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-24T13:47:13.366Z
+// 2015-04-24T14:18:27.603Z
 
 part of js.test.types_handling_test;
 
@@ -66,13 +66,10 @@ final __codec13 = new JsListCodec<B>(__codec12);
 final __codec14 = new JsListCodec<int>(null);
 
 /// codec for (int) → String
-final __codec15 = new FunctionCodec /*<(int) → String>*/ ((o) => o,
-    (o) => ((JsFunction f) {
-  if (f == null) return null;
-  return (p_i) {
-    return f.apply([p_i]);
-  };
-})(o));
+final __codec15 = new FunctionCodec /*<(int) → String>*/ ((f) => f,
+    (JsFunction f) => (p_i) {
+  return f.apply([p_i]);
+});
 
 /// codec for Color
 final __codec16 = new BiMapCodec<Color, dynamic>({
@@ -83,21 +80,15 @@ final __codec16 = new BiMapCodec<Color, dynamic>({
 });
 
 /// codec for (B) → B
-final __codec17 = new FunctionCodec /*<(B) → B>*/ ((o) => ((f) {
-  if (f == null) return null;
-  return (p_b) {
-    p_b = __codec12.decode(p_b);
-    final result = f(p_b);
-    return __codec12.encode(result);
-  };
-})(o), (o) => ((JsFunction f) {
-  if (f == null) return null;
-  return (p_b) {
-    p_b = __codec12.encode(p_b);
-    final result = f.apply([p_b]);
-    return __codec12.decode(result);
-  };
-})(o));
+final __codec17 = new FunctionCodec /*<(B) → B>*/ ((f) => (p_b) {
+  p_b = __codec12.decode(p_b);
+  final result = f(p_b);
+  return __codec12.encode(result);
+}, (JsFunction f) => (p_b) {
+  p_b = __codec12.encode(p_b);
+  final result = f.apply([p_b]);
+  return __codec12.decode(result);
+});
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
