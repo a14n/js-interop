@@ -64,10 +64,10 @@ class JsInterfaceCodec<T extends JsInterface>
 /// A [ConditionalCodec] that handles [List].
 class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
   JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories(
-          (o) => o is JsInterface
-              ? asJsObject(o)
-              : new JsArray.from(o.map(codec.encode)),
-          (o) => new JsList.created(o, codec));
+          (List<T> o) => o is JsInterface
+              ? asJsObject(o as JsInterface)
+              : new JsArray.from(codec == null ? o : o.map(codec.encode)),
+          (JsArray o) => codec == null ? o : new JsList.created(o, codec));
 }
 
 /// A [ConditionalCodec] used for union types.
@@ -80,10 +80,11 @@ class BiMapCodec<S, T> extends ConditionalCodec<S, T> {
 
 /// A [ConditionalCodec] that handles function.
 class FunctionCodec<T extends Function>
-    extends ConditionalCodec<T, JsFunction> {
+    extends ConditionalCodec<T, dynamic /*JsFunction|Function*/ > {
   FunctionCodec(Factory<T, dynamic /*JsFunction|Function*/ > encode,
       Factory<JsFunction, T> decode)
-      : super.fromFactories(encode, decode);
+      : super.fromFactories(encode, decode,
+          acceptEncodedValue: (o) => o is JsFunction);
 }
 
 class ChainedCodec extends ConditionalCodec {

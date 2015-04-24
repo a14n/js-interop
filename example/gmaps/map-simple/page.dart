@@ -69,6 +69,6 @@ void main() {
     ..center = new LatLng(-34.397, 150.644)
     ..mapTypeId = MapTypeId.ROADMAP;
   var map = new GMap(querySelector("#map_canvas"), mapOptions);
-  event.addListener(
-      map, "zoom_changed", () => print(asJsObject(map).callMethod('getZoom')));
+  event.addListener(asJsObject(map), "zoom_changed",
+      () => print(asJsObject(map).callMethod('getZoom')));
 }

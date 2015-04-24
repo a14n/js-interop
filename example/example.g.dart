@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-22T20:51:19.694Z
+// 2015-04-24T13:47:13.259Z
 
 part of js.example.js_proxy;
 
@@ -13,34 +13,17 @@ class JsFoo extends JsInterface implements _JsFoo {
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 
   void set l1(List _l1) {
-    asJsObject(this)['l1'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e);
-    })(_l1);
+    asJsObject(this)['l1'] = __codec5.encode(_l1);
   }
-  List get l1 => asJsObject(this)['l1'] as JsArray;
+  List get l1 => __codec5.decode(asJsObject(this)['l1']);
   void set l2(List<num> _l2) {
-    asJsObject(this)['l2'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e);
-    })(_l2);
+    asJsObject(this)['l2'] = __codec6.encode(_l2);
   }
-  List<num> get l2 => asJsObject(this)['l2'] as JsArray;
+  List<num> get l2 => __codec6.decode(asJsObject(this)['l2']);
   void set l3(List<JsFoo> _l3) {
-    asJsObject(this)['l3'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(new JsInterfaceCodec<JsFoo>(
-          (o) => ((e) => e == null ? null : new JsFoo.created(e))(o)).encode));
-    })(_l3);
+    asJsObject(this)['l3'] = __codec8.encode(_l3);
   }
-  List<JsFoo> get l3 => ((e) {
-    if (e == null) return null;
-    return new JsList<JsFoo>.created(e, new JsInterfaceCodec<JsFoo>(
-        (o) => ((e) => e == null ? null : new JsFoo.created(e))(o)));
-  })(asJsObject(this)['l3']);
+  List<JsFoo> get l3 => __codec8.decode(asJsObject(this)['l3']);
 
   void set i(int _i) {
     asJsObject(this)['_i'] = _i;
@@ -72,10 +55,21 @@ class JsFoo extends JsInterface implements _JsFoo {
   }
   String m3() => asJsObject(this).callMethod('m3');
   String m4(int a) => asJsObject(this).callMethod('m4', [a]);
-  int m5(int a, b) => asJsObject(this).callMethod('m5', [a, toJs(b)]);
+  int m5(int a, b) => asJsObject(this).callMethod('m5', [a, b]);
 
-  int _m6(int a, b) => asJsObject(this).callMethod('_m6', [a, toJs(b)]);
+  int _m6(int a, b) => asJsObject(this).callMethod('_m6', [a, b]);
 }
+/// codec for List<dynamic>
+final __codec5 = new JsListCodec<dynamic>(null);
+
+/// codec for List<num>
+final __codec6 = new JsListCodec<num>(null);
+
+/// codec for JsFoo
+final __codec7 = new JsInterfaceCodec<JsFoo>((o) => new JsFoo.created(o));
+
+/// codec for List<JsFoo>
+final __codec8 = new JsListCodec<JsFoo>(__codec7);
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
@@ -91,14 +85,15 @@ class JsBar extends JsInterface implements _JsBar {
   factory JsBar() = dynamic;
   factory JsBar.named(int x, int y) = dynamic;
 
-  JsBar m1() => ((e) => e == null ? null : new JsBar.created(e))(
-      asJsObject(this).callMethod('m1'));
+  JsBar m1() => __codec9.decode(asJsObject(this).callMethod('m1'));
 
   void set a(int a) {
     getState(this)[#a] = a;
   }
   int get a => getState(this)[#a];
 }
+/// codec for JsBar
+final __codec9 = new JsInterfaceCodec<JsBar>((o) => new JsBar.created(o));
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator

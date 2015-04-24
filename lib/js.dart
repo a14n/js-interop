@@ -10,7 +10,8 @@ import 'dart:js';
 
 export 'dart:js';
 export 'adapter/js_list.dart';
-export 'util/codec.dart' show BiMapCodec, JsInterfaceCodec, JsListCodec;
+export 'util/codec.dart'
+    show BiMapCodec, JsInterfaceCodec, JsListCodec, FunctionCodec;
 
 final JsObject _obj = context['Object'];
 
@@ -27,10 +28,6 @@ abstract class JsInterface {
 
 /// Returns the underlying [JsObject] corresponding to the non nullable [o].
 JsObject asJsObject(JsInterface o) => o._jsObject;
-
-/// Returns the underlying [JsObject] corresponding to [o] when [o] is a
-/// [JsInterface] or [o] in other cases.
-dynamic toJs(dynamic o) => o is JsInterface ? asJsObject(o) : o;
 
 /// Return the [JsObject] targeted by the [path].
 JsObject getPath(String path) =>

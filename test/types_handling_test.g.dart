@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-22T20:27:29.686Z
+// 2015-04-24T13:47:13.366Z
 
 part of js.test.types_handling_test;
 
@@ -13,105 +13,91 @@ class A extends JsInterface implements _A {
   A() : this.created(new JsObject(getPath('A')));
 
   void set gender(Gender _gender) {
-    asJsObject(this)['gender'] = genderCodec.encode(_gender);
+    asJsObject(this)['gender'] = __codec10.encode(_gender);
   }
-  Gender get gender => genderCodec.decode(asJsObject(this)['gender']);
+  Gender get gender => __codec10.decode(asJsObject(this)['gender']);
   void set genders(List<Gender> _genders) {
-    asJsObject(this)['genders'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(genderCodec.encode));
-    })(_genders);
+    asJsObject(this)['genders'] = __codec11.encode(_genders);
   }
-  List<Gender> get genders => ((e) {
-    if (e == null) return null;
-    return new JsList<Gender>.created(e, genderCodec);
-  })(asJsObject(this)['genders']);
+  List<Gender> get genders => __codec11.decode(asJsObject(this)['genders']);
 
   void set b(B _b) {
-    asJsObject(this)['b'] = ((e) => e == null ? null : asJsObject(e))(_b);
+    asJsObject(this)['b'] = __codec12.encode(_b);
   }
-  B get b =>
-      ((e) => e == null ? null : new B.created(e))(asJsObject(this)['b']);
+  B get b => __codec12.decode(asJsObject(this)['b']);
   void set bs(List<B> _bs) {
-    asJsObject(this)['bs'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(new JsInterfaceCodec<B>(
-          (o) => ((e) => e == null ? null : new B.created(e))(o)).encode));
-    })(_bs);
+    asJsObject(this)['bs'] = __codec13.encode(_bs);
   }
-  List<B> get bs => ((e) {
-    if (e == null) return null;
-    return new JsList<B>.created(e, new JsInterfaceCodec<B>(
-        (o) => ((e) => e == null ? null : new B.created(e))(o)));
-  })(asJsObject(this)['bs']);
+  List<B> get bs => __codec13.decode(asJsObject(this)['bs']);
   void set li(List<int> _li) {
-    asJsObject(this)['li'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e);
-    })(_li);
+    asJsObject(this)['li'] = __codec14.encode(_li);
   }
-  List<int> get li => asJsObject(this)['li'] as JsArray;
+  List<int> get li => __codec14.decode(asJsObject(this)['li']);
 
-  String toColorString(Color c) => asJsObject(this).callMethod('toColorString',
-      [
-    ((e) {
-      if (e == null) return null;
-      final path = getPath('Color');
-      if (e == Color.RED) return path['RED'];
-      if (e == Color.GREEN) return path['GREEN'];
-      if (e == Color.BLUE) return path['BLUE'];
-      if (e == Color.WHITE) return path['white'];
-    })(c)
-  ]);
-  Color toColor(String s) => ((e) {
-    if (e == null) return null;
-    final path = getPath('Color');
-    if (e == path['RED']) return Color.RED;
-    if (e == path['GREEN']) return Color.GREEN;
-    if (e == path['BLUE']) return Color.BLUE;
-    if (e == path['white']) return Color.WHITE;
-  })(asJsObject(this).callMethod('toColor', [s]));
+  String toColorString(Color c) =>
+      asJsObject(this).callMethod('toColorString', [__codec16.encode(c)]);
+  Color toColor(String s) =>
+      __codec16.decode(asJsObject(this).callMethod('toColor', [s]));
 
-  B execute(B f(B b)) => ((e) => e == null ? null : new B.created(e))(
-      asJsObject(this).callMethod('execute', [
-    ((f) {
-      if (f == null) return null;
-      return (p_b) {
-        p_b = new JsInterfaceCodec<B>(
-            (o) => ((e) => e == null ? null : new B.created(e))(o)).decode(p_b);
-        final result = f(p_b);
-        return new JsInterfaceCodec<B>(
-                (o) => ((e) => e == null ? null : new B.created(e))(o))
-            .encode(result);
-      };
-    })(f)
-  ]));
+  B execute(B f(B b)) => __codec12
+      .decode(asJsObject(this).callMethod('execute', [__codec17.encode(f)]));
 
-  BisFunc getBisFunc() => ((JsFunction f) {
-    if (f == null) return null;
-    return (p_b) {
-      p_b = new JsInterfaceCodec<B>(
-          (o) => ((e) => e == null ? null : new B.created(e))(o)).encode(p_b);
-      final result = f.apply([p_b]);
-      return new JsInterfaceCodec<B>(
-              (o) => ((e) => e == null ? null : new B.created(e))(o))
-          .decode(result);
-    };
-  })(asJsObject(this).callMethod('getBisFunc'));
+  BisFunc getBisFunc() =>
+      __codec17.decode(asJsObject(this).callMethod('getBisFunc'));
 
   void set simpleFunc(SimpleFunc _simpleFunc) {
-    asJsObject(this)['simpleFunc'] = _simpleFunc;
+    asJsObject(this)['simpleFunc'] = __codec15.encode(_simpleFunc);
   }
-  SimpleFunc get simpleFunc => ((JsFunction f) {
-    if (f == null) return null;
-    return (p_i) {
-      return f.apply([p_i]);
-    };
-  })(asJsObject(this)['simpleFunc']);
+  SimpleFunc get simpleFunc => __codec15.decode(asJsObject(this)['simpleFunc']);
 }
+/// codec for Gender
+final __codec10 = genderCodec;
+
+/// codec for List<Gender>
+final __codec11 = new JsListCodec<Gender>(__codec10);
+
+/// codec for B
+final __codec12 = new JsInterfaceCodec<B>((o) => new B.created(o));
+
+/// codec for List<B>
+final __codec13 = new JsListCodec<B>(__codec12);
+
+/// codec for List<int>
+final __codec14 = new JsListCodec<int>(null);
+
+/// codec for (int) → String
+final __codec15 = new FunctionCodec /*<(int) → String>*/ ((o) => o,
+    (o) => ((JsFunction f) {
+  if (f == null) return null;
+  return (p_i) {
+    return f.apply([p_i]);
+  };
+})(o));
+
+/// codec for Color
+final __codec16 = new BiMapCodec<Color, dynamic>({
+  Color.RED: getPath('Color')['RED'],
+  Color.GREEN: getPath('Color')['GREEN'],
+  Color.BLUE: getPath('Color')['BLUE'],
+  Color.WHITE: getPath('Color')['white']
+});
+
+/// codec for (B) → B
+final __codec17 = new FunctionCodec /*<(B) → B>*/ ((o) => ((f) {
+  if (f == null) return null;
+  return (p_b) {
+    p_b = __codec12.decode(p_b);
+    final result = f(p_b);
+    return __codec12.encode(result);
+  };
+})(o), (o) => ((JsFunction f) {
+  if (f == null) return null;
+  return (p_b) {
+    p_b = __codec12.encode(p_b);
+    final result = f.apply([p_b]);
+    return __codec12.decode(result);
+  };
+})(o));
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
@@ -135,18 +121,11 @@ class C extends JsInterface implements _C {
   C() : this.created(new JsObject(getPath('C')));
 
   void set gender(Gender _gender) {
-    asJsObject(this)['gender'] = genderCodec.encode(_gender);
+    asJsObject(this)['gender'] = __codec10.encode(_gender);
   }
-  Gender get gender => genderCodec.decode(asJsObject(this)['gender']);
+  Gender get gender => __codec10.decode(asJsObject(this)['gender']);
   void set genders(List<Gender> _genders) {
-    asJsObject(this)['genders'] = ((e) {
-      if (e == null) return null;
-      if (e is JsInterface) return asJsObject(e);
-      return new JsArray.from(e.map(genderCodec.encode));
-    })(_genders);
+    asJsObject(this)['genders'] = __codec11.encode(_genders);
   }
-  List<Gender> get genders => ((e) {
-    if (e == null) return null;
-    return new JsList<Gender>.created(e, genderCodec);
-  })(asJsObject(this)['genders']);
+  List<Gender> get genders => __codec11.decode(asJsObject(this)['genders']);
 }

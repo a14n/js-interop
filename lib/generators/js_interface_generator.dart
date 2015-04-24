@@ -14,31 +14,64 @@ import 'package:source_gen/source_gen.dart';
 
 import 'util.dart';
 
+const _CODECS_PREFIX = '__codec';
+
+int _codecId = 1;
+
 class JsInterfaceGenerator extends Generator {
-  const JsInterfaceGenerator();
+  final codecs = <LibraryElement, List<CodecSource>>{};
+  final codecsAlreadyEmitted = <LibraryElement, List<CodecSource>>{};
+
+  JsInterfaceGenerator();
 
   Future<String> generate(Element element) async {
+    codecs.putIfAbsent(element.library, () => <CodecSource>[]);
+    codecsAlreadyEmitted.putIfAbsent(element.library, () => <CodecSource>[]);
+
     // JsInterface
     final jsInterfaceClass = getType(element.library, 'js', 'JsInterface');
     if (element is ClassElement &&
         element.type.isSubtypeOf(jsInterfaceClass.type)) {
       if (element.unit.element.name.endsWith('.g.dart')) return null;
       if (!element.isPrivate) throw '$element must be private';
-      return new JsInterfaceClassGenerator(element).generate();
+      String output = new JsInterfaceClassGenerator(
+          element, codecs[element.library]).generate();
+      if (codecs[element.library].length >
+          codecsAlreadyEmitted[element.library].length) {
+        for (int i = codecsAlreadyEmitted[element.library].length;
+            i < codecs[element.library].length;
+            i++) {
+          final codec = codecs[element.library][i];
+          codecsAlreadyEmitted[element.library].add(codec);
+          if (codec.variableName != null) {
+            output += '\n/// codec for ${codec.type}\n';
+            output += 'final ${codec.variableName} = ${codec.initializer};\n';
+          }
+        }
+      }
+      return output;
     }
 
     return null;
   }
 }
 
+class CodecSource {
+  final String type;
+  final String variableName;
+  final String initializer;
+  CodecSource(this.type, this.variableName, this.initializer);
+}
+
 class JsInterfaceClassGenerator {
   final LibraryElement lib;
   final ClassElement clazz;
   final transformer = new Transformer();
+  final List<CodecSource> codecs;
 
   ClassElement _jsNameClass;
 
-  JsInterfaceClassGenerator(ClassElement clazz)
+  JsInterfaceClassGenerator(ClassElement clazz, this.codecs)
       : lib = clazz.library,
         clazz = clazz {
     _jsNameClass = getType(lib, 'js', 'JsName');
@@ -118,9 +151,12 @@ class JsInterfaceClassGenerator {
         final jsName = computeJsName(clazz, _jsNameClass, true);
         newJsObject += "getPath('$jsName')";
         if (constr.parameters.isNotEmpty) {
-          final parameterList = constr.parameters
-              .map((p) => toJs(p.type, p.displayName))
-              .join(', ');
+          final parameterList = constr.parameters.map((p) {
+            final codec = getCodec(p.type);
+            return codec == null
+                ? p.displayName
+                : '$codec.encode(${p.displayName})';
+          }).join(', ');
           newJsObject += ", [$parameterList]";
         }
       }
@@ -159,8 +195,12 @@ class JsInterfaceClassGenerator {
           : m.isPrivate ? m.displayName.substring(1) : m.displayName;
       var call = "asJsObject(this).callMethod('$name'";
       if (m.parameters.isNotEmpty) {
-        final parameterList =
-            m.parameters.map((p) => toJs(p.type, p.displayName)).join(', ');
+        final parameterList = m.parameters.map((p) {
+          final codec = getCodec(p.type);
+          return codec == null
+              ? p.displayName
+              : '$codec.encode(${p.displayName})';
+        }).join(', ');
         call += ", [$parameterList]";
       }
       call += ")";
@@ -168,8 +208,10 @@ class JsInterfaceClassGenerator {
       if (m.returnType.isVoid) {
         transformer.replace(m.node.end - 1, m.node.end, "{ $call; }");
       } else {
-        transformer.insertAt(
-            m.node.end - 1, " => ${toDart(m.returnType, call)}");
+        final codec = getCodec(m.returnType);
+        transformer.insertAt(m.node.end - 1, " => ${codec == null
+            ? call
+            : "$codec.decode($call)"}");
       }
 
       getAnnotations(m.node, _jsNameClass).forEach(transformer.removeNode);
@@ -283,7 +325,11 @@ class JsInterfaceClassGenerator {
 
   String createGetterBody(DartType type, String name,
       {String target: "asJsObject(this)"}) {
-    return toDart(type, "$target['$name']") + ';';
+    final codec = getCodec(type);
+    return (codec == null
+            ? "$target['$name']"
+            : "$codec.decode($target['$name'])") +
+        ';';
   }
 
   String createSetterBody(ParameterElement param,
@@ -291,58 +337,64 @@ class JsInterfaceClassGenerator {
     final name = param.displayName;
     final type = param.type;
     jsName = jsName != null ? jsName : name;
-    return "$target['$jsName'] = " + toJs(type, name) + ';';
+    final codec = getCodec(type);
+    return "$target['$jsName'] = " +
+        (codec == null ? name : "$codec.encode($name)") +
+        ';';
   }
 
   String toDart(DartType type, String content) {
-    if (!type.isDynamic) {
-      if (hasJsCodec(type)) {
-        final codec = getCodecAnnotation(
-            type.element.node, getType(lib, 'js', 'JsCodec'));
-        return '$codec.decode($content)';
-      } else if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
-        return '((e) => e == null ? null : new $type.created(e))($content)';
-      } else if (isJsEnum(type)) {
-        final values = getEnumValues(type.element);
-        final jsPath =
-            computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
-        return '''
+    if (type.isDynamic) {
+      return content;
+    }
+
+    if (hasJsCodec(type)) {
+      final codec =
+          getCodecAnnotation(type.element.node, getType(lib, 'js', 'JsCodec'));
+      return '$codec.decode($content)';
+    } else if (type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type)) {
+      return '((e) => e == null ? null : new $type.created(e))($content)';
+    } else if (isJsEnum(type)) {
+      final values = getEnumValues(type.element);
+      final jsPath =
+          computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
+      return '''
 ((e) {
   if (e == null) return null;
   final path = getPath('$jsPath');
   ${values.map((e) => "if (e == path['${getRealEnumNameValue(type, e)}']) return $type.$e;").join('\n')}
 })($content)''';
-      } else if (isListType(type)) {
-        final typeParam = (type as InterfaceType).typeArguments.first;
-        final codec = getCodec(typeParam);
-        if (codec != null) {
-          return '''
+    } else if (isListType(type)) {
+      final typeParam = (type as InterfaceType).typeArguments.first;
+      final codec = getCodec(typeParam);
+      if (codec != null) {
+        return '''
 ((e) {
   if (e == null) return null;
   return new JsList<$typeParam>.created(e, $codec);
 })($content)''';
-        } else {
-          return "$content as JsArray";
+      } else {
+        return "$content as JsArray";
+      }
+    } else if (type is FunctionType) {
+      final returnCodec = getCodec(type.returnType);
+      var paramChanges = '';
+      type.parameters.forEach((p) {
+        final codec = getCodec(p.type);
+        if (codec != null) {
+          paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
         }
-      } else if (type is FunctionType) {
-        final returnCodec = getCodec(type.returnType);
-        var paramChanges = '';
-        type.parameters.forEach((p) {
-          final codec = getCodec(p.type);
-          if (codec != null) {
-            paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
-          }
-        });
-        var call =
-            'f.apply([${type.parameters.map((p) => 'p_' + p.name).join(', ')}])';
-        if (returnCodec != null) {
-          call = 'final result = $call; return $returnCodec.decode(result);';
-        } else if (!type.returnType.isVoid) {
-          call = 'return $call;';
-        } else {
-          call = '$call;';
-        }
-        return '''
+      });
+      var call =
+          'f.apply([${type.parameters.map((p) => 'p_' + p.name).join(', ')}])';
+      if (returnCodec != null) {
+        call = 'final result = $call; return $returnCodec.decode(result);';
+      } else if (!type.returnType.isVoid) {
+        call = 'return $call;';
+      } else {
+        call = '$call;';
+      }
+      return '''
 ((JsFunction f) {
   if (f == null) return null;
   return (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
@@ -350,34 +402,52 @@ class JsInterfaceClassGenerator {
     $call
   };
 })($content)''';
-      }
     }
     return content;
   }
 
   String getCodec(DartType type) {
-    if (hasJsCodec(type)) {
-      return getCodecAnnotation(
-          type.element.node, getType(lib, 'js', 'JsCodec'));
-    } else if (isJsInterfaceType(type)) {
-      return 'new JsInterfaceCodec<$type>((o) => ${toDart(type, 'o')})';
-    } else if (isListType(type)) {
-      final typeParam = (type as InterfaceType).typeArguments.first;
-      return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
-    } else if (isJsEnum(type)) {
-      final values = getEnumValues(type.element);
-      final jsPath =
-          computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
-      final mapContent = values
-          .map((e) =>
-              "$type.$e: getPath('$jsPath')['${getRealEnumNameValue(type, e)}']")
-          .join(',');
-      return 'new BiMapCodec<$type, dynamic>({$mapContent})';
-    } else if (type is FunctionType) {
-      // TODO(aa) type for Function can be "int -> String" : create typedef
-      return 'new FunctionCodec/*<$type>*/((o) => ${toJs(type, 'o')}, (o) => ${toDart(type, 'o')})';
+    if (type.isDynamic) {
+      return null;
     }
-    return null;
+
+    return registerCodecIfAbsent(type.toString(), () {
+      if (hasJsCodec(type)) {
+        return getCodecAnnotation(
+            type.element.node, getType(lib, 'js', 'JsCodec'));
+      } else if (isJsInterfaceType(type)) {
+        return 'new JsInterfaceCodec<$type>((o) => new $type.created(o))';
+      } else if (isListType(type)) {
+        final typeParam = (type as InterfaceType).typeArguments.first;
+        return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
+      } else if (isJsEnum(type)) {
+        final values = getEnumValues(type.element);
+        final jsPath =
+            computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
+        final mapContent = values
+            .map((e) =>
+                "$type.$e: getPath('$jsPath')['${getRealEnumNameValue(type, e)}']")
+            .join(',');
+        return 'new BiMapCodec<$type, dynamic>({$mapContent})';
+      } else if (type is FunctionType) {
+        // TODO(aa) type for Function can be "int -> String" : create typedef
+        return 'new FunctionCodec/*<$type>*/((o) => ${toJs(type, 'o')}, (o) => ${toDart(type, 'o')})';
+      }
+      return null;
+    });
+  }
+
+  String registerCodecIfAbsent(String type, String getCodecInitializer()) {
+    CodecSource codec =
+        codecs.firstWhere((cs) => cs.type == type, orElse: () => null);
+    if (codec == null) {
+      final initializer = getCodecInitializer();
+      if (initializer == null) return null;
+      codec =
+          new CodecSource(type, '$_CODECS_PREFIX${_codecId++}', initializer);
+      codecs.add(codec);
+    }
+    return codec.variableName;
   }
 
   String getRealEnumNameValue(DartType type, String enumName) {
@@ -405,8 +475,10 @@ class JsInterfaceClassGenerator {
 
   String toJs(DartType type, String content) {
     if (type.isDynamic) {
-      return 'toJs($content)';
-    } else if (hasJsCodec(type)) {
+      return content;
+    }
+
+    if (hasJsCodec(type)) {
       final codec =
           getCodecAnnotation(type.element.node, getType(lib, 'js', 'JsCodec'));
       return '$codec.encode($content)';
@@ -460,10 +532,9 @@ class JsInterfaceClassGenerator {
   };
 })($content)''';
       }
-    } else if (isTypeTransferable(type)) {
-      return content;
     }
-    return 'toJs($content)';
+
+    return content;
   }
 
   bool isJsEnum(DartType type) {
@@ -503,6 +574,12 @@ class JsInterfaceClassGenerator {
     }
     return false;
   }
+}
+
+class CodecInfo {
+  final String codec;
+  final bool isIdentity;
+  CodecInfo(this.codec, this.isIdentity);
 }
 
 String getCodecAnnotation(AnnotatedNode node, ClassElement jsCodecClass) {
