@@ -34,24 +34,27 @@ class JsInterfaceGenerator extends Generator {
         element.type.isSubtypeOf(jsInterfaceClass.type)) {
       if (element.unit.element.name.endsWith('.g.dart')) return null;
       if (!element.isPrivate) throw '$element must be private';
-      String output = new JsInterfaceClassGenerator(
-          element, codecs[element.library]).generate();
-      if (codecs[element.library].length >
-          codecsAlreadyEmitted[element.library].length) {
-        for (int i = codecsAlreadyEmitted[element.library].length;
-            i < codecs[element.library].length;
-            i++) {
-          final codec = codecs[element.library][i];
-          codecsAlreadyEmitted[element.library].add(codec);
+
+      final codecsOfLib = codecs[element.library];
+
+      String output =
+          new JsInterfaceClassGenerator(element, codecsOfLib).generate();
+
+      // generate new codecs
+      final emitedCodecsOfLib = codecsAlreadyEmitted[element.library];
+      if (codecsOfLib.length > emitedCodecsOfLib.length) {
+        for (int i = emitedCodecsOfLib.length; i < codecsOfLib.length; i++) {
+          final codec = codecsOfLib[i];
+          emitedCodecsOfLib.add(codec);
           if (codec.variableName != null) {
             output += '\n/// codec for ${codec.type}\n';
             output += 'final ${codec.variableName} = ${codec.initializer};\n';
           }
         }
       }
+
       return output;
     }
-
     return null;
   }
 }
@@ -220,15 +223,8 @@ class JsInterfaceClassGenerator {
     return transformer.applyOn(clazz);
   }
 
-  Iterable<Annotation> get anonymousAnnotations => clazz.node.metadata
-      .where((a) {
-    var e = a.element;
-    return e.library.name == 'js' && e.name == 'anonymous';
-  });
-
-  void removeAnonymousAnnotation() {
-    anonymousAnnotations.forEach(transformer.removeNode);
-  }
+  Iterable<Annotation> get anonymousAnnotations => clazz.node.metadata.where(
+      (a) => a.element.library.name == 'js' && a.element.name == 'anonymous');
 
   void transformAbstractAccessors(Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
@@ -380,6 +376,8 @@ class JsInterfaceClassGenerator {
   String createFunctionCodec(FunctionType type) {
     final returnCodec = getCodec(type.returnType);
 
+    final parameters = type.parameters.map((p) => 'p_' + p.name).join(', ');
+
     final decode = () {
       var paramChanges = '';
       type.parameters.forEach((p) {
@@ -388,8 +386,7 @@ class JsInterfaceClassGenerator {
           paramChanges += 'p_${p.name} = $codec.encode(p_${p.name});';
         }
       });
-      var call =
-          'f.apply([${type.parameters.map((p) => 'p_' + p.name).join(', ')}])';
+      var call = 'f.apply([$parameters])';
       if (returnCodec != null) {
         call = 'final result = $call; return $returnCodec.decode(result);';
       } else if (!type.returnType.isVoid) {
@@ -397,11 +394,7 @@ class JsInterfaceClassGenerator {
       } else {
         call = '$call;';
       }
-      return '''
-(JsFunction f) => (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
-    $paramChanges
-    $call
-  }''';
+      return '(JsFunction f) => ($parameters) { $paramChanges $call }';
     }();
 
     final encode = () {
@@ -416,7 +409,7 @@ class JsInterfaceClassGenerator {
             paramChanges += 'p_${p.name} = $codec.decode(p_${p.name});';
           }
         });
-        var call = 'f(${type.parameters.map((p) => 'p_' + p.name).join(', ')})';
+        var call = 'f($parameters)';
         if (returnCodec != null) {
           call = 'final result = $call; return $returnCodec.encode(result);';
         } else if (!type.returnType.isVoid) {
@@ -424,11 +417,7 @@ class JsInterfaceClassGenerator {
         } else {
           call = '$call;';
         }
-        return '''
-(f) => (${type.parameters.map((p) => 'p_' + p.name).join(', ')}) {
-    $paramChanges
-    $call
-  }''';
+        return '(f) => ($parameters) { $paramChanges $call }';
       }
     }();
 
@@ -509,12 +498,6 @@ class JsInterfaceClassGenerator {
     }
     return false;
   }
-}
-
-class CodecInfo {
-  final String codec;
-  final bool isIdentity;
-  CodecInfo(this.codec, this.isIdentity);
 }
 
 String getCodecAnnotation(AnnotatedNode node, ClassElement jsCodecClass) {
