@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-24T13:47:13.259Z
+// 2015-04-26T20:24:01.371Z
 
 part of js.example.js_proxy;
 

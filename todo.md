@@ -1,8 +1,8 @@
+- handle union type
 - implements all unimplemented methods
 - handle Map<String, ?> (see FusionTablesMouseEvent.row)
 - generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members
-- extract codecs to have only one instance by type
 - named parameters to anonymous object
 - generate state in .created from initialized variables?
 - test on Google Maps
