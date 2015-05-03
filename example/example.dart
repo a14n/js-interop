@@ -40,6 +40,8 @@ abstract class _JsFoo implements JsInterface {
   int _m6(int a, b);
 }
 
+callM6(JsFoo foo) => foo._m6(1, 2);
+
 @JsName('a.b.JsBar')
 abstract class _JsBar extends JsInterface {
   _JsBar.created(JsObject o) : super.created(o) {
