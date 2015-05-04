@@ -1,32 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-04T12:18:18.378Z
+// 2015-05-04T20:57:54.803Z
 
-part of js.test.proxy_accessors_test;
-
-// **************************************************************************
-// Generator: JsInterfaceGenerator
-// Target: abstract class _Class0
-// **************************************************************************
-
-class Class0 extends JsInterface implements _Class0 {
-  Class0.created(JsObject o) : super.created(o);
-  Class0() : this.created(new JsObject(getPath('Class0')));
-
-  int get i => asJsObject(this)['i'];
-}
-
-// **************************************************************************
-// Generator: JsInterfaceGenerator
-// Target: abstract class _ClassFinalField
-// **************************************************************************
-
-@JsName('Class0')
-class ClassFinalField extends JsInterface implements _ClassFinalField {
-  ClassFinalField.created(JsObject o) : super.created(o);
-  ClassFinalField() : this.created(new JsObject(getPath('Class0')));
-
-  int get i => asJsObject(this)['i'];
-}
+part of js.test.proxy_static_accessors_test;
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
@@ -36,12 +11,11 @@ class ClassFinalField extends JsInterface implements _ClassFinalField {
 @JsName('Class0')
 class ClassNotFinalField extends JsInterface implements _ClassNotFinalField {
   ClassNotFinalField.created(JsObject o) : super.created(o);
-  ClassNotFinalField() : this.created(new JsObject(getPath('Class0')));
 
-  void set i(int _i) {
-    asJsObject(this)['i'] = _i;
+  static void set i(int _i) {
+    getPath('Class0')['i'] = _i;
   }
-  int get i => asJsObject(this)['i'];
+  static int get i => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -52,12 +26,11 @@ class ClassNotFinalField extends JsInterface implements _ClassNotFinalField {
 @JsName('Class0')
 class ClassPrivateField extends JsInterface implements _ClassPrivateField {
   ClassPrivateField.created(JsObject o) : super.created(o);
-  ClassPrivateField() : this.created(new JsObject(getPath('Class0')));
 
-  void set _i(int __i) {
-    asJsObject(this)['i'] = __i;
+  static void set _i(int __i) {
+    getPath('Class0')['i'] = __i;
   }
-  int get _i => asJsObject(this)['i'];
+  static int get _i => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -68,12 +41,11 @@ class ClassPrivateField extends JsInterface implements _ClassPrivateField {
 @JsName('Class0')
 class ClassRenamedField extends JsInterface implements _ClassRenamedField {
   ClassRenamedField.created(JsObject o) : super.created(o);
-  ClassRenamedField() : this.created(new JsObject(getPath('Class0')));
 
-  void set iBis(int _iBis) {
-    asJsObject(this)['i'] = _iBis;
+  static void set iBis(int _iBis) {
+    getPath('Class0')['i'] = _iBis;
   }
-  int get iBis => asJsObject(this)['i'];
+  static int get iBis => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -85,12 +57,11 @@ class ClassRenamedField extends JsInterface implements _ClassRenamedField {
 class ClassRenamedPrivateField extends JsInterface
     implements _ClassRenamedPrivateField {
   ClassRenamedPrivateField.created(JsObject o) : super.created(o);
-  ClassRenamedPrivateField() : this.created(new JsObject(getPath('Class0')));
 
-  void set _iBis(int __iBis) {
-    asJsObject(this)['i'] = __iBis;
+  static void set _iBis(int __iBis) {
+    getPath('Class0')['i'] = __iBis;
   }
-  int get _iBis => asJsObject(this)['i'];
+  static int get _iBis => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -101,9 +72,8 @@ class ClassRenamedPrivateField extends JsInterface
 @JsName('Class0')
 class ClassWithGetter extends JsInterface implements _ClassWithGetter {
   ClassWithGetter.created(JsObject o) : super.created(o);
-  ClassWithGetter() : this.created(new JsObject(getPath('Class0')));
 
-  int get i => asJsObject(this)['i'];
+  static int get i => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -114,10 +84,9 @@ class ClassWithGetter extends JsInterface implements _ClassWithGetter {
 @JsName('Class0')
 class ClassWithSetter extends JsInterface implements _ClassWithSetter {
   ClassWithSetter.created(JsObject o) : super.created(o);
-  ClassWithSetter() : this.created(new JsObject(getPath('Class0')));
 
-  set i(int i) {
-    asJsObject(this)['i'] = i;
+  static set i(int i) {
+    getPath('Class0')['i'] = i;
   }
 }
 
@@ -130,9 +99,8 @@ class ClassWithSetter extends JsInterface implements _ClassWithSetter {
 class ClassWithPrivateGetter extends JsInterface
     implements _ClassWithPrivateGetter {
   ClassWithPrivateGetter.created(JsObject o) : super.created(o);
-  ClassWithPrivateGetter() : this.created(new JsObject(getPath('Class0')));
 
-  int get _i => asJsObject(this)['i'];
+  static int get _i => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -144,10 +112,9 @@ class ClassWithPrivateGetter extends JsInterface
 class ClassWithPrivateSetter extends JsInterface
     implements _ClassWithPrivateSetter {
   ClassWithPrivateSetter.created(JsObject o) : super.created(o);
-  ClassWithPrivateSetter() : this.created(new JsObject(getPath('Class0')));
 
-  set _i(int i) {
-    asJsObject(this)['i'] = i;
+  static set _i(int i) {
+    getPath('Class0')['i'] = i;
   }
 }
 
@@ -160,9 +127,8 @@ class ClassWithPrivateSetter extends JsInterface
 class ClassWithRenamedGetter extends JsInterface
     implements _ClassWithRenamedGetter {
   ClassWithRenamedGetter.created(JsObject o) : super.created(o);
-  ClassWithRenamedGetter() : this.created(new JsObject(getPath('Class0')));
 
-  int get iBis => asJsObject(this)['i'];
+  static int get iBis => getPath('Class0')['i'];
 }
 
 // **************************************************************************
@@ -174,9 +140,8 @@ class ClassWithRenamedGetter extends JsInterface
 class ClassWithRenamedSetter extends JsInterface
     implements _ClassWithRenamedSetter {
   ClassWithRenamedSetter.created(JsObject o) : super.created(o);
-  ClassWithRenamedSetter() : this.created(new JsObject(getPath('Class0')));
 
-  set iBis(int i) {
-    asJsObject(this)['i'] = i;
+  static set iBis(int i) {
+    getPath('Class0')['i'] = i;
   }
 }

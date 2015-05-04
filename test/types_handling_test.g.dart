@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-04-26T20:24:01.483Z
+// 2015-05-04T12:26:03.830Z
 
 part of js.test.types_handling_test;
 
@@ -13,66 +13,66 @@ class A extends JsInterface implements _A {
   A() : this.created(new JsObject(getPath('A')));
 
   void set gender(Gender _gender) {
-    asJsObject(this)['gender'] = __codec10.encode(_gender);
+    asJsObject(this)['gender'] = __codec1.encode(_gender);
   }
-  Gender get gender => __codec10.decode(asJsObject(this)['gender']);
+  Gender get gender => __codec1.decode(asJsObject(this)['gender']);
   void set genders(List<Gender> _genders) {
-    asJsObject(this)['genders'] = __codec11.encode(_genders);
+    asJsObject(this)['genders'] = __codec2.encode(_genders);
   }
-  List<Gender> get genders => __codec11.decode(asJsObject(this)['genders']);
+  List<Gender> get genders => __codec2.decode(asJsObject(this)['genders']);
 
   void set b(B _b) {
-    asJsObject(this)['b'] = __codec12.encode(_b);
+    asJsObject(this)['b'] = __codec3.encode(_b);
   }
-  B get b => __codec12.decode(asJsObject(this)['b']);
+  B get b => __codec3.decode(asJsObject(this)['b']);
   void set bs(List<B> _bs) {
-    asJsObject(this)['bs'] = __codec13.encode(_bs);
+    asJsObject(this)['bs'] = __codec4.encode(_bs);
   }
-  List<B> get bs => __codec13.decode(asJsObject(this)['bs']);
+  List<B> get bs => __codec4.decode(asJsObject(this)['bs']);
   void set li(List<int> _li) {
-    asJsObject(this)['li'] = __codec14.encode(_li);
+    asJsObject(this)['li'] = __codec5.encode(_li);
   }
-  List<int> get li => __codec14.decode(asJsObject(this)['li']);
+  List<int> get li => __codec5.decode(asJsObject(this)['li']);
 
   String toColorString(Color c) =>
-      asJsObject(this).callMethod('toColorString', [__codec16.encode(c)]);
+      asJsObject(this).callMethod('toColorString', [__codec7.encode(c)]);
   Color toColor(String s) =>
-      __codec16.decode(asJsObject(this).callMethod('toColor', [s]));
+      __codec7.decode(asJsObject(this).callMethod('toColor', [s]));
 
-  B execute(B f(B b)) => __codec12
-      .decode(asJsObject(this).callMethod('execute', [__codec17.encode(f)]));
+  B execute(B f(B b)) => __codec3
+      .decode(asJsObject(this).callMethod('execute', [__codec8.encode(f)]));
 
   BisFunc getBisFunc() =>
-      __codec17.decode(asJsObject(this).callMethod('getBisFunc'));
+      __codec8.decode(asJsObject(this).callMethod('getBisFunc'));
 
   void set simpleFunc(SimpleFunc _simpleFunc) {
-    asJsObject(this)['simpleFunc'] = __codec15.encode(_simpleFunc);
+    asJsObject(this)['simpleFunc'] = __codec6.encode(_simpleFunc);
   }
-  SimpleFunc get simpleFunc => __codec15.decode(asJsObject(this)['simpleFunc']);
+  SimpleFunc get simpleFunc => __codec6.decode(asJsObject(this)['simpleFunc']);
 }
 /// codec for Gender
-final __codec10 = genderCodec;
+final __codec1 = genderCodec;
 
 /// codec for List<Gender>
-final __codec11 = new JsListCodec<Gender>(__codec10);
+final __codec2 = new JsListCodec<Gender>(__codec1);
 
 /// codec for B
-final __codec12 = new JsInterfaceCodec<B>((o) => new B.created(o));
+final __codec3 = new JsInterfaceCodec<B>((o) => new B.created(o));
 
 /// codec for List<B>
-final __codec13 = new JsListCodec<B>(__codec12);
+final __codec4 = new JsListCodec<B>(__codec3);
 
 /// codec for List<int>
-final __codec14 = new JsListCodec<int>(null);
+final __codec5 = new JsListCodec<int>(null);
 
 /// codec for (int) → String
-final __codec15 = new FunctionCodec /*<(int) → String>*/ ((f) => f,
+final __codec6 = new FunctionCodec /*<(int) → String>*/ ((f) => f,
     (JsFunction f) => (p_i) {
   return f.apply([p_i]);
 });
 
 /// codec for Color
-final __codec16 = new BiMapCodec<Color, dynamic>({
+final __codec7 = new BiMapCodec<Color, dynamic>({
   Color.RED: getPath('Color')['RED'],
   Color.GREEN: getPath('Color')['GREEN'],
   Color.BLUE: getPath('Color')['BLUE'],
@@ -80,14 +80,14 @@ final __codec16 = new BiMapCodec<Color, dynamic>({
 });
 
 /// codec for (B) → B
-final __codec17 = new FunctionCodec /*<(B) → B>*/ ((f) => (p_b) {
-  p_b = __codec12.decode(p_b);
+final __codec8 = new FunctionCodec /*<(B) → B>*/ ((f) => (p_b) {
+  p_b = __codec3.decode(p_b);
   final result = f(p_b);
-  return __codec12.encode(result);
+  return __codec3.encode(result);
 }, (JsFunction f) => (p_b) {
-  p_b = __codec12.encode(p_b);
+  p_b = __codec3.encode(p_b);
   final result = f.apply([p_b]);
-  return __codec12.decode(result);
+  return __codec3.decode(result);
 });
 
 // **************************************************************************
@@ -112,11 +112,11 @@ class C extends JsInterface implements _C {
   C() : this.created(new JsObject(getPath('C')));
 
   void set gender(Gender _gender) {
-    asJsObject(this)['gender'] = __codec10.encode(_gender);
+    asJsObject(this)['gender'] = __codec1.encode(_gender);
   }
-  Gender get gender => __codec10.decode(asJsObject(this)['gender']);
+  Gender get gender => __codec1.decode(asJsObject(this)['gender']);
   void set genders(List<Gender> _genders) {
-    asJsObject(this)['genders'] = __codec11.encode(_genders);
+    asJsObject(this)['genders'] = __codec2.encode(_genders);
   }
-  List<Gender> get genders => __codec11.decode(asJsObject(this)['genders']);
+  List<Gender> get genders => __codec2.decode(asJsObject(this)['genders']);
 }

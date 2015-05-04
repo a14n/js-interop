@@ -11,6 +11,10 @@ import 'package:js/util/state.dart';
 part 'example.g.dart';
 
 abstract class _JsFoo implements JsInterface {
+  external static int get static1;
+  static int static2;
+  external static int staticMethod(JsFoo foo);
+
   external factory _JsFoo();
 
   List l1;

@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-03T19:56:04.455Z
+// 2015-05-04T20:59:59.760Z
 
 part of js.example.js_proxy;
 
@@ -9,6 +9,14 @@ part of js.example.js_proxy;
 // **************************************************************************
 
 class JsFoo extends JsInterface implements _JsFoo {
+  static int get static1 => getPath('z.y.x.JsFoo')['static1'];
+  static void set static2(int _static2) {
+    getPath('z.y.x.JsFoo')['static2'] = _static2;
+  }
+  static int get static2 => getPath('z.y.x.JsFoo')['static2'];
+  static int staticMethod(JsFoo foo) =>
+      getPath('z.y.x.JsFoo').callMethod('staticMethod', [__codec3.encode(foo)]);
+
   JsFoo.created(JsObject o) : super.created(o);
   JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
 

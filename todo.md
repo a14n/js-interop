@@ -1,7 +1,6 @@
 - handle union type
 - implements all unimplemented methods
 - handle Map<String, ?> (see FusionTablesMouseEvent.row)
-- generate code for static members (see Marker.MAX_ZINDEX)
 - generate code for top level members
 - named parameters to anonymous object
 - generate state in .created from initialized variables?
@@ -11,6 +10,7 @@
 
 
 BAD IDEA
+
 - VarArgs ? see http://dartbug.com/16253
 - JsGlobal: not for the moment use a private template and bind top level to it.
 - use Expando<JsObject> instead of JsInterface._jsObject ? => NO because 

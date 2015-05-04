@@ -182,43 +182,13 @@ class JsInterfaceClassGenerator {
     }
 
     // generate properties
-    transformAbstractAccessors(
-        clazz.accessors.where((e) => !e.isStatic).where((e) => e.isAbstract));
-
-    transformInstanceVariables(clazz.accessors
-        .where((e) => !e.isStatic)
+    clazz.accessors.where((e) => !e.isSynthetic).forEach(transformAccessor);
+    transformVariables(clazz.accessors
         .where((e) => e.isSynthetic)
         .where((e) => e.variable.initializer == null));
 
     // generate abstract methods
-    clazz.methods.where((e) => !e.isStatic && e.isAbstract).forEach((m) {
-      final jsName = getNameAnnotation(m.node, _jsNameClass);
-      final name = jsName != null
-          ? jsName
-          : m.isPrivate ? m.displayName.substring(1) : m.displayName;
-      var call = "asJsObject(this).callMethod('$name'";
-      if (m.parameters.isNotEmpty) {
-        final parameterList = m.parameters.map((p) {
-          final codec = getCodec(p.type);
-          return codec == null
-              ? p.displayName
-              : '$codec.encode(${p.displayName})';
-        }).join(', ');
-        call += ", [$parameterList]";
-      }
-      call += ")";
-
-      if (m.returnType.isVoid) {
-        transformer.replace(m.node.end - 1, m.node.end, "{ $call; }");
-      } else {
-        final codec = getCodec(m.returnType);
-        transformer.insertAt(m.node.end - 1, " => ${codec == null
-            ? call
-            : "$codec.decode($call)"}");
-      }
-
-      getAnnotations(m.node, _jsNameClass).forEach(transformer.removeNode);
-    });
+    clazz.methods.forEach(transformMethod);
 
     return transformer.applyOn(clazz);
   }
@@ -226,32 +196,43 @@ class JsInterfaceClassGenerator {
   Iterable<Annotation> get anonymousAnnotations => clazz.node.metadata.where(
       (a) => a.element.library.name == 'js' && a.element.name == 'anonymous');
 
-  void transformAbstractAccessors(Iterable<PropertyAccessorElement> accessors) {
-    accessors.forEach((accessor) {
-      final jsName = getNameAnnotation(accessor.node, _jsNameClass);
-      final name = jsName != null
-          ? jsName
-          : accessor.isPrivate
-              ? accessor.displayName.substring(1)
-              : accessor.displayName;
-      String newFuncDecl;
-      if (accessor.isGetter) {
-        final getterBody = createGetterBody(accessor.returnType, name);
-        newFuncDecl = " => $getterBody";
-      } else if (accessor.isSetter) {
-        final setterBody =
-            createSetterBody(accessor.parameters.first, jsName: name);
-        newFuncDecl = " { $setterBody }";
-      }
-      transformer.replace(
-          accessor.node.end - 1, accessor.node.end, newFuncDecl);
+  void transformAccessor(PropertyAccessorElement accessor) {
+    if (accessor.isStatic &&
+        (accessor.node as MethodDeclaration).externalKeyword == null) return;
+    if (!accessor.isStatic && !accessor.isAbstract) return;
 
-      getAnnotations(accessor.node, _jsNameClass)
-          .forEach(transformer.removeNode);
-    });
+    if (accessor.isStatic &&
+        (accessor.node as MethodDeclaration).externalKeyword != null) {
+      transformer
+          .removeToken((accessor.node as MethodDeclaration).externalKeyword);
+    }
+
+    final jsName = getNameAnnotation(accessor.node, _jsNameClass);
+    final name = jsName != null
+        ? jsName
+        : accessor.isPrivate
+            ? accessor.displayName.substring(1)
+            : accessor.displayName;
+
+    final target = accessor.isStatic
+        ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+        : 'asJsObject(this)';
+
+    String newFuncDecl;
+    if (accessor.isGetter) {
+      final getterBody = createGetterBody(accessor.returnType, name, target);
+      newFuncDecl = " => $getterBody";
+    } else if (accessor.isSetter) {
+      final setterBody =
+          createSetterBody(accessor.parameters.first, target, jsName: name);
+      newFuncDecl = " { $setterBody }";
+    }
+    transformer.replace(accessor.node.end - 1, accessor.node.end, newFuncDecl);
+
+    getAnnotations(accessor.node, _jsNameClass).forEach(transformer.removeNode);
   }
 
-  void transformInstanceVariables(Iterable<PropertyAccessorElement> accessors) {
+  void transformVariables(Iterable<PropertyAccessorElement> accessors) {
     accessors.forEach((accessor) {
       final VariableDeclarationList varDeclList = accessor.variable.node.parent;
       var jsName = getNameAnnotation(accessor.variable.node, _jsNameClass);
@@ -265,15 +246,22 @@ class JsInterfaceClassGenerator {
               : accessor.displayName;
       var name = accessor.displayName;
 
-      var code;
+      final target = accessor.isStatic
+          ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+          : 'asJsObject(this)';
+
+      final varType =
+          varDeclList.type != null ? varDeclList.type.toString() : '';
+      var code = accessor.isStatic ? 'static ' : '';
       if (accessor.isGetter) {
-        final getterBody = createGetterBody(accessor.returnType, jsName);
-        code = "${varDeclList.type} get $name => $getterBody";
+        final getterBody =
+            createGetterBody(accessor.returnType, jsName, target);
+        code += "$varType get $name => $getterBody";
       } else if (accessor.isSetter) {
         final param = accessor.parameters.first;
-        final setterBody = createSetterBody(param, jsName: jsName);
-        code = accessor.returnType.displayName +
-            " set $name(${varDeclList.type} ${param.displayName})"
+        final setterBody = createSetterBody(param, target, jsName: jsName);
+        code += accessor.returnType.displayName +
+            " set $name($varType ${param.displayName})"
             "{ $setterBody }";
       }
       transformer.insertAt(varDeclList.end + 1, code);
@@ -287,6 +275,47 @@ class JsInterfaceClassGenerator {
     varDeclLists.forEach((varDeclList) {
       transformer.removeNode(varDeclList.parent);
     });
+  }
+
+  void transformMethod(MethodElement m) {
+    if (m.isStatic && m.node.externalKeyword == null) return;
+    if (!m.isStatic && !m.isAbstract) return;
+
+    if (m.isStatic && m.node.externalKeyword != null) {
+      transformer.removeToken(m.node.externalKeyword);
+    }
+
+    final jsName = getNameAnnotation(m.node, _jsNameClass);
+    final name = jsName != null
+        ? jsName
+        : m.isPrivate ? m.displayName.substring(1) : m.displayName;
+
+    final target = m.isStatic
+        ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+        : 'asJsObject(this)';
+
+    var call = "$target.callMethod('$name'";
+    if (m.parameters.isNotEmpty) {
+      final parameterList = m.parameters.map((p) {
+        final codec = getCodec(p.type);
+        return codec == null
+            ? p.displayName
+            : '$codec.encode(${p.displayName})';
+      }).join(', ');
+      call += ", [$parameterList]";
+    }
+    call += ")";
+
+    if (m.returnType.isVoid) {
+      transformer.replace(m.node.end - 1, m.node.end, "{ $call; }");
+    } else {
+      final codec = getCodec(m.returnType);
+      transformer.insertAt(m.node.end - 1, " => ${codec == null
+          ? call
+          : "$codec.decode($call)"}");
+    }
+
+    getAnnotations(m.node, _jsNameClass).forEach(transformer.removeNode);
   }
 
   static String computeJsName(
@@ -319,8 +348,7 @@ class JsInterfaceClassGenerator {
   static String getPublicClassName(ClassElement clazz) =>
       clazz.isPrivate ? clazz.displayName.substring(1) : clazz.displayName;
 
-  String createGetterBody(DartType type, String name,
-      {String target: "asJsObject(this)"}) {
+  String createGetterBody(DartType type, String name, String target) {
     final codec = getCodec(type);
     return (codec == null
             ? "$target['$name']"
@@ -328,8 +356,8 @@ class JsInterfaceClassGenerator {
         ';';
   }
 
-  String createSetterBody(ParameterElement param,
-      {String target: "asJsObject(this)", String jsName}) {
+  String createSetterBody(ParameterElement param, String target,
+      {String jsName}) {
     final name = param.displayName;
     final type = param.type;
     jsName = jsName != null ? jsName : name;
