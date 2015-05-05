@@ -33,6 +33,7 @@ class JsInterfaceGenerator extends Generator {
     if (element is ClassElement &&
         element.type.isSubtypeOf(jsInterfaceClass.type)) {
       if (element.unit.element.name.endsWith('.g.dart')) return null;
+      if (!element.isAbstract) return null;
       if (!element.isPrivate) throw '$element must be private';
 
       final codecsOfLib = codecs[element.library];
