@@ -13,6 +13,9 @@ part 'page.g.dart';
 @JsName('Map')
 abstract class _GMap implements JsInterface {
   external factory _GMap(Node mapDiv, [MapOptions opts]);
+
+  num _getZoom();
+  num get zoom => _getZoom();
 }
 
 abstract class _LatLng implements JsInterface {
@@ -65,6 +68,5 @@ void main() {
     ..center = new LatLng(-34.397, 150.644)
     ..mapTypeId = MapTypeId.ROADMAP;
   var map = new GMap(querySelector("#map_canvas"), mapOptions);
-  event.addListener(asJsObject(map), "zoom_changed",
-      () => print(asJsObject(map).callMethod('getZoom')));
+  event.addListener(map, "zoom_changed", () => print(map.zoom));
 }

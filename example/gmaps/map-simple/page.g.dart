@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-11T15:43:30.893Z
+// 2015-05-11T21:26:18.188Z
 
 part of google_maps.sample.simple;
 
@@ -13,6 +13,9 @@ class GMap extends JsInterface implements _GMap {
   GMap.created(JsObject o) : super.created(o);
   GMap(Node mapDiv, [MapOptions opts]) : this.created(new JsObject(
           getPath('google.maps.Map'), [mapDiv, __codec1.encode(opts)]));
+
+  num _getZoom() => asJsObject(this).callMethod('getZoom');
+  num get zoom => _getZoom();
 }
 /// codec for MapOptions
 final __codec1 =
