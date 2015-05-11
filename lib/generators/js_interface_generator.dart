@@ -29,13 +29,11 @@ class JsInterfaceGenerator extends Generator {
     codecsAlreadyEmitted.putIfAbsent(element.library, () => <CodecSource>[]);
 
     // JsInterface
-    final jsInterfaceClass = getType(element.library, 'js', 'JsInterface');
     if (element is ClassElement &&
-        element.type.isSubtypeOf(jsInterfaceClass.type)) {
-      if (element.unit.element.name.endsWith('.g.dart')) return null;
-      if (!element.isAbstract) return null;
-      if (!element.isPrivate) throw '$element must be private';
-
+        isJsInterface(element.library, element.type) &&
+        isNotGenerated(element) &&
+        element.isAbstract &&
+        element.isPrivate) {
       final codecsOfLib = codecs[element.library];
 
       String output =
@@ -56,8 +54,20 @@ class JsInterfaceGenerator extends Generator {
 
       return output;
     }
+
+    // JsEnum
+    if (element is ClassElement &&
+        isJsEnum(element.library, element.type) &&
+        isNotGenerated(element) &&
+        element.isPrivate) {
+      return new JsEnumGenerator(element).generate();
+    }
+
     return null;
   }
+
+  bool isNotGenerated(ClassElement element) =>
+      !element.unit.element.name.endsWith('.g.dart');
 }
 
 class CodecSource {
@@ -65,6 +75,43 @@ class CodecSource {
   final String variableName;
   final String initializer;
   CodecSource(this.type, this.variableName, this.initializer);
+}
+
+class JsEnumGenerator {
+  final LibraryElement lib;
+  final ClassElement clazz;
+
+  ClassElement _jsNameClass;
+
+  JsEnumGenerator(ClassElement clazz)
+      : lib = clazz.library,
+        clazz = clazz {
+    _jsNameClass = getType(lib, 'js', 'JsName');
+  }
+
+  String generate() {
+    final values = getEnumValues(clazz);
+    final jsPath = computeJsName(clazz, getType(lib, 'js', 'JsName'));
+    final name = getPublicClassName(clazz);
+    final type = clazz.type;
+
+    final getValueFunction = getJsEnumGetValueFunction(lib, type);
+
+    String result = '';
+
+    result += 'class $name extends JsEnumBase {';
+    result += "static final values = <$name>[${values.join(',')}];";
+    for (final value in values) {
+      final jsValue = (getValueFunction != null)
+          ? "$getValueFunction('$value')"
+          : "getPath('$jsPath')['${getRealEnumNameValue(lib, type, value)}']";
+      result += "static final $value = new $name._($jsValue)";
+      result += ";\n";
+    }
+    result += '  $name._(o) : super.created(o);';
+    result += '}';
+    return result;
+  }
 }
 
 class JsInterfaceClassGenerator {
@@ -152,7 +199,7 @@ class JsInterfaceClassGenerator {
         }
         newJsObject += "context['Object']";
       } else {
-        final jsName = computeJsName(clazz, _jsNameClass, true);
+        final jsName = computeJsName(clazz, _jsNameClass);
         newJsObject += "getPath('$jsName')";
         if (constr.parameters.isNotEmpty) {
           final parameterList = constr.parameters.map((p) {
@@ -216,7 +263,7 @@ class JsInterfaceClassGenerator {
             : accessor.displayName;
 
     final target = accessor.isStatic
-        ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+        ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
         : 'asJsObject(this)';
 
     String newFuncDecl;
@@ -248,7 +295,7 @@ class JsInterfaceClassGenerator {
       var name = accessor.displayName;
 
       final target = accessor.isStatic
-          ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+          ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
           : 'asJsObject(this)';
 
       final varType =
@@ -292,7 +339,7 @@ class JsInterfaceClassGenerator {
         : m.isPrivate ? m.displayName.substring(1) : m.displayName;
 
     final target = m.isStatic
-        ? "getPath('${computeJsName(clazz, _jsNameClass, true)}')"
+        ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
         : 'asJsObject(this)';
 
     var call = "$target.callMethod('$name'";
@@ -319,36 +366,6 @@ class JsInterfaceClassGenerator {
     getAnnotations(m.node, _jsNameClass).forEach(transformer.removeNode);
   }
 
-  static String computeJsName(
-      ClassElement clazz, ClassElement jsNameClass, bool useClassName) {
-    var name = "";
-
-    final nameOfLib =
-        getNameAnnotation(clazz.library.unit.directives.first, jsNameClass);
-    if (nameOfLib != null) name += nameOfLib + '.';
-
-    final nameOfClass = getNameAnnotation(getNodeOfElement(clazz), jsNameClass);
-    if (nameOfClass != null) {
-      name += nameOfClass;
-    } else if (useClassName) {
-      name += getPublicClassName(clazz);
-    } else if (name.endsWith('.')) {
-      name = name.substring(0, name.length - 1);
-    }
-    return name;
-  }
-
-  // workaround issue 23071
-  static AnnotatedNode getNodeOfElement(Element e) {
-    if (e == null || e.isSynthetic) return null;
-    if (!(e is ClassElement && e.isEnum)) return e.node;
-    return e.library.units.expand((u) => u.node.declarations
-        .where((d) => d is EnumDeclaration && d.name.name == e.name)).first;
-  }
-
-  static String getPublicClassName(ClassElement clazz) =>
-      clazz.isPrivate ? clazz.displayName.substring(1) : clazz.displayName;
-
   String createGetterBody(DartType type, String name, String target) {
     final codec = getCodec(type);
     return (codec == null
@@ -368,39 +385,28 @@ class JsInterfaceClassGenerator {
         ';';
   }
 
-  String getCodec(DartType type) {
+  String getCodec(DartType type) => registerCodecIfAbsent(type.toString(), () {
     if (type.isDynamic) {
-      return null;
+      return 'new DynamicCodec()';
+    } else if (isJsInterface(lib, type)) {
+      return 'new JsInterfaceCodec<$type>((o) => new $type.created(o))';
+    } else if (isListType(type)) {
+      final typeParam = (type as InterfaceType).typeArguments.first;
+      return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
+    } else if (isJsEnumBase(type)) {
+      return createEnumCodec(type);
+    } else if (type is FunctionType) {
+      return createFunctionCodec(type);
     }
+    return null;
+  });
 
-    return registerCodecIfAbsent(type.toString(), () {
-      if (hasJsCodec(type)) {
-        return getCodecAnnotation(
-            type.element.node, getType(lib, 'js', 'JsCodec'));
-      } else if (isJsInterfaceType(type)) {
-        return 'new JsInterfaceCodec<$type>((o) => new $type.created(o))';
-      } else if (isListType(type)) {
-        final typeParam = (type as InterfaceType).typeArguments.first;
-        return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
-      } else if (isJsEnum(type)) {
-        return createEnumCodec(type);
-      } else if (type is FunctionType) {
-        return createFunctionCodec(type);
-      }
-      return null;
-    });
-  }
+  bool isJsEnumBase(DartType type) => !type.isDynamic &&
+      type.isSubtypeOf(getType(lib, 'js', 'JsEnumBase').type);
 
-  String createEnumCodec(DartType type) {
-    final values = getEnumValues(type.element);
-    final jsPath =
-        computeJsName(type.element, getType(lib, 'js', 'JsName'), true);
-    final mapContent = values
-        .map((e) =>
-            "$type.$e: getPath('$jsPath')['${getRealEnumNameValue(type, e)}']")
-        .join(',');
-    return 'new BiMapCodec<$type, dynamic>({$mapContent})';
-  }
+  String createEnumCodec(DartType type) => 'new BiMapCodec<$type, dynamic>('
+      'new Map<$type, dynamic>.fromIterable($type.values, value: asJs)'
+      ')';
 
   String createFunctionCodec(FunctionType type) {
     final returnCodec = getCodec(type.returnType);
@@ -467,43 +473,6 @@ class JsInterfaceClassGenerator {
     return codec.variableName;
   }
 
-  String getRealEnumNameValue(DartType type, String enumName) {
-    final a = getAnnotations(
-        getNodeOfElement(type.element), getType(lib, 'js', 'JsEnum')).single;
-    if (a.arguments.arguments.length == 1) {
-      var param = a.arguments.arguments.first;
-      if (param is NamedExpression &&
-          param.name.label.name == "names" &&
-          param.expression is MapLiteral) {
-        for (final e in param.expression.entries) {
-          if (e.key.toString() == '$type.$enumName') {
-            return (e.value as StringLiteral).stringValue;
-          }
-        }
-      }
-    }
-    return enumName;
-  }
-
-  Iterable<String> getEnumValues(ClassElement element) {
-    EnumDeclaration enumDecl = getNodeOfElement(element);
-    return enumDecl.constants.map((e) => e.name.name);
-  }
-
-  bool isJsEnum(DartType type) {
-    final element = type.element;
-    if (element is! ClassElement) return false;
-    if (!element.isEnum) return false;
-    return getAnnotations(
-        getNodeOfElement(element), getType(lib, 'js', 'JsEnum')).isNotEmpty;
-  }
-
-  bool hasJsCodec(DartType type) => getAnnotations(
-      getNodeOfElement(type.element), getType(lib, 'js', 'JsCodec')).isNotEmpty;
-
-  bool isJsInterfaceType(DartType type) => !type.isDynamic &&
-      type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);
-
   bool isListType(DartType type) => !type.isDynamic &&
       type.isSubtypeOf(getType(lib, 'dart.core', 'List').type
           .substitute4([DynamicTypeImpl.instance]));
@@ -529,18 +498,81 @@ class JsInterfaceClassGenerator {
   }
 }
 
-String getCodecAnnotation(AnnotatedNode node, ClassElement jsCodecClass) {
-  final jsNames = getAnnotations(node, jsCodecClass);
-  if (jsNames.isEmpty) return null;
-  final a = jsNames.single;
+String computeJsName(ClassElement clazz, ClassElement jsNameClass) {
+  var name = "";
+
+  final nameOfLib =
+      getNameAnnotation(clazz.library.unit.directives.first, jsNameClass);
+  if (nameOfLib != null) name += nameOfLib + '.';
+
+  final nameOfClass = getNameAnnotation(getNodeOfElement(clazz), jsNameClass);
+  if (nameOfClass != null) {
+    name += nameOfClass;
+  } else {
+    name += getPublicClassName(clazz);
+  }
+  return name;
+}
+
+String getPublicClassName(ClassElement clazz) =>
+    clazz.isPrivate ? clazz.displayName.substring(1) : clazz.displayName;
+
+// workaround issue 23071
+AnnotatedNode getNodeOfElement(Element e) {
+  if (e == null || e.isSynthetic) return null;
+  if (!(e is ClassElement && e.isEnum)) return e.node;
+  return e.library.units.expand((u) => u.node.declarations
+      .where((d) => d is EnumDeclaration && d.name.name == e.name)).first;
+}
+
+bool isJsEnum(LibraryElement lib, DartType type) {
+  final element = type.element;
+  if (element is! ClassElement) return false;
+  if (!element.isEnum) return false;
+  return getAnnotations(
+      getNodeOfElement(element), getType(lib, 'js', 'JsEnum')).isNotEmpty;
+}
+
+Iterable<String> getEnumValues(ClassElement element) {
+  EnumDeclaration enumDecl = getNodeOfElement(element);
+  return enumDecl.constants.map((e) => e.name.name);
+}
+
+String getRealEnumNameValue(
+    LibraryElement lib, DartType type, String enumName) {
+  final a = getAnnotations(
+      getNodeOfElement(type.element), getType(lib, 'js', 'JsEnum')).single;
   if (a.arguments.arguments.length == 1) {
     var param = a.arguments.arguments.first;
-    if (param is SymbolLiteral) {
-      return param.toString().substring(1);
+    if (param is NamedExpression &&
+        param.name.label.name == "names" &&
+        param.expression is MapLiteral) {
+      for (final e in param.expression.entries) {
+        if (e.key.toString() == '$type.$enumName') {
+          return (e.value as StringLiteral).stringValue;
+        }
+      }
+    }
+  }
+  return enumName;
+}
+
+String getJsEnumGetValueFunction(LibraryElement lib, DartType type) {
+  final a = getAnnotations(
+      getNodeOfElement(type.element), getType(lib, 'js', 'JsEnum')).single;
+  if (a.arguments.arguments.length == 1) {
+    var param = a.arguments.arguments.first;
+    if (param is NamedExpression &&
+        param.name.label.name == "getValueFunction" &&
+        param.expression is SymbolLiteral) {
+      return param.expression.toString().substring(1);
     }
   }
   return null;
 }
+
+bool isJsInterface(LibraryElement lib, DartType type) =>
+    !type.isDynamic && type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);
 
 String getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
   final jsNames = getAnnotations(node, jsNameClass);

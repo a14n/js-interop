@@ -10,8 +10,8 @@ import 'package:test/test.dart';
 
 part 'types_handling_test.g.dart';
 
-@JsEnum(names: const {Color.WHITE: 'white'})
-enum Color { RED, GREEN, BLUE, WHITE }
+@JsEnum(names: const {_Color.WHITE: 'white'})
+enum _Color { RED, GREEN, BLUE, WHITE }
 
 typedef String SimpleFunc(int i);
 
@@ -43,11 +43,10 @@ abstract class _B implements JsInterface {
   String toString();
 }
 
-@JsCodec(#genderCodec)
-enum Gender { MALE, FEMALE }
+@JsEnum(getValueFunction: #getGenderValue)
+enum _Gender { MALE, FEMALE }
 
-final genderCodec = new BiMapCodec<Gender, String>(
-    {Gender.MALE: "male", Gender.FEMALE: "female",});
+getGenderValue(String e) => {'MALE': "male", 'FEMALE': "female",}[e];
 
 abstract class _C implements JsInterface {
   external factory _C();

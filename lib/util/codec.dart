@@ -52,6 +52,12 @@ class IdentityCodec<T> extends ConditionalCodec<T, T> {
   IdentityCodec() : super.fromFactories((T o) => o, (T o) => o);
 }
 
+/// A [ConditionalCodec] that accepts any values and apply [asJs] for encoding.
+class DynamicCodec extends ConditionalCodec {
+  DynamicCodec() : super.fromFactories(asJs, (o) => o,
+          acceptEncodedValue: (o) => true, acceptDecodedValue: (o) => true);
+}
+
 /// A [ConditionalCodec] that handles a given kind of [JsInterface].
 class JsInterfaceCodec<T extends JsInterface>
     extends ConditionalCodec<T, JsObject> {

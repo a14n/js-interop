@@ -33,15 +33,11 @@ abstract class _MapOptions implements JsInterface {
 
   int zoom;
   LatLng center;
-  String mapTypeId;
+  MapTypeId mapTypeId;
 }
 
-class MapTypeId {
-  static final String HYBRID = getPath('google.maps.MapTypeId')['HYBRID'];
-  static final String ROADMAP = getPath('google.maps.MapTypeId')['ROADMAP'];
-  static final String SATELLITE = getPath('google.maps.MapTypeId')['SATELLITE'];
-  static final String TERRAIN = getPath('google.maps.MapTypeId')['TERRAIN'];
-}
+@JsEnum()
+enum _MapTypeId { HYBRID, ROADMAP, SATELLITE, TERRAIN }
 
 final GEvent event = new GEvent.created(getPath('google.maps.event'));
 
