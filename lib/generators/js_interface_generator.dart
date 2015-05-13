@@ -57,7 +57,7 @@ class JsInterfaceGenerator extends Generator {
 
     // JsEnum
     if (element is ClassElement &&
-        isJsEnum(element.library, element.type) &&
+        hasJsEnumAnnotation(element) &&
         isNotGenerated(element) &&
         element.isPrivate) {
       return new JsEnumGenerator(element).generate();
@@ -90,27 +90,27 @@ class JsEnumGenerator {
   }
 
   String generate() {
-    final values = getEnumValues(clazz);
+    final values = getEnumValues();
     final jsPath = computeJsName(clazz, getType(lib, 'js', 'JsName'));
     final name = getPublicClassName(clazz);
-    final type = clazz.type;
-
-    final getValueFunction = getJsEnumGetValueFunction(lib, type);
 
     String result = '';
 
-    result += 'class $name extends JsEnumBase {';
+    result += 'class $name extends JsEnum {';
     result += "static final values = <$name>[${values.join(',')}];";
     for (final value in values) {
-      final jsValue = (getValueFunction != null)
-          ? "$getValueFunction('$value')"
-          : "getPath('$jsPath')['${getRealEnumNameValue(lib, type, value)}']";
+      final jsValue = "getPath('$jsPath')['$value']";
       result += "static final $value = new $name._($jsValue)";
       result += ";\n";
     }
     result += '  $name._(o) : super.created(o);';
     result += '}';
     return result;
+  }
+
+  Iterable<String> getEnumValues() {
+    EnumDeclaration enumDecl = getNodeOfElement(clazz);
+    return enumDecl.constants.map((e) => e.name.name);
   }
 }
 
@@ -192,7 +192,7 @@ class JsInterfaceClassGenerator {
       }
 
       var newJsObject = "new JsObject(";
-      if (anonymousAnnotations.isNotEmpty) {
+      if (hasAnonymousAnnotations) {
         if (constr.parameters.isNotEmpty) {
           throw '@anonymous JsInterface can not have constructor with '
               'parameters';
@@ -241,8 +241,9 @@ class JsInterfaceClassGenerator {
     return transformer.applyOn(clazz);
   }
 
-  Iterable<Annotation> get anonymousAnnotations => clazz.node.metadata.where(
-      (a) => a.element.library.name == 'js' && a.element.name == 'anonymous');
+  bool get hasAnonymousAnnotations => clazz.node.metadata.where(
+      (a) => a.element.library.name == 'js' &&
+          a.element.name == 'anonymous').isNotEmpty;
 
   void transformAccessor(PropertyAccessorElement accessor) {
     if (accessor.isStatic &&
@@ -393,7 +394,7 @@ class JsInterfaceClassGenerator {
     } else if (isListType(type)) {
       final typeParam = (type as InterfaceType).typeArguments.first;
       return 'new JsListCodec<$typeParam>(${getCodec(typeParam)})';
-    } else if (isJsEnumBase(type)) {
+    } else if (isJsEnum(type)) {
       return createEnumCodec(type);
     } else if (type is FunctionType) {
       return createFunctionCodec(type);
@@ -401,8 +402,8 @@ class JsInterfaceClassGenerator {
     return null;
   });
 
-  bool isJsEnumBase(DartType type) => !type.isDynamic &&
-      type.isSubtypeOf(getType(lib, 'js', 'JsEnumBase').type);
+  bool isJsEnum(DartType type) => !type.isDynamic &&
+      type.isSubtypeOf(getType(lib, 'js', 'JsEnum').type);
 
   String createEnumCodec(DartType type) => 'new BiMapCodec<$type, dynamic>('
       'new Map<$type, dynamic>.fromIterable($type.values, value: asJs)'
@@ -525,51 +526,8 @@ AnnotatedNode getNodeOfElement(Element e) {
       .where((d) => d is EnumDeclaration && d.name.name == e.name)).first;
 }
 
-bool isJsEnum(LibraryElement lib, DartType type) {
-  final element = type.element;
-  if (element is! ClassElement) return false;
-  if (!element.isEnum) return false;
-  return getAnnotations(
-      getNodeOfElement(element), getType(lib, 'js', 'JsEnum')).isNotEmpty;
-}
-
-Iterable<String> getEnumValues(ClassElement element) {
-  EnumDeclaration enumDecl = getNodeOfElement(element);
-  return enumDecl.constants.map((e) => e.name.name);
-}
-
-String getRealEnumNameValue(
-    LibraryElement lib, DartType type, String enumName) {
-  final a = getAnnotations(
-      getNodeOfElement(type.element), getType(lib, 'js', 'JsEnum')).single;
-  if (a.arguments.arguments.length == 1) {
-    var param = a.arguments.arguments.first;
-    if (param is NamedExpression &&
-        param.name.label.name == "names" &&
-        param.expression is MapLiteral) {
-      for (final e in param.expression.entries) {
-        if (e.key.toString() == '$type.$enumName') {
-          return (e.value as StringLiteral).stringValue;
-        }
-      }
-    }
-  }
-  return enumName;
-}
-
-String getJsEnumGetValueFunction(LibraryElement lib, DartType type) {
-  final a = getAnnotations(
-      getNodeOfElement(type.element), getType(lib, 'js', 'JsEnum')).single;
-  if (a.arguments.arguments.length == 1) {
-    var param = a.arguments.arguments.first;
-    if (param is NamedExpression &&
-        param.name.label.name == "getValueFunction" &&
-        param.expression is SymbolLiteral) {
-      return param.expression.toString().substring(1);
-    }
-  }
-  return null;
-}
+bool hasJsEnumAnnotation(ClassElement clazz) => clazz.node.metadata.where((a) =>
+    a.element.library.name == 'js' && a.element.name == 'jsEnum').isNotEmpty;
 
 bool isJsInterface(LibraryElement lib, DartType type) =>
     !type.isDynamic && type.isSubtypeOf(getType(lib, 'js', 'JsInterface').type);

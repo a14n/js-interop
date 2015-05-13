@@ -39,7 +39,7 @@ abstract class _MapOptions implements JsInterface {
   MapTypeId mapTypeId;
 }
 
-@JsEnum()
+@jsEnum
 enum _MapTypeId { HYBRID, ROADMAP, SATELLITE, TERRAIN }
 
 final GEvent event = new GEvent.created(getPath('google.maps.event'));

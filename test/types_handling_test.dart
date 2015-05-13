@@ -10,8 +10,8 @@ import 'package:test/test.dart';
 
 part 'types_handling_test.g.dart';
 
-@JsEnum(names: const {_Color.WHITE: 'white'})
-enum _Color { RED, GREEN, BLUE, WHITE }
+@jsEnum
+enum _Color { RED, GREEN, BLUE }
 
 typedef String SimpleFunc(int i);
 
@@ -19,9 +19,6 @@ typedef B BisFunc(B b);
 
 abstract class _A implements JsInterface {
   external factory _A();
-
-  Gender gender;
-  List<Gender> genders;
 
   B b;
   List<B> bs;
@@ -43,43 +40,11 @@ abstract class _B implements JsInterface {
   String toString();
 }
 
-@JsEnum(getValueFunction: #getGenderValue)
-enum _Gender { MALE, FEMALE }
-
-getGenderValue(String e) => {'MALE': "male", 'FEMALE': "female",}[e];
-
-abstract class _C implements JsInterface {
-  external factory _C();
-
-  Gender gender;
-  List<Gender> genders;
-}
-
 main() {
-  test('enum annotated with @JsEnum should be supported', () {
+  test('enum annotated with @jsEnum should be supported', () {
     final o = new A();
     expect(o.toColor('green'), Color.GREEN);
     expect(o.toColorString(Color.BLUE), 'blue');
-  });
-
-  test('enum annotated with @JsEnum should take care of names specific value',
-      () {
-    final o = new A();
-    expect(o.toColor('white'), Color.WHITE);
-    expect(o.toColorString(Color.WHITE), 'white');
-  });
-
-  test('enum annotated with @JsCodec should use this codec', () {
-    final o = new C();
-
-    expect(o.gender, Gender.MALE);
-    o.gender = Gender.FEMALE;
-    expect(o.gender, Gender.FEMALE);
-
-    expect(o.genders, [Gender.FEMALE, Gender.FEMALE]);
-    o.genders.addAll([Gender.MALE, Gender.FEMALE]);
-    expect(
-        o.genders, [Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE]);
   });
 
   test('JsInterface should be wrap/unwrap', () {

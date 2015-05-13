@@ -30,8 +30,8 @@ abstract class JsRef<T> {
 }
 
 /// The base class of Dart interfaces for JavaScript objects.
-abstract class JsEnumBase extends JsRef {
-  JsEnumBase.created(o) : super.created(o);
+abstract class JsEnum extends JsRef {
+  JsEnum.created(o) : super.created(o);
 }
 
 /// Returns the underlying [JsObject] corresponding to the non nullable [o].
@@ -46,10 +46,9 @@ JsObject getPath(String path) =>
     path.split('.').fold(context, (JsObject o, p) => o[p]);
 
 /// A metadata annotation that marks an enum as a set of values.
-class JsEnum<T> {
-  final Map<T, String> names;
-  final Symbol getValueFunction;
-  const JsEnum({this.names, this.getValueFunction});
+const jsEnum = const _JsEnum();
+class _JsEnum {
+  const _JsEnum();
 }
 
 /// A metadata annotation that allows to customize the name used for method call
@@ -61,10 +60,10 @@ class JsName {
   const JsName(this.name);
 }
 
-class _Anonymous {
-  const _Anonymous();
-}
 
 /// A metadata annotation used to indicate that the Js object is a anonymous js
 /// object. That is it is created with `new Object()`.
-const _Anonymous anonymous = const _Anonymous();
+const anonymous = const _Anonymous();
+class _Anonymous {
+  const _Anonymous();
+}
