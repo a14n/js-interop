@@ -404,8 +404,8 @@ class JsInterfaceClassGenerator {
     return null;
   });
 
-  bool isJsEnum(DartType type) => !type.isDynamic &&
-      type.isSubtypeOf(getType(lib, 'js', 'JsEnum').type);
+  bool isJsEnum(DartType type) =>
+      !type.isDynamic && type.isSubtypeOf(getType(lib, 'js', 'JsEnum').type);
 
   String createEnumCodec(DartType type) => 'new BiMapCodec<$type, dynamic>('
       'new Map<$type, dynamic>.fromIterable($type.values, value: asJs)'
@@ -415,6 +415,20 @@ class JsInterfaceClassGenerator {
     final returnCodec = getCodec(type.returnType);
 
     final parameters = type.parameters.map((p) => 'p_' + p.name).join(', ');
+    String parametersDecl = type.parameters
+        .where((p) => p.parameterKind == ParameterKind.REQUIRED)
+        .map((p) => 'p_' + p.name)
+        .join(', ');
+    if (type.parameters
+        .any((p) => p.parameterKind == ParameterKind.POSITIONAL)) {
+      if (parametersDecl.isNotEmpty) parametersDecl += ',';
+      parametersDecl += '[';
+      parametersDecl += type.parameters
+          .where((p) => p.parameterKind == ParameterKind.POSITIONAL)
+          .map((p) => 'p_' + p.name)
+          .join(', ');
+      parametersDecl += ']';
+    }
 
     final decode = () {
       var paramChanges = '';
@@ -432,7 +446,7 @@ class JsInterfaceClassGenerator {
       } else {
         call = '$call;';
       }
-      return '(JsFunction f) => ($parameters) { $paramChanges $call }';
+      return '(JsFunction f) => ($parametersDecl) { $paramChanges $call }';
     }();
 
     final encode = () {
@@ -455,7 +469,7 @@ class JsInterfaceClassGenerator {
         } else {
           call = '$call;';
         }
-        return '(f) => ($parameters) { $paramChanges $call }';
+        return '(f) => ($parametersDecl) { $paramChanges $call }';
       }
     }();
 

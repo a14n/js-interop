@@ -29,6 +29,9 @@ abstract class _A implements JsInterface {
 
   B execute(B f(B b));
 
+  @JsName('execute')
+  B execute2(B f(B b, [int i]));
+
   BisFunc getBisFunc();
 
   SimpleFunc simpleFunc;
@@ -84,6 +87,18 @@ main() {
   test('Function should be wrap/unwrap', () {
     final o = new A();
     expect(o.execute((b) => new B('t')).toString(), 't');
+    expect((o.getBisFunc()(new B('a'))).toString(), 'aBis');
+
+    o.simpleFunc = (int i) => '$i';
+    expect(asJsObject(o).callMethod('simpleFunc', [4]), '4');
+
+    asJsObject(o)['simpleFunc'] = (int i) => '$i$i';
+    expect(o.simpleFunc(3), '33');
+  });
+
+  test('Function with optional parameter should be wrap/unwrap', () {
+    final o = new A();
+    expect(o.execute2((b, [i]) => new B('t')).toString(), 't');
     expect((o.getBisFunc()(new B('a'))).toString(), 'aBis');
 
     o.simpleFunc = (int i) => '$i';
