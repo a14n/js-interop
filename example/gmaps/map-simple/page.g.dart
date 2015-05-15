@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-13T16:50:14.017Z
+// 2015-05-15T13:27:16.627Z
 
 part of google_maps.sample.simple;
 
@@ -63,10 +63,13 @@ class MapOptions extends JsInterface implements _MapOptions {
   }
   LatLng get center => __codec2.decode(asJsObject(this)['center']);
   void set mapTypeId(MapTypeId _mapTypeId) {
-    asJsObject(this)['mapTypeId'] = _mapTypeId;
+    asJsObject(this)['mapTypeId'] = __codec3.encode(_mapTypeId);
   }
-  MapTypeId get mapTypeId => asJsObject(this)['mapTypeId'];
+  MapTypeId get mapTypeId => __codec3.decode(asJsObject(this)['mapTypeId']);
 }
+/// codec for MapTypeId
+final __codec3 = new BiMapCodec<MapTypeId, dynamic>(
+    new Map<MapTypeId, dynamic>.fromIterable(MapTypeId.values, value: asJs));
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator
@@ -76,14 +79,16 @@ class MapOptions extends JsInterface implements _MapOptions {
 class MapTypeId extends JsEnum {
   static final values = <MapTypeId>[HYBRID, ROADMAP, SATELLITE, TERRAIN];
   static final HYBRID =
-      new MapTypeId._(getPath('google.maps.MapTypeId')['HYBRID']);
+      new MapTypeId._('HYBRID', getPath('google.maps.MapTypeId')['HYBRID']);
   static final ROADMAP =
-      new MapTypeId._(getPath('google.maps.MapTypeId')['ROADMAP']);
-  static final SATELLITE =
-      new MapTypeId._(getPath('google.maps.MapTypeId')['SATELLITE']);
+      new MapTypeId._('ROADMAP', getPath('google.maps.MapTypeId')['ROADMAP']);
+  static final SATELLITE = new MapTypeId._(
+      'SATELLITE', getPath('google.maps.MapTypeId')['SATELLITE']);
   static final TERRAIN =
-      new MapTypeId._(getPath('google.maps.MapTypeId')['TERRAIN']);
-  MapTypeId._(o) : super.created(o);
+      new MapTypeId._('TERRAIN', getPath('google.maps.MapTypeId')['TERRAIN']);
+  final String _name;
+  MapTypeId._(this._name, o) : super.created(o);
+  String toString() => 'MapTypeId.$_name';
 }
 
 // **************************************************************************
@@ -96,59 +101,59 @@ class GEvent extends JsInterface implements _GEvent {
 
   MapsEventListener addDomListener(
       dynamic instance, String eventName, Function handler,
-      [bool capture]) => __codec4.decode(asJsObject(this).callMethod(
+      [bool capture]) => __codec5.decode(asJsObject(this).callMethod(
           'addDomListener', [
-    __codec3.encode(instance),
+    __codec4.encode(instance),
     eventName,
     handler,
     capture
   ]));
   MapsEventListener addDomListenerOnce(
       dynamic instance, String eventName, Function handler,
-      [bool capture]) => __codec4.decode(asJsObject(this).callMethod(
+      [bool capture]) => __codec5.decode(asJsObject(this).callMethod(
           'addDomListenerOnce', [
-    __codec3.encode(instance),
+    __codec4.encode(instance),
     eventName,
     handler,
     capture
   ]));
   MapsEventListener addListener(
-      dynamic instance, String eventName, Function handler) => __codec4.decode(
+      dynamic instance, String eventName, Function handler) => __codec5.decode(
           asJsObject(this).callMethod(
-              'addListener', [__codec3.encode(instance), eventName, handler]));
+              'addListener', [__codec4.encode(instance), eventName, handler]));
   MapsEventListener addListenerOnce(
-      dynamic instance, String eventName, Function handler) => __codec4
+      dynamic instance, String eventName, Function handler) => __codec5
       .decode(asJsObject(this).callMethod(
-          'addListenerOnce', [__codec3.encode(instance), eventName, handler]));
+          'addListenerOnce', [__codec4.encode(instance), eventName, handler]));
   void clearInstanceListeners(dynamic instance) {
     asJsObject(this).callMethod(
-        'clearInstanceListeners', [__codec3.encode(instance)]);
+        'clearInstanceListeners', [__codec4.encode(instance)]);
   }
   void clearListeners(dynamic instance, String eventName) {
     asJsObject(this).callMethod(
-        'clearListeners', [__codec3.encode(instance), eventName]);
+        'clearListeners', [__codec4.encode(instance), eventName]);
   }
   void removeListener(MapsEventListener listener) {
-    asJsObject(this).callMethod('removeListener', [__codec4.encode(listener)]);
+    asJsObject(this).callMethod('removeListener', [__codec5.encode(listener)]);
   }
   void trigger(
       dynamic instance, String eventName, /*@VarArgs()*/ List<dynamic> args) {
     asJsObject(this).callMethod('trigger', [
-      __codec3.encode(instance),
+      __codec4.encode(instance),
       eventName,
-      __codec5.encode(args)
+      __codec6.encode(args)
     ]);
   }
 }
 /// codec for dynamic
-final __codec3 = new DynamicCodec();
+final __codec4 = new DynamicCodec();
 
 /// codec for MapsEventListener
-final __codec4 = new JsInterfaceCodec<MapsEventListener>(
+final __codec5 = new JsInterfaceCodec<MapsEventListener>(
     (o) => new MapsEventListener.created(o));
 
 /// codec for List<dynamic>
-final __codec5 = new JsListCodec<dynamic>(__codec3);
+final __codec6 = new JsListCodec<dynamic>(__codec4);
 
 // **************************************************************************
 // Generator: JsInterfaceGenerator

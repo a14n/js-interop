@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-13T16:48:07.218Z
+// 2015-05-15T13:27:16.798Z
 
 part of js.test.types_handling_test;
 
@@ -10,10 +10,12 @@ part of js.test.types_handling_test;
 
 class Color extends JsEnum {
   static final values = <Color>[RED, GREEN, BLUE];
-  static final RED = new Color._(getPath('Color')['RED']);
-  static final GREEN = new Color._(getPath('Color')['GREEN']);
-  static final BLUE = new Color._(getPath('Color')['BLUE']);
-  Color._(o) : super.created(o);
+  static final RED = new Color._('RED', getPath('Color')['RED']);
+  static final GREEN = new Color._('GREEN', getPath('Color')['GREEN']);
+  static final BLUE = new Color._('BLUE', getPath('Color')['BLUE']);
+  final String _name;
+  Color._(this._name, o) : super.created(o);
+  String toString() => 'Color.$_name';
 }
 
 // **************************************************************************
@@ -26,62 +28,62 @@ class A extends JsInterface implements _A {
   A() : this.created(new JsObject(getPath('A')));
 
   void set b(B _b) {
-    asJsObject(this)['b'] = __codec1.encode(_b);
+    asJsObject(this)['b'] = __codec13.encode(_b);
   }
-  B get b => __codec1.decode(asJsObject(this)['b']);
+  B get b => __codec13.decode(asJsObject(this)['b']);
   void set bs(List<B> _bs) {
-    asJsObject(this)['bs'] = __codec2.encode(_bs);
+    asJsObject(this)['bs'] = __codec14.encode(_bs);
   }
-  List<B> get bs => __codec2.decode(asJsObject(this)['bs']);
+  List<B> get bs => __codec14.decode(asJsObject(this)['bs']);
   void set li(List<int> _li) {
-    asJsObject(this)['li'] = __codec3.encode(_li);
+    asJsObject(this)['li'] = __codec15.encode(_li);
   }
-  List<int> get li => __codec3.decode(asJsObject(this)['li']);
+  List<int> get li => __codec15.decode(asJsObject(this)['li']);
 
   String toColorString(Color c) =>
-      asJsObject(this).callMethod('toColorString', [__codec5.encode(c)]);
+      asJsObject(this).callMethod('toColorString', [__codec17.encode(c)]);
   Color toColor(String s) =>
-      __codec5.decode(asJsObject(this).callMethod('toColor', [s]));
+      __codec17.decode(asJsObject(this).callMethod('toColor', [s]));
 
-  B execute(B f(B b)) => __codec1
-      .decode(asJsObject(this).callMethod('execute', [__codec6.encode(f)]));
+  B execute(B f(B b)) => __codec13
+      .decode(asJsObject(this).callMethod('execute', [__codec18.encode(f)]));
 
   BisFunc getBisFunc() =>
-      __codec6.decode(asJsObject(this).callMethod('getBisFunc'));
+      __codec18.decode(asJsObject(this).callMethod('getBisFunc'));
 
   void set simpleFunc(SimpleFunc _simpleFunc) {
-    asJsObject(this)['simpleFunc'] = __codec4.encode(_simpleFunc);
+    asJsObject(this)['simpleFunc'] = __codec16.encode(_simpleFunc);
   }
-  SimpleFunc get simpleFunc => __codec4.decode(asJsObject(this)['simpleFunc']);
+  SimpleFunc get simpleFunc => __codec16.decode(asJsObject(this)['simpleFunc']);
 }
 /// codec for B
-final __codec1 = new JsInterfaceCodec<B>((o) => new B.created(o));
+final __codec13 = new JsInterfaceCodec<B>((o) => new B.created(o));
 
 /// codec for List<B>
-final __codec2 = new JsListCodec<B>(__codec1);
+final __codec14 = new JsListCodec<B>(__codec13);
 
 /// codec for List<int>
-final __codec3 = new JsListCodec<int>(null);
+final __codec15 = new JsListCodec<int>(null);
 
 /// codec for (int) → String
-final __codec4 = new FunctionCodec /*<(int) → String>*/ ((f) => f,
+final __codec16 = new FunctionCodec /*<(int) → String>*/ ((f) => f,
     (JsFunction f) => (p_i) {
   return f.apply([p_i]);
 });
 
 /// codec for Color
-final __codec5 = new BiMapCodec<Color, dynamic>(
+final __codec17 = new BiMapCodec<Color, dynamic>(
     new Map<Color, dynamic>.fromIterable(Color.values, value: asJs));
 
 /// codec for (B) → B
-final __codec6 = new FunctionCodec /*<(B) → B>*/ ((f) => (p_b) {
-  p_b = __codec1.decode(p_b);
+final __codec18 = new FunctionCodec /*<(B) → B>*/ ((f) => (p_b) {
+  p_b = __codec13.decode(p_b);
   final result = f(p_b);
-  return __codec1.encode(result);
+  return __codec13.encode(result);
 }, (JsFunction f) => (p_b) {
-  p_b = __codec1.encode(p_b);
+  p_b = __codec13.encode(p_b);
   final result = f.apply([p_b]);
-  return __codec1.decode(result);
+  return __codec13.decode(result);
 });
 
 // **************************************************************************

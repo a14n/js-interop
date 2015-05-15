@@ -100,10 +100,12 @@ class JsEnumGenerator {
     result += "static final values = <$name>[${values.join(',')}];";
     for (final value in values) {
       final jsValue = "getPath('$jsPath')['$value']";
-      result += "static final $value = new $name._($jsValue)";
+      result += "static final $value = new $name._('$value', $jsValue)";
       result += ";\n";
     }
-    result += '  $name._(o) : super.created(o);';
+    result += '  final String _name;';
+    result += '  $name._(this._name, o) : super.created(o);';
+    result += "  String toString() => '$name.\$_name';";
     result += '}';
     return result;
   }
