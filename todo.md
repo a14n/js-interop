@@ -1,10 +1,8 @@
 - handle union type
-- implements all unimplemented methods
-- handle Map<String, ?> (see FusionTablesMouseEvent.row)
+- implements all unimplemented methods from inheritance(extends/implements/with)
 - generate code for top level members
 - named parameters to anonymous object
 - generate state in .created from initialized variables?
-- test on Google Maps
 - prefix of library
 
 

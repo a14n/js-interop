@@ -10,6 +10,7 @@ import 'dart:js';
 
 export 'dart:js';
 export 'adapter/js_list.dart';
+export 'adapter/js_map.dart';
 export 'util/codec.dart';
 
 final JsObject _obj = context['Object'];

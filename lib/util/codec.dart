@@ -68,12 +68,21 @@ class JsInterfaceCodec<T extends JsInterface>
 }
 
 /// A [ConditionalCodec] that handles [List].
-class JsListCodec<T> extends ConditionalCodec<List<T>, JsObject> {
+class JsListCodec<T> extends ConditionalCodec<List<T>, JsArray> {
   JsListCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories(
           (List<T> o) => o is JsInterface
               ? asJsObject(o as JsInterface)
-              : new JsArray.from(codec == null ? o : o.map(codec.encode)),
-          (JsArray o) => codec == null ? o : new JsList.created(o, codec));
+              : asJsObject(new JsList(codec)..addAll(o)),
+          (JsArray o) => new JsList.created(o, codec));
+}
+
+/// A [ConditionalCodec] that handles [Map]<[String], dynamic>
+class JsObjectAsMapCodec<T> extends ConditionalCodec<Map<String, T>, JsObject> {
+  JsObjectAsMapCodec(ConditionalCodec<T, dynamic> codec) : super.fromFactories(
+          (Map<String, T> o) => o is JsInterface
+              ? asJsObject(o as JsInterface)
+              : asJsObject(new JsObjectAsMap(codec)..addAll(o)),
+          (JsObject o) => new JsObjectAsMap.created(o, codec));
 }
 
 /// A [ConditionalCodec] used for union types.

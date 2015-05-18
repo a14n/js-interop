@@ -10,6 +10,8 @@ import 'dart:js';
 
 import 'package:js/js.dart' show JsInterface;
 
+import '../src/codec_util.dart';
+
 final JsObject _obj = context['Object'];
 
 /// A [Map] interface wrapper for [JsObject]s.
@@ -29,8 +31,9 @@ class JsObjectAsMap<V> extends JsInterface with MapMixin<String, V> {
       : this.created(new JsObject(_obj), codec);
 
   /// Creates an instance backed by the JavaScript object [o].
-  JsObjectAsMap.created(JsObject o, this._codec)
+  JsObjectAsMap.created(JsObject o, Codec<V, dynamic> codec)
       : _o = o,
+        _codec = codec != null ? codec : const IdentityCodec(),
         super.created(o);
 
   void _checkKey(String key) {

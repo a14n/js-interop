@@ -400,6 +400,9 @@ class JsInterfaceClassGenerator {
       return createEnumCodec(type);
     } else if (type is FunctionType) {
       return createFunctionCodec(type);
+    } else if (isMapType(type)) {
+      final typeParam = (type as InterfaceType).typeArguments[1];
+      return 'new JsObjectAsMapCodec<$typeParam>(${getCodec(typeParam)})';
     }
     return null;
   });
@@ -493,6 +496,12 @@ class JsInterfaceClassGenerator {
   bool isListType(DartType type) => !type.isDynamic &&
       type.isSubtypeOf(getType(lib, 'dart.core', 'List').type
           .substitute4([DynamicTypeImpl.instance]));
+
+  bool isMapType(DartType type) => !type.isDynamic &&
+      type.isSubtypeOf(getType(lib, 'dart.core', 'Map').type.substitute4([
+    getType(lib, 'dart.core', 'String').type,
+    DynamicTypeImpl.instance
+  ]));
 
   /// return [true] if the type is transferable through dart:js
   /// (see https://api.dartlang.org/docs/channels/stable/latest/dart_js.html)
