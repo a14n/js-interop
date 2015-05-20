@@ -30,6 +30,14 @@ abstract class _Class2 implements JsInterface {
   external factory _Class2();
 }
 
+abstract class _Class3 implements JsInterface {
+  external factory _Class3(String s, [int i, int j]);
+}
+
+abstract class _Class4 implements JsInterface {
+  external factory _Class4(String s, {int i, int j});
+}
+
 main() {
   test('Class0 should be instantiable', () {
     final o = new Class0();
@@ -73,5 +81,37 @@ main() {
     final jsO = asJsObject(o);
     expect(jsO, new isInstanceOf<js.JsObject>());
     expect(js.context.callMethod('isClass2', [jsO]), true);
+  });
+
+  test('Class3 should be instantiable with 1 argument and '
+      '2 optional positional arguments', () {
+    var o = new Class3('test1');
+    expect(asJsObject(o)['s'], 'test1');
+    expect(asJsObject(o)['i'], isNull);
+    expect(asJsObject(o)['j'], isNull);
+    o = new Class3('test2', 1);
+    expect(asJsObject(o)['s'], 'test2');
+    expect(asJsObject(o)['i'], 1);
+    expect(asJsObject(o)['j'], isNull);
+    o = new Class3('test2', 1, 3);
+    expect(asJsObject(o)['s'], 'test2');
+    expect(asJsObject(o)['i'], 1);
+    expect(asJsObject(o)['j'], 3);
+  });
+
+  test('Class4 should be instantiable with 1 argument and '
+      '2 optional named arguments (mapped on an anonymous object)', () {
+    var o = new Class4('test1');
+    expect(asJsObject(o)['s'], 'test1');
+    expect(asJsObject(o)['i'], isNull);
+    expect(asJsObject(o)['j'], isNull);
+    o = new Class4('test2', i: 1);
+    expect(asJsObject(o)['s'], 'test2');
+    expect(asJsObject(o)['i'], 1);
+    expect(asJsObject(o)['j'], isNull);
+    o = new Class4('test2', i: 1, j: 3);
+    expect(asJsObject(o)['s'], 'test2');
+    expect(asJsObject(o)['i'], 1);
+    expect(asJsObject(o)['j'], 3);
   });
 }

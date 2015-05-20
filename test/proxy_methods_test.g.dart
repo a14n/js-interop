@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-04T12:18:18.218Z
+// 2015-05-20T21:49:21.816Z
 
 part of js.test.proxy_methods_test;
 
@@ -56,4 +56,32 @@ class ClassRenamedPrivateMethod extends JsInterface
   ClassRenamedPrivateMethod() : this.created(new JsObject(getPath('Class0')));
 
   int _getIBis() => asJsObject(this).callMethod('getI');
+}
+
+// **************************************************************************
+// Generator: JsInterfaceGenerator
+// Target: abstract class _Class1
+// **************************************************************************
+
+class Class1 extends JsInterface implements _Class1 {
+  Class1.created(JsObject o) : super.created(o);
+  Class1() : this.created(new JsObject(getPath('Class1')));
+
+  void set1(String s) {
+    asJsObject(this).callMethod('set1', [s]);
+  }
+  void set2(String s, [int i]) {
+    asJsObject(this).callMethod('set2', [s, i]);
+  }
+  void set3(String s, {int i, bool j}) {
+    asJsObject(this).callMethod('set3', [
+      s,
+      () {
+        final o = new JsObject(context['Object']);
+        if (i != null) o['i'] = i;
+        if (j != null) o['j'] = j;
+        return o;
+      }()
+    ]);
+  }
 }

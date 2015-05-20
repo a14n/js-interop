@@ -1,7 +1,6 @@
 - handle union type
 - implements all unimplemented methods from inheritance(extends/implements/with)
 - generate code for top level members
-- named parameters to anonymous object
 - generate state in .created from initialized variables?
 - prefix of library
 

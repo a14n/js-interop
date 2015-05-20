@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-04T12:18:18.236Z
+// 2015-05-20T21:29:48.565Z
 
 part of js.test.proxy_instantiation_test;
 
@@ -43,4 +43,34 @@ class Class0Alias extends JsInterface implements _Class0Alias {
 class Class2 extends JsInterface implements _Class2 {
   Class2.created(JsObject o) : super.created(o);
   Class2() : this.created(new JsObject(getPath('my.package.Class2')));
+}
+
+// **************************************************************************
+// Generator: JsInterfaceGenerator
+// Target: abstract class _Class3
+// **************************************************************************
+
+class Class3 extends JsInterface implements _Class3 {
+  Class3.created(JsObject o) : super.created(o);
+  Class3(String s, [int i, int j])
+      : this.created(new JsObject(getPath('Class3'), [s, i, j]));
+}
+
+// **************************************************************************
+// Generator: JsInterfaceGenerator
+// Target: abstract class _Class4
+// **************************************************************************
+
+class Class4 extends JsInterface implements _Class4 {
+  Class4.created(JsObject o) : super.created(o);
+  Class4(String s, {int i, int j}) : this.created(new JsObject(
+          getPath('Class4'), [
+        s,
+        () {
+          final o = new JsObject(context['Object']);
+          if (i != null) o['i'] = i;
+          if (j != null) o['j'] = j;
+          return o;
+        }()
+      ]));
 }

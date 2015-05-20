@@ -21,7 +21,10 @@ A.prototype.toColor = function(colorAsString) {
   return null;
 }
 A.prototype.execute = function(f) {
-  return f(this.b);
+  return String(f(this.b));
+}
+A.prototype.execute2 = function(f) {
+  return f(this.b) + f(this.b, 1) + f(this.b, 2);
 }
 A.prototype.getBisFunc = function() {
   return function(b) {

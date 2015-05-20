@@ -204,12 +204,7 @@ class JsInterfaceClassGenerator {
         final jsName = computeJsName(clazz, _jsNameClass);
         newJsObject += "getPath('$jsName')";
         if (constr.parameters.isNotEmpty) {
-          final parameterList = constr.parameters.map((p) {
-            final codec = getCodec(p.type);
-            return codec == null
-                ? p.displayName
-                : '$codec.encode(${p.displayName})';
-          }).join(', ');
+          final parameterList = convertParameters(constr.parameters);
           newJsObject += ", [$parameterList]";
         }
       }
@@ -241,6 +236,34 @@ class JsInterfaceClassGenerator {
     clazz.methods.forEach(transformMethod);
 
     return transformer.applyOn(clazz);
+  }
+
+  String convertParameters(List<ParameterElement> parameters) {
+    final nonNamedParams =
+        parameters.where((p) => p.parameterKind != ParameterKind.NAMED);
+    final namedParams =
+        parameters.where((p) => p.parameterKind == ParameterKind.NAMED);
+
+    String parameterList = nonNamedParams.map(convertParameterToJs).join(', ');
+    if (namedParams.isNotEmpty) {
+      if (nonNamedParams.isNotEmpty) parameterList += ',';
+      parameterList += '() {';
+      parameterList += "final o = new JsObject(context['Object']);";
+      for (final p in namedParams) {
+        parameterList +=
+            "if (${p.displayName} != null) o['${p.displayName}'] = " +
+                convertParameterToJs(p) +
+                ';';
+      }
+      parameterList += 'return o;';
+      parameterList += '} ()';
+    }
+    return parameterList;
+  }
+
+  String convertParameterToJs(ParameterElement p) {
+    final codec = getCodec(p.type);
+    return codec == null ? p.displayName : '$codec.encode(${p.displayName})';
   }
 
   bool get hasAnonymousAnnotations => clazz.node.metadata.where(
@@ -347,12 +370,7 @@ class JsInterfaceClassGenerator {
 
     var call = "$target.callMethod('$name'";
     if (m.parameters.isNotEmpty) {
-      final parameterList = m.parameters.map((p) {
-        final codec = getCodec(p.type);
-        return codec == null
-            ? p.displayName
-            : '$codec.encode(${p.displayName})';
-      }).join(', ');
+      final parameterList = convertParameters(m.parameters);
       call += ", [$parameterList]";
     }
     call += ")";

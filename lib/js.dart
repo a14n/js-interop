@@ -36,7 +36,7 @@ abstract class JsEnum extends JsRef {
 }
 
 /// Returns the underlying [JsObject] corresponding to the non nullable [o].
-JsObject asJsObject(JsInterface o) => o._value;
+JsObject asJsObject(JsRef<JsObject> o) => o._value;
 
 /// Returns the underlying js value corresponding to [o] if [o] is a [JsRef]
 /// (usually [JsEnumBase] or [JsInterface]). Otherwise it returns [o].
