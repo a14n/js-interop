@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-21T16:42:25.828Z
+// 2015-05-21T16:59:47.909Z
 
 part of js.test.types_handling_test;
 
@@ -13,9 +13,15 @@ class Color extends JsEnum {
   static final RED = new Color._('RED', context['Color']['RED']);
   static final GREEN = new Color._('GREEN', context['Color']['GREEN']);
   static final BLUE = new Color._('BLUE', context['Color']['BLUE']);
+
   final String _name;
   Color._(this._name, o) : super.created(o);
+
   String toString() => 'Color.$_name';
+
+  // dumb code to remove analyzer hint for unused _Color
+  _Color _dumbMethod1() => _dumbMethod2();
+  _Color _dumbMethod2() => _dumbMethod1();
 }
 
 // **************************************************************************

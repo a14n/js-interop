@@ -103,10 +103,18 @@ class JsEnumGenerator {
       result += "static final $value = new $name._('$value', $jsValue)";
       result += ";\n";
     }
-    result += '  final String _name;';
-    result += '  $name._(this._name, o) : super.created(o);';
-    result += "  String toString() => '$name.\$_name';";
-    result += '}';
+    result += '''
+
+  final String _name;
+  $name._(this._name, o) : super.created(o);
+
+  String toString() => '$name.\$_name';
+
+  // dumb code to remove analyzer hint for unused _$name
+  _$name _dumbMethod1() => _dumbMethod2();
+  _$name _dumbMethod2() => _dumbMethod1();
+}
+''';
     return result;
   }
 

@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-21T16:42:25.609Z
+// 2015-05-21T16:59:47.707Z
 
 part of google_maps.sample.simple;
 
@@ -86,9 +86,15 @@ class MapTypeId extends JsEnum {
       'SATELLITE', context['google']['maps']['MapTypeId']['SATELLITE']);
   static final TERRAIN = new MapTypeId._(
       'TERRAIN', context['google']['maps']['MapTypeId']['TERRAIN']);
+
   final String _name;
   MapTypeId._(this._name, o) : super.created(o);
+
   String toString() => 'MapTypeId.$_name';
+
+  // dumb code to remove analyzer hint for unused _MapTypeId
+  _MapTypeId _dumbMethod1() => _dumbMethod2();
+  _MapTypeId _dumbMethod2() => _dumbMethod1();
 }
 
 // **************************************************************************
