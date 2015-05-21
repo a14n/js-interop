@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-15T13:27:16.627Z
+// 2015-05-21T16:42:25.609Z
 
 part of google_maps.sample.simple;
 
@@ -12,7 +12,7 @@ part of google_maps.sample.simple;
 class GMap extends JsInterface implements _GMap {
   GMap.created(JsObject o) : super.created(o);
   GMap(Node mapDiv, [MapOptions opts]) : this.created(new JsObject(
-          getPath('google.maps.Map'), [mapDiv, __codec1.encode(opts)]));
+          context['google']['maps']['Map'], [mapDiv, __codec1.encode(opts)]));
 
   num _getZoom() => asJsObject(this).callMethod('getZoom');
   num get zoom => _getZoom();
@@ -28,8 +28,8 @@ final __codec1 =
 
 class LatLng extends JsInterface implements _LatLng {
   LatLng.created(JsObject o) : super.created(o);
-  LatLng(num lat, num lng, [bool noWrap]) : this.created(
-          new JsObject(getPath('google.maps.LatLng'), [lat, lng, noWrap]));
+  LatLng(num lat, num lng, [bool noWrap]) : this.created(new JsObject(
+          context['google']['maps']['LatLng'], [lat, lng, noWrap]));
 
   bool equals(LatLng other) =>
       asJsObject(this).callMethod('equals', [__codec2.encode(other)]);
@@ -78,14 +78,14 @@ final __codec3 = new BiMapCodec<MapTypeId, dynamic>(
 
 class MapTypeId extends JsEnum {
   static final values = <MapTypeId>[HYBRID, ROADMAP, SATELLITE, TERRAIN];
-  static final HYBRID =
-      new MapTypeId._('HYBRID', getPath('google.maps.MapTypeId')['HYBRID']);
-  static final ROADMAP =
-      new MapTypeId._('ROADMAP', getPath('google.maps.MapTypeId')['ROADMAP']);
+  static final HYBRID = new MapTypeId._(
+      'HYBRID', context['google']['maps']['MapTypeId']['HYBRID']);
+  static final ROADMAP = new MapTypeId._(
+      'ROADMAP', context['google']['maps']['MapTypeId']['ROADMAP']);
   static final SATELLITE = new MapTypeId._(
-      'SATELLITE', getPath('google.maps.MapTypeId')['SATELLITE']);
-  static final TERRAIN =
-      new MapTypeId._('TERRAIN', getPath('google.maps.MapTypeId')['TERRAIN']);
+      'SATELLITE', context['google']['maps']['MapTypeId']['SATELLITE']);
+  static final TERRAIN = new MapTypeId._(
+      'TERRAIN', context['google']['maps']['MapTypeId']['TERRAIN']);
   final String _name;
   MapTypeId._(this._name, o) : super.created(o);
   String toString() => 'MapTypeId.$_name';

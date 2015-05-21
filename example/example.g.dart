@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-11T15:30:38.251Z
+// 2015-05-21T16:42:25.675Z
 
 part of js.example.js_proxy;
 
@@ -9,16 +9,16 @@ part of js.example.js_proxy;
 // **************************************************************************
 
 class JsFoo extends JsInterface implements _JsFoo {
-  static int get static1 => getPath('z.y.x.JsFoo')['static1'];
+  static int get static1 => context['z']['y']['x']['JsFoo']['static1'];
   static void set static2(int _static2) {
-    getPath('z.y.x.JsFoo')['static2'] = _static2;
+    context['z']['y']['x']['JsFoo']['static2'] = _static2;
   }
-  static int get static2 => getPath('z.y.x.JsFoo')['static2'];
-  static int staticMethod(JsFoo foo) => getPath('z.y.x.JsFoo').callMethod(
-      'staticMethod', [__codec10.encode(foo)]);
+  static int get static2 => context['z']['y']['x']['JsFoo']['static2'];
+  static int staticMethod(JsFoo foo) => context['z']['y']['x']['JsFoo']
+      .callMethod('staticMethod', [__codec10.encode(foo)]);
 
   JsFoo.created(JsObject o) : super.created(o);
-  JsFoo() : this.created(new JsObject(getPath('z.y.x.JsFoo')));
+  JsFoo() : this.created(new JsObject(context['z']['y']['x']['JsFoo']));
 
   void set l1(List _l1) {
     asJsObject(this)['l1'] = __codec8.encode(_l1);

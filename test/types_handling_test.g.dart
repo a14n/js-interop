@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-20T21:49:21.925Z
+// 2015-05-21T16:42:25.828Z
 
 part of js.test.types_handling_test;
 
@@ -10,9 +10,9 @@ part of js.test.types_handling_test;
 
 class Color extends JsEnum {
   static final values = <Color>[RED, GREEN, BLUE];
-  static final RED = new Color._('RED', getPath('Color')['RED']);
-  static final GREEN = new Color._('GREEN', getPath('Color')['GREEN']);
-  static final BLUE = new Color._('BLUE', getPath('Color')['BLUE']);
+  static final RED = new Color._('RED', context['Color']['RED']);
+  static final GREEN = new Color._('GREEN', context['Color']['GREEN']);
+  static final BLUE = new Color._('BLUE', context['Color']['BLUE']);
   final String _name;
   Color._(this._name, o) : super.created(o);
   String toString() => 'Color.$_name';
@@ -25,7 +25,7 @@ class Color extends JsEnum {
 
 class A extends JsInterface implements _A {
   A.created(JsObject o) : super.created(o);
-  A() : this.created(new JsObject(getPath('A')));
+  A() : this.created(new JsObject(context['A']));
 
   void set b(B _b) {
     asJsObject(this)['b'] = __codec13.encode(_b);
@@ -106,7 +106,7 @@ final __codec19 = new FunctionCodec /*<(B, [int]) → String>*/ ((f) => (p_s,
 
 class B extends JsInterface implements _B {
   B.created(JsObject o) : super.created(o);
-  B(String v) : this.created(new JsObject(getPath('B'), [v]));
+  B(String v) : this.created(new JsObject(context['B'], [v]));
 
   String toString() => asJsObject(this).callMethod('toString');
 }

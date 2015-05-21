@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// 2015-05-04T12:18:18.184Z
+// 2015-05-21T16:42:25.687Z
 
 part of js.test.namespaced_library_test;
 
@@ -10,7 +10,7 @@ part of js.test.namespaced_library_test;
 
 class Class0 extends JsInterface implements _Class0 {
   Class0.created(JsObject o) : super.created(o);
-  Class0() : this.created(new JsObject(getPath('a.Class0')));
+  Class0() : this.created(new JsObject(context['a']['Class0']));
 }
 
 // **************************************************************************
@@ -21,5 +21,5 @@ class Class0 extends JsInterface implements _Class0 {
 @JsName('b.Class1')
 class Class1 extends JsInterface implements _Class1 {
   Class1.created(JsObject o) : super.created(o);
-  Class1() : this.created(new JsObject(getPath('a.b.Class1')));
+  Class1() : this.created(new JsObject(context['a']['b']['Class1']));
 }

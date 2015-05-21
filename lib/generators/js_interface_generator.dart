@@ -99,7 +99,7 @@ class JsEnumGenerator {
     result += 'class $name extends JsEnum {';
     result += "static final values = <$name>[${values.join(',')}];";
     for (final value in values) {
-      final jsValue = "getPath('$jsPath')['$value']";
+      final jsValue = "${getPath(jsPath)}['$value']";
       result += "static final $value = new $name._('$value', $jsValue)";
       result += ";\n";
     }
@@ -202,7 +202,7 @@ class JsInterfaceClassGenerator {
         newJsObject += "context['Object']";
       } else {
         final jsName = computeJsName(clazz, _jsNameClass);
-        newJsObject += "getPath('$jsName')";
+        newJsObject += getPath(jsName);
         if (constr.parameters.isNotEmpty) {
           final parameterList = convertParameters(constr.parameters);
           newJsObject += ", [$parameterList]";
@@ -289,7 +289,7 @@ class JsInterfaceClassGenerator {
             : accessor.displayName;
 
     final target = accessor.isStatic
-        ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
+        ? getPath(computeJsName(clazz, _jsNameClass))
         : 'asJsObject(this)';
 
     String newFuncDecl;
@@ -321,7 +321,7 @@ class JsInterfaceClassGenerator {
       var name = accessor.displayName;
 
       final target = accessor.isStatic
-          ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
+          ? getPath(computeJsName(clazz, _jsNameClass))
           : 'asJsObject(this)';
 
       final varType =
@@ -365,7 +365,7 @@ class JsInterfaceClassGenerator {
         : m.isPrivate ? m.displayName.substring(1) : m.displayName;
 
     final target = m.isStatic
-        ? "getPath('${computeJsName(clazz, _jsNameClass)}')"
+        ? getPath(computeJsName(clazz, _jsNameClass))
         : 'asJsObject(this)';
 
     var call = "$target.callMethod('$name'";
@@ -587,3 +587,6 @@ String getNameAnnotation(AnnotatedNode node, ClassElement jsNameClass) {
   }
   return null;
 }
+
+String getPath(String path) =>
+    path.split('.').fold('context', (String t, p) => "$t['$p']");

@@ -42,7 +42,7 @@ abstract class _MapOptions implements JsInterface {
 @jsEnum
 enum _MapTypeId { HYBRID, ROADMAP, SATELLITE, TERRAIN }
 
-final GEvent event = new GEvent.created(getPath('google.maps.event'));
+final GEvent event = new GEvent.created(context['google']['maps']['event']);
 
 abstract class _GEvent implements JsInterface {
   MapsEventListener addDomListener(
